@@ -1,0 +1,215 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Saved resumes for the Resume Studio — one row per save. Lives in the same
+// physical database as the LMS app (shared Clerk accounts), but is its own
+// table, independent of LMS's own CvSavedVersion. No DB-level FK to LMS's
+// User table: a Profile-builder-only user (who never touched LMS) may not
+// have a User row there, so ownership is enforced purely by filtering on
+// the Clerk userId in every query here, not by a foreign key.
+model ResumeSave {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  data      Json
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("profile_builder_resumes")
+}
+
+// Saved GitHub profiles for the GitHub Studio
+model GithubSave {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  data      Json
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("profile_builder_github_saves")
+}
+
+// Saved LinkedIn profiles for the LinkedIn Studio
+model LinkedinSave {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  data      Json
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("profile_builder_linkedin_saves")
+}
+
+// One-time-payment unlock: watermark-free Resume PDF/PNG exports and GitHub
+// README downloads, both gated by this single shared flag — same "pay once,
+// permanently unlocked" model as LMS's CV Builder (User.cvDownloadUnlocked),
+// kept as its own table rather than reusing that field since paying for
+// Profile-builder shouldn't be conflated with paying for LMS's CV Builder.
+model PaymentUnlock {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  unlockedAt   DateTime  @default(now())
+  celebratedAt DateTime?
+
+  @@map("profile_builder_payment_unlocks")
+}
+
+// Audit log of every payment-screenshot verification attempt — mirrors
+// LMS's CvPaymentProof field-for-field (same verification pipeline: fuzzy
+// title/account/amount matching, dHash duplicate detection, EXIF tamper
+// flag, recency window), ported rather than reusing LMS's table so this
+// app's payment history stays independent of LMS's.
+model PaymentProof {
+  id                     String   @id @default(cuid())
+  userId                 String
+  imageUrl               String
+  imageHash              String
+  transactionRef         String?
+  extractedMethod        String?
+  extractedTitle         String?
+  extractedAccountNumber String?
+  extractedAmount        String?
+  titleMatched           Boolean  @default(false)
+  numberMatched          Boolean  @default(false)
+  amountMatched          Boolean  @default(false)
+  duplicateOfProofId     String?
+  tamperSignal           Boolean  @default(false)
+  status                 String   @default("PENDING")
+  decisionReason         String?
+  createdAt              DateTime @default(now())
+
+  @@index([userId])
+  @@index([imageHash])
+  @@index([status])
+  @@map("profile_builder_payment_proofs")
+}
+
+// Coupon codes that bypass the payment requirement — created in the LMS Admin
+// Panel and redeemed here. A code can be used by up to `maxUses` distinct
+// users (admin-controlled); each user may redeem a given code only once
+// (enforced by the unique pair on ProfileBuilderCouponRedemption).
+model ProfileBuilderCoupon {
+  id        String   @id @default(cuid())
+  /// What the student types. Stored UPPERCASE, trimmed.
+  code      String   @unique
+  /// Admin note, e.g. "August batch free download"
+  label     String?
+  /// Max number of users who can redeem this code.
+  maxUses   Int      @default(1)
+  /// How many distinct users have redeemed so far (incremented atomically).
+  usedCount Int      @default(0)
+  /// Optional expiry as ISO date string "YYYY-MM-DD" (Pakistan time). Null = never expires.
+  expiresAt String?
+  /// Admin can disable without deleting. Disabled codes are always rejected.
+  isActive  Boolean  @default(true)
+  createdBy String?
+  createdAt DateTime @default(now())
+
+  redemptions ProfileBuilderCouponRedemption[]
+
+  @@map("profile_builder_coupons")
+}
+
+/// One row per user who has redeemed a given coupon.
+/// The UNIQUE pair (couponId, userId) is the database-level guard that
+/// prevents the same user from redeeming the same code twice.
+model ProfileBuilderCouponRedemption {
+  id         String   @id @default(cuid())
+  couponId   String
+  userId     String
+  redeemedAt DateTime @default(now())
+
+  coupon ProfileBuilderCoupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+
+  @@unique([couponId, userId])
+  @@index([userId])
+  @@map("profile_builder_coupon_redemptions")
+}
+
+// Tracks the number of free AI messages a user has consumed across all
+// Profile Builder tools (Resume, GitHub, LinkedIn). 
+// One-to-one with the user's Clerk ID.
+model ProfileBuilderAiUsage {
+  userId     String   @id
+  usedCount  Int      @default(0)
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+
+  @@map("profile_builder_ai_usage")
+}
+
+
+/// Represents one turn of an AI conversation in the Resume Builder.
+/// A frontend-generated sessionId groups multiple turns together.
+model ProfileBuilderChatLog {
+  id          String   @id @default(cuid())
+  sessionId   String
+  builderType String   @default("resume") // "resume", "github", "linkedin"
+  userId      String?
+  userMessage String
+  aiReply     String
+  isAutoFit   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([userId])
+  @@map("profile_builder_chat_logs")
+}
+
+// Tracks how many times a user has self-service-changed their resume name
+// (personalInfo.fullName). Once fullNameEditsUsed >= MAX_FREE_RESUME_NAME_EDITS
+// any further change creates a ResumeNameChangeRequest instead — mirrors
+// LMS's CvProfile.fullNameEditsUsed in cv-actions.ts.
+model ResumeProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  fullNameEditsUsed Int      @default(0)
+  downloadedNames   Json     @default("[]")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  nameChangeRequests ResumeNameChangeRequest[]
+
+  @@map("profile_builder_resume_profiles")
+}
+
+// A student's request to change their locked resume name after using up all
+// free self-service edits — requires admin approval. Only one PENDING request
+// per user is allowed at a time. Mirrors LMS's CvNameChangeRequest model.
+model ResumeNameChangeRequest {
+  id            String    @id @default(cuid())
+  userId        String
+  currentName   String
+  requestedName String
+  status        String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  createdAt     DateTime  @default(now())
+  decidedAt     DateTime?
+
+  profile ResumeProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("profile_builder_resume_name_requests")
+}
+
+// User-submitted issues or bug reports from the Resume Builder
+model ProfileBuilderIssue {
+  id        String   @id @default(cuid())
+  userId    String?
+  text      String
+  imageUrl  String?
+  status    String   @default("OPEN") // OPEN, RESOLVED
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([status])
+  @@map("profile_builder_issues")
+}
