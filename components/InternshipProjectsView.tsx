@@ -8,14 +8,9 @@ import {
   Users,
   ChevronRight,
   ChevronDown,
-  Code2,
-  Database,
-  Brain,
   Palette,
   BarChart3,
-  Shield,
   Globe,
-  Smartphone,
   CheckCircle2,
   Target,
   Layers,
@@ -29,9 +24,15 @@ import {
   Calendar,
   Star,
   Filter,
+  Briefcase,
+  DollarSign,
+  HeartHandshake,
+  Megaphone,
+  UserCheck,
+  FileText,
 } from 'lucide-react';
 
-// ── Domain definitions ─────────────────────────────────────────────────────
+// ── Domain definitions (Corporate & Business Functions) ───────────────────
 interface Domain {
   id: string;
   label: string;
@@ -43,14 +44,14 @@ interface Domain {
 
 const DOMAINS: Domain[] = [
   { id: 'all', label: 'All Domains', icon: Layers, color: 'text-slate-700', bgColor: 'bg-slate-100', borderColor: 'border-slate-200' },
-  { id: 'fullstack', label: 'Full Stack Web', icon: Code2, color: 'text-blue-700', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' },
-  { id: 'ml', label: 'Machine Learning', icon: Brain, color: 'text-purple-700', bgColor: 'bg-purple-50', borderColor: 'border-purple-200' },
-  { id: 'data', label: 'Data Science', icon: BarChart3, color: 'text-amber-700', bgColor: 'bg-amber-50', borderColor: 'border-amber-200' },
-  { id: 'backend', label: 'Backend Engineering', icon: Database, color: 'text-emerald-700', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200' },
-  { id: 'uiux', label: 'UI/UX Design', icon: Palette, color: 'text-pink-700', bgColor: 'bg-pink-50', borderColor: 'border-pink-200' },
-  { id: 'mobile', label: 'Mobile Development', icon: Smartphone, color: 'text-cyan-700', bgColor: 'bg-cyan-50', borderColor: 'border-cyan-200' },
-  { id: 'cybersecurity', label: 'Cybersecurity', icon: Shield, color: 'text-red-700', bgColor: 'bg-red-50', borderColor: 'border-red-200' },
-  { id: 'devops', label: 'DevOps & Cloud', icon: Globe, color: 'text-teal-700', bgColor: 'bg-teal-50', borderColor: 'border-teal-200' },
+  { id: 'hr', label: 'Human Resources (HR)', icon: Users, color: 'text-purple-700', bgColor: 'bg-purple-50', borderColor: 'border-purple-200' },
+  { id: 'sales', label: 'Sales & Business Dev', icon: TrendingUp, color: 'text-emerald-700', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200' },
+  { id: 'marketing', label: 'Digital Marketing & Growth', icon: Target, color: 'text-rose-700', bgColor: 'bg-rose-50', borderColor: 'border-rose-200' },
+  { id: 'finance', label: 'Finance & Accounting', icon: DollarSign, color: 'text-blue-700', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' },
+  { id: 'operations', label: 'Operations & Logistics', icon: Briefcase, color: 'text-amber-700', bgColor: 'bg-amber-50', borderColor: 'border-amber-200' },
+  { id: 'customersuccess', label: 'Customer Success & Support', icon: HeartHandshake, color: 'text-teal-700', bgColor: 'bg-teal-50', borderColor: 'border-teal-200' },
+  { id: 'product', label: 'Product & Strategy', icon: Lightbulb, color: 'text-indigo-700', bgColor: 'bg-indigo-50', borderColor: 'border-indigo-200' },
+  { id: 'design', label: 'Graphic Design & Branding', icon: Palette, color: 'text-pink-700', bgColor: 'bg-pink-50', borderColor: 'border-pink-200' },
 ];
 
 // ── Project definitions ────────────────────────────────────────────────────
@@ -65,165 +66,165 @@ interface Project {
   techStack: string[];
   learningOutcomes: string[];
   points: number;
-  popularity: number; // out of 100
+  popularity: number;
 }
 
 const PROJECTS: Project[] = [
   {
     id: 'p1',
-    title: 'AI-Powered Resume Analyzer',
-    description: 'Build an intelligent web application that parses resumes, extracts key information using NLP, and provides ATS compatibility scores with actionable improvement suggestions.',
-    domain: 'fullstack',
+    title: 'HR Talent Acquisition & Onboarding Workflow',
+    description: 'Design and implement a structured talent pipeline, 30-60-90 day employee onboarding journey, automated check-ins, and performance feedback frameworks for a remote workforce.',
+    domain: 'hr',
     difficulty: 'Intermediate',
     duration: '4 weeks',
     teamSize: '1–2',
-    techStack: ['Next.js', 'TypeScript', 'OpenAI API', 'Tailwind CSS', 'Prisma', 'PostgreSQL'],
-    learningOutcomes: ['Full-stack app development', 'API integration with LLMs', 'PDF parsing & NLP', 'Database design'],
+    techStack: ['HRIS Frameworks', 'Notion', 'Excel / Sheets', 'LMS Tools', 'Process Mapping'],
+    learningOutcomes: ['End-to-end recruitment funnel', 'Onboarding SLA design', 'Employee retention strategies', 'HR metrics & analytics'],
     points: 350,
-    popularity: 92,
+    popularity: 94,
   },
   {
     id: 'p2',
-    title: 'Real-Time Sentiment Dashboard',
-    description: 'Create a live dashboard that monitors social media feeds, performs sentiment analysis using custom ML models, and visualizes trends with interactive charts.',
-    domain: 'ml',
-    difficulty: 'Advanced',
-    duration: '6 weeks',
-    teamSize: '2–3',
-    techStack: ['Python', 'PyTorch', 'FastAPI', 'React', 'D3.js', 'Redis', 'WebSocket'],
-    learningOutcomes: ['Transformer-based NLP models', 'Real-time data pipelines', 'Interactive data visualization', 'Model deployment'],
-    points: 500,
-    popularity: 88,
+    title: 'B2B Sales Pipeline & Lead Scoring Engine',
+    description: 'Build an outbound sales pipeline strategy, define ideal customer profiles (ICPs), create a quantitative lead scoring model, and design automated email follow-up workflows.',
+    domain: 'sales',
+    difficulty: 'Intermediate',
+    duration: '4 weeks',
+    teamSize: '1–2',
+    techStack: ['HubSpot CRM', 'Salesforce Logic', 'LinkedIn Sales Navigator', 'Excel Financials', 'Email Automation'],
+    learningOutcomes: ['B2B prospecting methodology', 'CRM pipeline optimization', 'Lead scoring algorithms', 'Sales conversion tracking'],
+    points: 380,
+    popularity: 91,
   },
   {
     id: 'p3',
-    title: 'E-Commerce Analytics Engine',
-    description: 'Design and implement a data pipeline that ingests e-commerce transaction data, performs cohort analysis, churn prediction, and generates automated weekly business intelligence reports.',
-    domain: 'data',
-    difficulty: 'Intermediate',
+    title: 'Omnichannel Digital Growth & ROI Campaign',
+    description: 'Develop a multi-channel digital marketing campaign strategy across Search, Paid Social, and Content Marketing, complete with CAC/LTV forecasting and live ROI analytics dashboards.',
+    domain: 'marketing',
+    difficulty: 'Advanced',
     duration: '5 weeks',
-    teamSize: '1–2',
-    techStack: ['Python', 'Pandas', 'SQL', 'Apache Airflow', 'Metabase', 'dbt'],
-    learningOutcomes: ['ETL pipeline design', 'Statistical analysis', 'Business intelligence', 'Data warehouse modeling'],
-    points: 400,
-    popularity: 81,
+    teamSize: '2–3',
+    techStack: ['Google Analytics 4', 'Meta Ads Manager', 'SEO Tools (Ahrefs/SEMrush)', 'Looker Studio', 'Canva'],
+    learningOutcomes: ['Performance marketing strategy', 'Customer acquisition cost (CAC)', 'UTM attribution modeling', 'Data-driven ad copywriting'],
+    points: 450,
+    popularity: 96,
   },
   {
     id: 'p4',
-    title: 'Microservices Authentication System',
-    description: 'Architect a production-grade authentication and authorization system with JWT, OAuth2.0, RBAC, rate limiting, and audit logging across a microservices architecture.',
-    domain: 'backend',
+    title: 'Corporate Financial Modeling & Cash Flow Forecast',
+    description: 'Construct a 3-statement financial model, monthly cash flow forecast, and variance analysis system for quarterly operational budgeting and executive decision-making.',
+    domain: 'finance',
     difficulty: 'Advanced',
     duration: '5 weeks',
-    teamSize: '1–3',
-    techStack: ['Node.js', 'Go', 'gRPC', 'Redis', 'PostgreSQL', 'Docker', 'Kong API Gateway'],
-    learningOutcomes: ['Auth architecture patterns', 'API gateway design', 'Rate limiting algorithms', 'Security best practices'],
+    teamSize: '1–2',
+    techStack: ['Financial Modeling', 'Excel / Sheets (Advanced)', 'Power BI', 'QuickBooks / Xero', 'Variance Analysis'],
+    learningOutcomes: ['3-statement financial modeling', 'Cash burn & runway forecasting', 'Budget variance analysis', 'Executive financial reporting'],
     points: 480,
-    popularity: 85,
+    popularity: 88,
   },
   {
     id: 'p5',
-    title: 'Design System & Component Library',
-    description: 'Create a comprehensive, accessible design system with 30+ reusable UI components, interactive documentation, theme support, and Figma-to-code integration.',
-    domain: 'uiux',
+    title: 'Supply Chain & Vendor Performance Management',
+    description: 'Establish vendor evaluation SLAs, procurement tracking frameworks, and inventory optimization models to reduce supply chain delays and operational expenditure.',
+    domain: 'operations',
     difficulty: 'Intermediate',
     duration: '4 weeks',
     teamSize: '1–2',
-    techStack: ['Figma', 'React', 'Storybook', 'CSS Variables', 'Radix UI', 'TypeScript'],
-    learningOutcomes: ['Design token systems', 'Accessibility (WCAG 2.1)', 'Component architecture', 'Design documentation'],
-    points: 320,
-    popularity: 76,
+    techStack: ['Operations Process Mapping', 'ERP Systems', 'Excel / Power Pivot', 'SLA Frameworks', 'Risk Assessment'],
+    learningOutcomes: ['Vendor SLA management', 'Inventory replenishment logic', 'Operational bottleneck audit', 'Cost reduction strategy'],
+    points: 360,
+    popularity: 82,
   },
   {
     id: 'p6',
-    title: 'Cross-Platform Fitness Tracker',
-    description: 'Build a mobile app for iOS and Android that tracks workouts, integrates with health APIs, provides AI-generated workout plans, and syncs data across devices in real-time.',
-    domain: 'mobile',
-    difficulty: 'Intermediate',
-    duration: '5 weeks',
-    teamSize: '1–2',
-    techStack: ['React Native', 'Expo', 'TypeScript', 'Supabase', 'HealthKit', 'Google Fit API'],
-    learningOutcomes: ['Cross-platform mobile dev', 'Native API integration', 'Offline-first architecture', 'Push notifications'],
-    points: 380,
-    popularity: 79,
-  },
-  {
-    id: 'p7',
-    title: 'Vulnerability Scanner CLI Tool',
-    description: 'Develop an automated security scanning tool that detects OWASP Top 10 vulnerabilities in web applications, generates detailed remediation reports, and integrates with CI/CD pipelines.',
-    domain: 'cybersecurity',
-    difficulty: 'Advanced',
-    duration: '6 weeks',
-    teamSize: '1–2',
-    techStack: ['Python', 'Go', 'Docker', 'GitHub Actions', 'NIST CVE Database', 'Playwright'],
-    learningOutcomes: ['OWASP security principles', 'Automated pen-testing', 'CI/CD integration', 'Security reporting standards'],
-    points: 520,
-    popularity: 72,
-  },
-  {
-    id: 'p8',
-    title: 'Kubernetes Auto-Scaling Platform',
-    description: 'Build an intelligent auto-scaling orchestration platform that monitors application metrics, predicts load patterns with ML, and automatically scales Kubernetes deployments.',
-    domain: 'devops',
-    difficulty: 'Advanced',
-    duration: '6 weeks',
-    teamSize: '2–3',
-    techStack: ['Kubernetes', 'Helm', 'Prometheus', 'Grafana', 'Terraform', 'Python', 'ArgoCD'],
-    learningOutcomes: ['Container orchestration', 'Infrastructure as Code', 'Monitoring & observability', 'Predictive scaling'],
-    points: 550,
-    popularity: 83,
-  },
-  {
-    id: 'p9',
-    title: 'AI Chatbot with RAG Pipeline',
-    description: 'Create a context-aware AI chatbot that uses Retrieval-Augmented Generation to answer questions from a custom knowledge base with citation tracking and conversation memory.',
-    domain: 'ml',
+    title: 'Customer Retention & CSAT Health Score System',
+    description: 'Analyze customer churn drivers, design an automated NPS/CSAT survey workflow, and build a proactive customer health score playbook to expand account expansion revenue.',
+    domain: 'customersuccess',
     difficulty: 'Intermediate',
     duration: '4 weeks',
     teamSize: '1–2',
-    techStack: ['Python', 'LangChain', 'Pinecone', 'OpenAI', 'FastAPI', 'React'],
-    learningOutcomes: ['RAG architecture', 'Vector databases', 'Embedding models', 'Prompt engineering'],
-    points: 420,
-    popularity: 95,
+    techStack: ['Zendesk / Freshdesk', 'NPS Analytics', 'Customer Journey Mapping', 'Churn Analysis', 'Gainsight Frameworks'],
+    learningOutcomes: ['Net Promoter Score (NPS) methodology', 'Customer health scoring', 'Churn reduction tactics', 'Account expansion playbooks'],
+    points: 340,
+    popularity: 85,
   },
   {
-    id: 'p10',
-    title: 'Personal Finance Dashboard',
-    description: 'Build a full-stack personal finance management app with bank transaction categorization, budget tracking, spending analytics, and AI-powered financial advice.',
-    domain: 'fullstack',
-    difficulty: 'Beginner',
-    duration: '3 weeks',
-    teamSize: '1',
-    techStack: ['Next.js', 'TypeScript', 'Chart.js', 'Tailwind CSS', 'SQLite', 'Clerk Auth'],
-    learningOutcomes: ['CRUD application patterns', 'Data visualization', 'Authentication flows', 'Responsive design'],
-    points: 250,
+    id: 'p7',
+    title: 'Product Go-To-Market (GTM) & Competitive Positioning',
+    description: 'Conduct a comprehensive competitive analysis, user persona validation, positioning framework, and RICE feature prioritization matrix for launching a new SaaS product feature.',
+    domain: 'product',
+    difficulty: 'Advanced',
+    duration: '5 weeks',
+    teamSize: '1–3',
+    techStack: ['Product Strategy', 'Miro / Figma', 'User Research Methods', 'RICE Prioritization', 'Feature Roadmapping'],
+    learningOutcomes: ['GTM product strategy', 'Competitive benchmarking', 'User interview synthesis', 'RICE prioritization framework'],
+    points: 500,
+    popularity: 93,
+  },
+  {
+    id: 'p8',
+    title: 'Corporate Brand Identity & Marketing Design System',
+    description: 'Produce a complete brand identity package including visual design guidelines, social media creative templates, investor pitch decks, and digital ad marketing collateral.',
+    domain: 'design',
+    difficulty: 'Intermediate',
+    duration: '4 weeks',
+    teamSize: '1–2',
+    techStack: ['Figma', 'Adobe Illustrator', 'Photoshop', 'Brand Guidelines', 'Visual Asset Design'],
+    learningOutcomes: ['Corporate visual identity', 'Brand style guide creation', 'Marketing collateral design', 'Design token consistency'],
+    points: 320,
     popularity: 89,
   },
   {
-    id: 'p11',
-    title: 'Automated Data Quality Monitor',
-    description: 'Design a data quality monitoring system that automatically detects anomalies, schema drift, data freshness issues and sends alerts via Slack/email with root cause analysis.',
-    domain: 'data',
+    id: 'p9',
+    title: 'HR Performance Management & OKR Evaluation Framework',
+    description: 'Develop a quarterly OKR (Objectives & Key Results) tracking template, employee self-appraisal rubric, and structured 360-degree performance feedback process.',
+    domain: 'hr',
     difficulty: 'Beginner',
     duration: '3 weeks',
     teamSize: '1',
-    techStack: ['Python', 'Great Expectations', 'SQL', 'Slack API', 'Cron', 'Streamlit'],
-    learningOutcomes: ['Data quality frameworks', 'Anomaly detection', 'Alerting systems', 'Dashboard creation'],
+    techStack: ['OKR Frameworks', 'Performance Management', 'Google Sheets', 'HR Analytics', 'Employee Feedback Design'],
+    learningOutcomes: ['OKR goal setting methodology', 'Performance appraisal rubric design', '360-degree feedback framework', 'Employee growth mapping'],
+    points: 260,
+    popularity: 80,
+  },
+  {
+    id: 'p10',
+    title: 'Outbound Cold Email & Lead Nurturing Campaign',
+    description: 'Craft high-converting cold outreach email copy, setup automated drip sequences, conduct A/B subject line experiments, and analyze response rate conversions.',
+    domain: 'sales',
+    difficulty: 'Beginner',
+    duration: '3 weeks',
+    teamSize: '1',
+    techStack: ['Copywriting', 'Apollo.io / Instantly', 'Email Deliverability Setup', 'HubSpot / Mailchimp', 'A/B Testing'],
+    learningOutcomes: ['Cold email copywriting', 'Email deliverability (SPF/DKIM)', 'A/B testing methodology', 'Outreach response tracking'],
     points: 280,
-    popularity: 68,
+    popularity: 87,
+  },
+  {
+    id: 'p11',
+    title: 'Content Marketing Strategy & SEO Editorial Calendar',
+    description: 'Perform keyword research, design a 3-month topic cluster strategy, write SEO-optimized long-form articles, and setup Google Search Console performance tracking.',
+    domain: 'marketing',
+    difficulty: 'Beginner',
+    duration: '3 weeks',
+    teamSize: '1',
+    techStack: ['SEO Copywriting', 'SurferSEO', 'WordPress / CMS', 'Google Search Console', 'Editorial Calendar'],
+    learningOutcomes: ['SEO keyword research & intent', 'Topic cluster strategy', 'Search engine content optimization', 'Editorial calendar management'],
+    points: 270,
+    popularity: 84,
   },
   {
     id: 'p12',
-    title: 'Real-Time Collaborative Whiteboard',
-    description: 'Build a multiplayer whiteboard app supporting freehand drawing, sticky notes, shapes, and real-time cursor tracking using WebSocket and CRDT-based conflict resolution.',
-    domain: 'fullstack',
-    difficulty: 'Advanced',
-    duration: '5 weeks',
-    teamSize: '2–3',
-    techStack: ['Next.js', 'TypeScript', 'WebSocket', 'Yjs (CRDT)', 'Canvas API', 'Redis Pub/Sub'],
-    learningOutcomes: ['Real-time collaboration', 'CRDT algorithms', 'Canvas rendering', 'WebSocket protocols'],
-    points: 480,
-    popularity: 86,
+    title: 'Support SLA Architecture & Knowledge Base Optimization',
+    description: 'Rearchitect customer support ticket tiers, write 20+ standardized self-service help center articles, and implement workflows to reduce First Response Time (FRT).',
+    domain: 'customersuccess',
+    difficulty: 'Intermediate',
+    duration: '4 weeks',
+    teamSize: '1–2',
+    techStack: ['Helpdesk Administration', 'Technical Writing', 'Knowledge Base Design', 'Ticket Analytics', 'SLA Management'],
+    learningOutcomes: ['SLA escalation rules', 'Knowledge base taxonomy', 'Help center technical writing', 'Support queue optimization'],
+    points: 330,
+    popularity: 78,
   },
 ];
 
@@ -246,94 +247,92 @@ interface GeneratedPlan {
 
 function generatePlan(project: Project): GeneratedPlan {
   const weekCount = parseInt(project.duration);
-
   const weeklyPlans: WeekPlan[] = [];
 
-  // Week 1: Always setup & research
+  // Week 1: Research & Setup
   weeklyPlans.push({
     week: 1,
-    title: 'Foundation & Project Setup',
+    title: 'Scope Definition & Baseline Analysis',
     objectives: [
-      `Set up development environment with ${project.techStack.slice(0, 3).join(', ')}`,
-      'Research existing solutions and define project requirements document',
-      'Create project repository with CI/CD pipeline, linting, and README',
-      'Design system architecture diagram and data flow',
+      `Audit current domain workflows and baseline tools (${project.techStack.slice(0, 3).join(', ')})`,
+      'Conduct stakeholder interviews / market research to map core project requirements',
+      'Define success metrics (KPIs/OKRs) and establish workspace documentation structure',
+      'Create project master sheet / workspace dashboard',
     ],
-    deliverables: ['Project repo with boilerplate', 'Architecture diagram', 'Requirements doc'],
-    keyMetrics: '100% environment setup, architecture design approved',
+    deliverables: ['Baseline audit report', 'Project charter & KPI document', 'Workspace setup'],
+    keyMetrics: '100% stakeholder alignment & scope approval',
   });
 
-  // Week 2: Core implementation
+  // Week 2: Core Framework Development
   weeklyPlans.push({
     week: 2,
-    title: 'Core Feature Development',
+    title: 'Framework & Workflow Design',
     objectives: [
-      `Implement the primary data models and ${project.techStack.includes('PostgreSQL') || project.techStack.includes('SQL') ? 'database schema' : 'data layer'}`,
-      'Build the core business logic and primary API endpoints',
-      'Create the foundational UI components and page layouts',
-      'Write unit tests for core functionality (≥ 60% coverage)',
+      `Design the primary operational framework and ${project.techStack.slice(1, 3).join(' / ')} workflows`,
+      'Create standardized templates, formulas, or process documentation',
+      'Conduct mid-stage testing with sample data or dummy scenarios',
+      'Gather initial feedback from domain mentors or team members',
     ],
-    deliverables: ['Working API endpoints', 'Core UI screens', 'Unit test suite'],
-    keyMetrics: 'Core CRUD operations functional, API tests passing',
+    deliverables: ['Core framework draft', 'Standardized templates & guidelines', 'Test scenario log'],
+    keyMetrics: 'Initial framework approved, zero critical process gaps',
   });
 
   if (weekCount >= 4) {
     weeklyPlans.push({
       week: 3,
-      title: 'Feature Expansion & Integration',
+      title: 'Execution & Tool Integration',
       objectives: [
-        `Integrate ${project.techStack.length > 3 ? project.techStack.slice(3, 5).join(' and ') : 'external services'}`,
-        'Implement advanced features: search, filtering, and data processing',
-        'Add error handling, loading states, and edge case management',
-        'Conduct mid-project code review and refactoring sprint',
+        `Integrate ${project.techStack.length > 3 ? project.techStack.slice(3, 5).join(' and ') : 'additional tools & automation'}`,
+        'Roll out test execution across target scenarios or campaign segments',
+        'Refine copy, analytics tracking, or calculation formulas based on pilot data',
+        'Establish operational SLAs and quality assurance checklists',
       ],
-      deliverables: ['Integrated external services', 'Advanced feature set', 'Refactored codebase'],
-      keyMetrics: 'All integrations tested, zero critical bugs',
+      deliverables: ['Integrated tool workflows', 'Pilot execution data', 'SLA checklist'],
+      keyMetrics: 'Pilot metrics meeting performance target ≥ 80%',
     });
   }
 
   if (weekCount >= 5) {
     weeklyPlans.push({
       week: 4,
-      title: 'Polish, Performance & Testing',
+      title: 'Optimization & Data Analytics',
       objectives: [
-        'Optimize performance: lazy loading, caching, query optimization',
-        'Implement responsive design and cross-browser compatibility',
-        'Add comprehensive error boundaries and fallback UI',
-        'Write integration tests and end-to-end tests for critical flows',
+        'Analyze pilot data and perform gap analysis against benchmark standards',
+        'Optimize conversion funnels, response times, or cost efficiency metrics',
+        'Build live visual reporting dashboards for leadership review',
+        'Conduct peer review sprint and implement feedback iterations',
       ],
-      deliverables: ['Performance audit report', 'E2E test coverage', 'Responsive UI'],
-      keyMetrics: 'Lighthouse score ≥ 90, E2E tests passing',
+      deliverables: ['Analytics dashboard', 'Funnel optimization report', 'Revised process templates'],
+      keyMetrics: 'Dashboard live, performance improvement ≥ 15%',
     });
   }
 
-  // Final week: Always deploy & present
+  // Final week: Presentation & Rollout
   weeklyPlans.push({
     week: weekCount,
-    title: 'Deployment, Documentation & Presentation',
+    title: 'Final Implementation, SOPs & Executive Presentation',
     objectives: [
-      'Deploy to production environment and configure monitoring',
-      'Write comprehensive documentation: API docs, setup guide, architecture overview',
-      'Prepare demo video (3-5 min) showcasing key features and technical decisions',
-      'Submit final project report with learnings and future improvement roadmap',
+      'Finalize Standard Operating Procedures (SOPs) and training handoff documentation',
+      'Publish final project portfolio materials (case study report + executive summary)',
+      'Prepare a 3-5 minute video presentation walking through strategic findings and outcomes',
+      'Present results to domain leads for final score evaluation',
     ],
-    deliverables: ['Live deployment URL', 'Documentation site', 'Demo video', 'Final report'],
-    keyMetrics: 'Zero-downtime deployment, full documentation coverage',
+    deliverables: ['Final SOP documentation', 'Executive presentation deck', 'Demo video (3-5 min)', 'Portfolio case study'],
+    keyMetrics: '100% deliverable approval by domain leads',
   });
 
   // Fill middle weeks if 6-week project
   if (weekCount >= 6 && weeklyPlans.length < weekCount) {
     weeklyPlans.splice(weeklyPlans.length - 1, 0, {
       week: weekCount - 1,
-      title: 'Advanced Features & User Testing',
+      title: 'Scaling Strategy & Stakeholder Review',
       objectives: [
-        'Implement remaining advanced features from the backlog',
-        'Conduct user acceptance testing with 3-5 test users',
-        'Fix bugs, address feedback, and improve UX based on findings',
-        'Add analytics tracking and monitoring dashboards',
+        'Develop long-term scaling recommendations and risk mitigation strategies',
+        'Conduct full review session with cross-functional stakeholders',
+        'Finalize automation rules and automated reporting alerts',
       ],
-      deliverables: ['UAT report', 'Bug fix log', 'Analytics dashboard'],
-      keyMetrics: 'All critical feedback addressed, analytics tracking live',
+      deliverables: ['Scaling roadmap doc', 'Stakeholder sign-off log', 'Automation ruleset'],
+      keyMetrics: 'All stakeholder feedback resolved',
     });
   }
 
@@ -341,81 +340,86 @@ function generatePlan(project: Project): GeneratedPlan {
   weeklyPlans.forEach((w, i) => { w.week = i + 1; });
 
   return {
-    overview: `This ${project.duration} project will take you through the complete lifecycle of building "${project.title}" — from architecture design to production deployment. You'll work with ${project.techStack.join(', ')} to deliver a portfolio-ready project worth ${project.points} leaderboard points.`,
+    overview: `This ${project.duration} project will guide you through the execution of "${project.title}" — from strategy and process design to live deployment and reporting. You will leverage tools like ${project.techStack.join(', ')} to deliver a industry-standard portfolio project worth ${project.points} leaderboard points.`,
     weeklyPlan: weeklyPlans,
     techStackBreakdown: project.techStack.map((tech) => ({
       name: tech,
       role: getTechRole(tech),
     })),
-    finalDeliverable: `A fully deployed ${project.title.toLowerCase()} with comprehensive documentation, test coverage ≥ 70%, and a 3-5 minute demo video presentation.`,
+    finalDeliverable: `A comprehensive executive case study for "${project.title}", complete with live dashboards/templates, standardized SOP documentation, and a 3-5 minute video presentation.`,
     evaluationCriteria: [
-      'Code quality & architecture decisions (25%)',
-      'Feature completeness & correctness (25%)',
-      'Documentation & demo presentation (20%)',
-      'Testing coverage & reliability (15%)',
-      'UI/UX polish & responsiveness (15%)',
+      'Strategic depth & problem-solving framework (25%)',
+      'Execution completeness & template quality (25%)',
+      'Data accuracy & analytical rigor (20%)',
+      'Documentation & presentation clarity (15%)',
+      'Tool mastery & automation efficiency (15%)',
     ],
   };
 }
 
 function getTechRole(tech: string): string {
   const roles: Record<string, string> = {
-    'Next.js': 'Full-stack React framework for SSR/SSG',
-    'TypeScript': 'Type-safe JavaScript for better DX',
-    'React': 'UI component library for interactive interfaces',
-    'Tailwind CSS': 'Utility-first CSS framework for rapid styling',
-    'Prisma': 'Type-safe ORM for database operations',
-    'PostgreSQL': 'Primary relational database',
-    'OpenAI API': 'LLM integration for AI-powered features',
-    'OpenAI': 'Large language model for text generation',
-    'Python': 'Primary language for backend / ML',
-    'PyTorch': 'Deep learning framework for model training',
-    'FastAPI': 'High-performance Python API framework',
-    'D3.js': 'Data visualization library',
-    'Redis': 'In-memory cache & message broker',
-    'WebSocket': 'Real-time bidirectional communication',
-    'Docker': 'Containerization for consistent environments',
-    'Kubernetes': 'Container orchestration platform',
-    'Node.js': 'Server-side JavaScript runtime',
-    'Go': 'Systems programming for performance-critical services',
-    'gRPC': 'High-performance RPC framework',
-    'Pandas': 'Data manipulation & analysis library',
-    'SQL': 'Database querying language',
-    'Figma': 'Design tool for UI/UX prototyping',
-    'Storybook': 'Component development environment',
-    'React Native': 'Cross-platform mobile framework',
-    'Expo': 'React Native toolchain & services',
-    'Supabase': 'Open-source Firebase alternative (BaaS)',
-    'Chart.js': 'Lightweight charting library',
-    'LangChain': 'Framework for LLM application development',
-    'Pinecone': 'Vector database for semantic search',
-    'Terraform': 'Infrastructure as Code tool',
-    'Prometheus': 'Metrics collection & alerting',
-    'Grafana': 'Monitoring dashboard platform',
-    'Helm': 'Kubernetes package manager',
-    'ArgoCD': 'GitOps continuous delivery tool',
-    'GitHub Actions': 'CI/CD automation platform',
-    'Playwright': 'End-to-end browser testing framework',
-    'Slack API': 'Messaging integration platform',
-    'SQLite': 'Lightweight embedded database',
-    'Clerk Auth': 'Authentication & user management',
-    'Yjs (CRDT)': 'Conflict-free replicated data types for collaboration',
-    'Canvas API': 'Browser API for 2D graphics rendering',
-    'Redis Pub/Sub': 'Message broadcasting for real-time events',
-    'CSS Variables': 'Custom properties for design tokens',
-    'Radix UI': 'Accessible headless UI component primitives',
-    'HealthKit': 'Apple health data framework',
-    'Google Fit API': 'Android health data integration',
-    'NIST CVE Database': 'Vulnerability reference database',
-    'Kong API Gateway': 'API gateway & service mesh',
-    'Apache Airflow': 'Workflow orchestration platform',
-    'Metabase': 'Business intelligence dashboard tool',
-    'dbt': 'Data transformation tool for analytics',
-    'Great Expectations': 'Data validation & quality framework',
-    'Cron': 'Task scheduling utility',
-    'Streamlit': 'Python data app framework',
+    'HRIS Frameworks': 'HR Management Systems & Employee Data Architecture',
+    'Notion': 'Workspace documentation, SOP wikis & project tracking',
+    'Excel / Sheets': 'Data modeling, quantitative calculations & reporting',
+    'LMS Tools': 'Learning Management Systems for onboarding & training',
+    'Process Mapping': 'Visual workflow & standard operating procedure (SOP) design',
+    'HubSpot CRM': 'Customer Relationship Management & sales pipeline tracking',
+    'Salesforce Logic': 'Enterprise sales workflow & lead management logic',
+    'LinkedIn Sales Navigator': 'B2B prospecting & targeted lead discovery',
+    'Excel Financials': 'Financial modeling, valuation & formula logic',
+    'Email Automation': 'Drip campaign sequences & automated follow-ups',
+    'Google Analytics 4': 'Web traffic, event attribution & user behavior analytics',
+    'Meta Ads Manager': 'Paid social campaign creation, audience targeting & ad optimization',
+    'SEO Tools (Ahrefs/SEMrush)': 'Keyword research, search volume & competitor auditing',
+    'Looker Studio': 'Interactive business intelligence & executive dashboarding',
+    'Canva': 'Rapid visual asset & social media creative design',
+    'Financial Modeling': '3-statement financial modeling & valuation logic',
+    'Excel / Sheets (Advanced)': 'VLOOKUP, INDEX/MATCH, Pivot Tables & financial macros',
+    'Power BI': 'Enterprise data modeling, DAX queries & interactive reports',
+    'QuickBooks / Xero': 'Cloud accounting software & general ledger tracking',
+    'Variance Analysis': 'Budget vs. actual expenditure monitoring framework',
+    'Operations Process Mapping': 'End-to-end supply chain & operational workflow design',
+    'ERP Systems': 'Enterprise Resource Planning & inventory synchronization',
+    'Excel / Power Pivot': 'Large dataset analysis & data model creation',
+    'SLA Frameworks': 'Service Level Agreement definition & compliance tracking',
+    'Risk Assessment': 'Operational risk identification & mitigation planning',
+    'Zendesk / Freshdesk': 'Support ticketing system, queue routing & SLA tracking',
+    'NPS Analytics': 'Net Promoter Score survey analysis & sentiment grouping',
+    'Customer Journey Mapping': 'Touchpoint analysis from onboarding to renewal',
+    'Churn Analysis': 'Predictive analysis for customer retention & churn prevention',
+    'Gainsight Frameworks': 'Customer success health scoring & expansion playbooks',
+    'Product Strategy': 'GTM positioning, value proposition & market validation',
+    'Miro / Figma': 'Collaborative whiteboarding & visual wireframing',
+    'User Research Methods': 'Customer interviews, surveys & usability synthesis',
+    'RICE Prioritization': 'Reach, Impact, Confidence, Effort scoring methodology',
+    'Feature Roadmapping': 'Release planning & milestone strategy',
+    'Adobe Illustrator': 'Vector graphic design, typography & logo creation',
+    'Photoshop': 'Image editing & marketing visual asset processing',
+    'Brand Guidelines': 'Typography, color palette & brand voice standards',
+    'Visual Asset Design': 'Creative collateral for digital & print channels',
+    'OKR Frameworks': 'Objectives and Key Results goal-setting methodology',
+    'Performance Management': 'Appraisal rubrics & 360-degree review design',
+    'Google Sheets': 'Collaborative cloud spreadsheets',
+    'HR Analytics': 'Headcount, turnover & performance data analysis',
+    'Employee Feedback Design': 'Structured survey & review templates',
+    'Copywriting': 'High-converting persuasive text generation for sales',
+    'Apollo.io / Instantly': 'B2B contact data & cold email automation platforms',
+    'Email Deliverability Setup': 'SPF, DKIM, DMARC & domain warmup configuration',
+    'HubSpot / Mailchimp': 'Email marketing platform & automation builder',
+    'A/B Testing': 'Split-testing subject lines, copy & call-to-actions',
+    'SEO Copywriting': 'Search engine optimized content writing for intent matching',
+    'SurferSEO': 'On-page content optimization & keyword density tool',
+    'WordPress / CMS': 'Content management system publishing & formatting',
+    'Google Search Console': 'Search index monitoring & click-through-rate analytics',
+    'Editorial Calendar': 'Content scheduling, distribution & publishing plan',
+    'Helpdesk Administration': 'Support queue configuration & macro management',
+    'Technical Writing': 'Clear, step-by-step user documentation',
+    'Knowledge Base Design': 'Self-service help center taxonomy & layout',
+    'Ticket Analytics': 'Support volume, response time & resolution metrics',
+    'SLA Management': 'Response time SLAs & escalation procedure design',
   };
-  return roles[tech] || 'Supporting technology';
+  return roles[tech] || 'Supporting business tool';
 }
 
 // ── Difficulty badge styles ────────────────────────────────────────────────
@@ -461,7 +465,6 @@ export const InternshipProjectsView: React.FC = () => {
     setSelectedProject(project);
     setIsGenerating(true);
     setExpandedWeek(1);
-    // Simulate brief generation delay
     setTimeout(() => {
       setGeneratedPlan(generatePlan(project));
       setIsGenerating(false);
@@ -638,12 +641,12 @@ export const InternshipProjectsView: React.FC = () => {
               </div>
             </div>
 
-            {/* Tech Stack Breakdown */}
+            {/* Tools & Methodology Breakdown */}
             <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Code2 className="w-4.5 h-4.5 text-blue-600" />
-                  <h2 className="text-base font-extrabold text-slate-900">Tech Stack Breakdown</h2>
+                  <Briefcase className="w-4.5 h-4.5 text-blue-600" />
+                  <h2 className="text-base font-extrabold text-slate-900">Tools & Methodology Breakdown</h2>
                 </div>
                 <button
                   onClick={() => handleCopy(generatedPlan.techStackBreakdown.map((t) => `${t.name}: ${t.role}`).join('\n'), 'techstack')}
@@ -714,7 +717,7 @@ export const InternshipProjectsView: React.FC = () => {
                   const fullPlan = [
                     `# Project Plan: ${selectedProject.title}`,
                     `\n## Overview\n${generatedPlan.overview}`,
-                    `\n## Tech Stack\n${generatedPlan.techStackBreakdown.map((t) => `- **${t.name}**: ${t.role}`).join('\n')}`,
+                    `\n## Tools & Methodology\n${generatedPlan.techStackBreakdown.map((t) => `- **${t.name}**: ${t.role}`).join('\n')}`,
                     `\n## Weekly Plan`,
                     ...generatedPlan.weeklyPlan.map((w) => [
                       `\n### Week ${w.week}: ${w.title}`,
@@ -751,7 +754,7 @@ export const InternshipProjectsView: React.FC = () => {
           <span>Internship Projects</span>
         </h1>
         <p className="text-sm text-slate-500 font-medium max-w-2xl">
-          Select a project aligned with your domain, generate a detailed execution plan, and earn leaderboard points upon completion.
+          Select a project aligned with your domain (HR, Sales, Marketing, Finance, Operations, Product, CS, Design), generate a detailed execution plan, and earn leaderboard points upon completion.
         </p>
       </div>
 
@@ -760,8 +763,8 @@ export const InternshipProjectsView: React.FC = () => {
         {[
           { label: 'Total Projects', value: PROJECTS.length.toString(), icon: Layers, accent: 'text-blue-600' },
           { label: 'Domains', value: (DOMAINS.length - 1).toString(), icon: Globe, accent: 'text-emerald-600' },
-          { label: 'Max Points', value: '550', icon: Star, accent: 'text-amber-600' },
-          { label: 'Avg Duration', value: '4.7 wks', icon: Clock, accent: 'text-purple-600' },
+          { label: 'Max Points', value: '500', icon: Star, accent: 'text-amber-600' },
+          { label: 'Avg Duration', value: '4.2 wks', icon: Clock, accent: 'text-purple-600' },
         ].map((stat) => (
           <div key={stat.label} className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
             <div className="flex items-center gap-2 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
@@ -801,117 +804,142 @@ export const InternshipProjectsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Search + Difficulty Filter */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+      {/* Search & Difficulty Filter Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
+            placeholder="Search projects, tools, or keywords..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search projects, tech stack, or keywords..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 transition-all shadow-xs"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-xs transition-all"
           />
         </div>
+
         <div className="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-200 shadow-xs shrink-0">
-          {(['All', 'Beginner', 'Intermediate', 'Advanced'] as const).map((lvl) => (
+          {(['All', 'Beginner', 'Intermediate', 'Advanced'] as const).map((diff) => (
             <button
-              key={lvl}
-              onClick={() => setDifficultyFilter(lvl)}
+              key={diff}
+              onClick={() => setDifficultyFilter(diff)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                difficultyFilter === lvl
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                difficultyFilter === diff
+                  ? 'bg-slate-900 text-white shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              {lvl}
+              {diff}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Results count */}
-      <div className="text-xs font-semibold text-slate-500">
+      {/* Projects Count */}
+      <div className="text-xs text-slate-500 font-medium">
         Showing {filteredProjects.length} of {PROJECTS.length} projects
       </div>
 
-      {/* Project Cards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Projects Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {filteredProjects.map((project) => {
           const domain = DOMAINS.find((d) => d.id === project.domain);
           const DomainIcon = domain?.icon || Layers;
+
           return (
             <div
               key={project.id}
-              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:shadow-md hover:border-slate-300 transition-all group"
+              className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between space-y-4 group"
             >
-              {/* Top row */}
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border ${domain?.bgColor} ${domain?.color} ${domain?.borderColor} flex items-center gap-1`}>
-                    <DomainIcon className="w-3 h-3" />
-                    {domain?.label}
+              <div className="space-y-3">
+                {/* Top Badges */}
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${domain?.bgColor} ${domain?.color} ${domain?.borderColor} flex items-center gap-1`}>
+                      <DomainIcon className="w-3 h-3" />
+                      {domain?.label}
+                    </span>
+                    <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold border ${getDifficultyStyles(project.difficulty)}`}>
+                      {project.difficulty}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs font-black text-amber-600">
+                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    <span>{project.points} pts</span>
+                  </div>
+                </div>
+
+                {/* Title & Description */}
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors tracking-tight">
+                    {project.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-normal leading-relaxed mt-1.5 line-clamp-3">
+                    {project.description}
+                  </p>
+                </div>
+
+                {/* Duration & Team */}
+                <div className="flex items-center gap-4 text-[11px] text-slate-500 font-semibold pt-1">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-slate-400" /> {project.duration}
                   </span>
-                  <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border ${getDifficultyStyles(project.difficulty)}`}>
-                    {project.difficulty}
+                  <span className="flex items-center gap-1">
+                    <Users className="w-3.5 h-3.5 text-slate-400" /> {project.teamSize}
+                  </span>
+                  <span className="flex items-center gap-1 text-emerald-700">
+                    <TrendingUp className="w-3.5 h-3.5" /> {project.popularity}% popular
                   </span>
                 </div>
-                <div className="flex items-center gap-1 text-xs font-bold text-emerald-700 shrink-0">
-                  <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                  <span>{project.points} pts</span>
+
+                {/* Tech / Tools Badges */}
+                <div className="flex flex-wrap gap-1.5 pt-2">
+                  {project.techStack.map((tech) => (
+                    <span
+                      key={tech}
+                      className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200/80 text-slate-700 text-[10px] font-medium"
+                    >
+                      {tech}
+                    </span>
+                  ))}
                 </div>
-              </div>
-
-              {/* Title & Description */}
-              <h3 className="text-base font-extrabold text-slate-900 leading-snug mb-2 group-hover:text-emerald-800 transition-colors">
-                {project.title}
-              </h3>
-              <p className="text-xs text-slate-500 leading-relaxed mb-4 line-clamp-2">
-                {project.description}
-              </p>
-
-              {/* Meta row */}
-              <div className="flex items-center gap-3 mb-4 text-[11px] text-slate-500 font-medium">
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> {project.duration}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Users className="w-3 h-3" /> {project.teamSize}
-                </span>
-                <span className="flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3" /> {project.popularity}% popular
-                </span>
-              </div>
-
-              {/* Tech stack pills */}
-              <div className="flex flex-wrap gap-1.5 mb-4">
-                {project.techStack.map((tech) => (
-                  <span key={tech} className="px-2 py-0.5 rounded-md bg-slate-50 border border-slate-150 text-slate-600 text-[10px] font-semibold">
-                    {tech}
-                  </span>
-                ))}
               </div>
 
               {/* Generate Plan Button */}
-              <button
-                onClick={() => handleGeneratePlan(project)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-all group/btn"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Generate Project Plan</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
-              </button>
+              <div className="pt-3 border-t border-slate-100">
+                <button
+                  onClick={() => handleGeneratePlan(project)}
+                  className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-xs flex items-center justify-center gap-2 transition-all"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Generate Project Plan</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              </div>
             </div>
           );
         })}
       </div>
 
-      {/* Empty state */}
+      {/* Empty State */}
       {filteredProjects.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Search className="w-10 h-10 text-slate-300 mb-3" />
-          <div className="text-sm font-bold text-slate-600">No projects found</div>
-          <div className="text-xs text-slate-400 mt-1">Try adjusting your filters or search query</div>
+        <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center space-y-3">
+          <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+            <Search className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-slate-900">No projects found</h3>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            Try adjusting your search query or filter selection to find available projects.
+          </p>
+          <button
+            onClick={() => {
+              setActiveDomain('all');
+              setSearchQuery('');
+              setDifficultyFilter('All');
+            }}
+            className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
+          >
+            Clear Filters
+          </button>
         </div>
       )}
     </div>
