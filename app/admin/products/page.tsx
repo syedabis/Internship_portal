@@ -29,6 +29,132 @@ const ICON_BGS = [
   'from-fuchsia-600 to-pink-600',
 ];
 
+const INITIAL_PRODUCTS = [
+  {
+    name: 'Google AI One Premium',
+    provider: 'Google Gemini',
+    category: 'AI Models',
+    description: 'Get Gemini 1.5 Pro, 2TB Google One Cloud Storage, and seamless integration in Docs & Gmail.',
+    badge: 'Popular',
+    popular: true,
+    rating: 4.9,
+    reviews_count: 1420,
+    icon_bg: 'from-blue-600 to-indigo-600',
+    icon_name: 'Brain',
+    features: ['Gemini 1.5 Pro with 1M context', '2TB Google One Storage', 'Integration with Docs, Sheets & Gmail', 'Priority Access to Experimental Features']
+  },
+  {
+    name: 'Higgsfield AI Pro',
+    provider: 'Higgsfield Inc.',
+    category: 'Video & Motion',
+    description: 'Create cinematic AI video animations with precise camera controls and photorealistic render quality.',
+    badge: 'Trending',
+    rating: 4.8,
+    reviews_count: 890,
+    icon_bg: 'from-rose-500 to-purple-600',
+    icon_name: 'Video',
+    features: ['4K Camera-controlled Video Gens', 'Anime & Photorealistic Models', 'Unlimited Image-to-Video conversion', 'Commercial Royalty-free License']
+  },
+  {
+    name: 'Zoom Pro + AI Companion',
+    provider: 'Zoom Video Communications',
+    category: 'Productivity',
+    description: 'Unlimited meeting duration, AI automated meeting summaries, and smart action item generation.',
+    badge: 'Best Seller',
+    rating: 4.7,
+    reviews_count: 3100,
+    icon_bg: 'from-blue-500 to-cyan-500',
+    icon_name: 'Video',
+    features: ['Unlimited 30-hour meeting duration', 'Automated AI Meeting Summaries', '5GB Cloud Recording Storage', 'Custom Branded Meeting Rooms']
+  },
+  {
+    name: 'ChatGPT Plus / Team',
+    provider: 'OpenAI',
+    category: 'AI Models',
+    description: 'Access GPT-4o, DALL-E 3 image creation, Advanced Data Analysis, and custom GPT builders.',
+    badge: 'Top Rated',
+    popular: true,
+    rating: 4.95,
+    reviews_count: 5200,
+    icon_bg: 'from-emerald-600 to-teal-700',
+    icon_name: 'MessageSquare',
+    features: ['GPT-4o & GPT-4o-mini Priority', 'DALL-E 3 High-Res Image Generation', 'Custom GPT creation & Code Interpreter', 'Browsing & File Upload Analysis']
+  },
+  {
+    name: 'Claude Pro (Anthropic)',
+    provider: 'Anthropic',
+    category: 'AI Models',
+    description: 'Leverage Claude 3.5 Sonnet with 200k context window, interactive code artifacts, and deep reasoning.',
+    badge: 'Dev Pick',
+    rating: 4.9,
+    reviews_count: 2400,
+    icon_bg: 'from-amber-600 to-orange-600',
+    icon_name: 'Brain',
+    features: ['Claude 3.5 Sonnet & Opus', '200,000 Token Context Window', 'Interactive Artifacts & Canvas', '5x More Usage vs Free Tier']
+  },
+  {
+    name: 'Cursor Pro AI Editor',
+    provider: 'Anysphere',
+    category: 'Developer Tools',
+    description: 'The ultimate AI-first code editor. Instant code edits, multi-file codebase indexing, and terminal agent.',
+    badge: 'Essential for Devs',
+    popular: true,
+    rating: 4.98,
+    reviews_count: 1850,
+    icon_bg: 'from-slate-800 to-slate-950',
+    icon_name: 'Code',
+    features: ['Unlimited Fast Copilot Auto-complete', '500 Fast GPT-4o & Sonnet Edits/mo', 'Codebase-wide Indexing & Chat', 'Terminal Command Generation']
+  },
+  {
+    name: 'Midjourney Standard',
+    provider: 'Midjourney Inc.',
+    category: 'Video & Motion',
+    description: 'State-of-the-art AI image generation. High-definition concept art, web assets, and commercial license.',
+    badge: 'Creative Choice',
+    rating: 4.88,
+    reviews_count: 4100,
+    icon_bg: 'from-indigo-700 to-purple-800',
+    icon_name: 'Wand2',
+    features: ['15 Fast GPU hours per month', 'Unlimited Relaxed GPU hours', 'General Commercial Terms', 'Access to Web & Discord Generator']
+  },
+  {
+    name: 'ElevenLabs AI Voice',
+    provider: 'ElevenLabs',
+    category: 'Audio & Voice',
+    description: 'Realistic voice cloning, text-to-speech in 29 languages, and AI audio dubbing for media projects.',
+    badge: 'High Demand',
+    rating: 4.85,
+    reviews_count: 1290,
+    icon_bg: 'from-cyan-600 to-blue-700',
+    icon_name: 'Volume2',
+    features: ['100,000 Text-to-Speech characters/mo', 'Instant Voice Cloning (10 voices)', 'Multi-lingual Dubbing Studio', 'Commercial Usage License']
+  },
+  {
+    name: 'Perplexity Pro Research',
+    provider: 'Perplexity AI',
+    category: 'Productivity',
+    description: 'AI-powered deep research search engine with inline academic citation and multi-modal file parsing.',
+    badge: 'Research Pick',
+    rating: 4.92,
+    reviews_count: 2980,
+    icon_bg: 'from-teal-600 to-emerald-700',
+    icon_name: 'Compass',
+    features: ['300+ Pro Searches per day', 'Choice of Claude 3.5, Sonar & GPT-4o', 'Unlimited File & PDF Uploads', '$5/mo API Credits Included']
+  },
+  {
+    name: 'Luma Dream Machine Pro',
+    provider: 'Luma AI',
+    category: 'Video & Motion',
+    description: 'Next-gen 3D asset generator and realistic video synthesis for game developers and motion designers.',
+    badge: 'Next-Gen',
+    rating: 4.79,
+    reviews_count: 750,
+    icon_bg: 'from-fuchsia-600 to-pink-600',
+    icon_name: 'Video',
+    features: ['120 High-Priority Video Gens/mo', 'Text-to-3D Model Export (GLTF/OBJ)', 'Commercial Rendering Rights', 'Keyframe Camera Control']
+  }
+];
+
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +179,19 @@ export default function AdminProductsPage() {
 
   const fetchProducts = async () => {
     const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-    setProducts(data || []);
+    
+    if (data && data.length > 0) {
+      setProducts(data);
+    } else {
+      // Auto seed initial products into Supabase so every product has a real UUID
+      const { data: seededData } = await supabase.from('products').insert(INITIAL_PRODUCTS).select();
+      if (seededData && seededData.length > 0) {
+        setProducts(seededData);
+      } else {
+        const { data: reFetch } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+        setProducts(reFetch || []);
+      }
+    }
     setLoading(false);
   };
 
@@ -70,19 +208,47 @@ export default function AdminProductsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 3 * 1024 * 1024) {
-      alert('File size is too large. Please select an image under 3MB.');
-      return;
-    }
-
     const reader = new FileReader();
     reader.onload = (event) => {
-      const base64 = event.target?.result as string;
-      if (base64) {
-        setImageUrl(base64);
-      }
+      const rawResult = event.target?.result as string;
+      if (!rawResult) return;
+
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_SIZE = 300;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_SIZE) {
+            height = Math.round((height * MAX_SIZE) / width);
+            width = MAX_SIZE;
+          }
+        } else {
+          if (height > MAX_SIZE) {
+            width = Math.round((width * MAX_SIZE) / height);
+            height = MAX_SIZE;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedBase64 = canvas.toDataURL('image/png', 0.9);
+          setImageUrl(compressedBase64);
+        } else {
+          setImageUrl(rawResult);
+        }
+      };
+      img.onerror = () => setImageUrl(rawResult);
+      img.src = rawResult;
     };
     reader.readAsDataURL(file);
+    // Reset file input value so re-selecting triggers onChange
+    e.target.value = '';
   };
 
   const handleSave = async () => {
@@ -91,21 +257,60 @@ export default function AdminProductsPage() {
 
     const features = featuresText.split('\n').map(f => f.trim()).filter(Boolean);
     const payload = {
-      name, provider, category, description, badge, features,
-      icon_name: iconName, icon_bg: iconBg, image_url: imageUrl.trim() || null, popular,
+      name: name.trim(),
+      provider: provider.trim(),
+      category,
+      description: description.trim(),
+      badge: badge.trim(),
+      features,
+      icon_name: iconName,
+      icon_bg: iconBg,
+      image_url: imageUrl.trim() || null,
+      popular,
       rating: parseFloat(rating) || 4.5,
       reviews_count: parseInt(reviewsCount) || 0,
     };
 
+    let success = false;
+
     if (editingId) {
-      await supabase.from('products').update(payload).eq('id', editingId);
+      // 1. Try updating by ID
+      const { data, error } = await supabase
+        .from('products')
+        .update(payload)
+        .eq('id', editingId)
+        .select();
+
+      if (!error && data && data.length > 0) {
+        success = true;
+      } else {
+        // 2. Try updating by Name (in case ID didn't match UUID in DB)
+        const { data: nameData } = await supabase
+          .from('products')
+          .update(payload)
+          .eq('name', name.trim())
+          .select();
+
+        if (nameData && nameData.length > 0) {
+          success = true;
+        } else {
+          // 3. Insert as new record if neither ID nor Name matched
+          const { error: insertErr } = await supabase.from('products').insert([payload]);
+          if (!insertErr) success = true;
+          else alert('Error updating product: ' + insertErr.message);
+        }
+      }
     } else {
-      await supabase.from('products').insert(payload);
+      const { error: insertErr } = await supabase.from('products').insert([payload]);
+      if (!insertErr) success = true;
+      else alert('Error adding product: ' + insertErr.message);
     }
 
     setSaving(false);
-    resetForm();
-    fetchProducts();
+    if (success) {
+      resetForm();
+      await fetchProducts();
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -127,7 +332,7 @@ export default function AdminProductsPage() {
     setImageUrl(p.image_url || '');
     setPopular(p.popular);
     setRating(String(p.rating));
-    setReviewsCount(String(p.reviews_count));
+    setReviewsCount(String(p.reviews_count || 0));
     setShowForm(true);
   };
 
@@ -148,7 +353,7 @@ export default function AdminProductsPage() {
 
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-xs shrink-0"
+          className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-xs shrink-0 cursor-pointer"
         >
           <Plus className="w-4 h-4 text-emerald-400" />
           <span>Add Product</span>
@@ -202,7 +407,7 @@ export default function AdminProductsPage() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="px-4 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shrink-0"
+                className="px-4 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shrink-0 cursor-pointer"
               >
                 <UploadCloud className="w-4 h-4 text-emerald-600" />
                 <span>Upload Image File</span>
@@ -215,7 +420,7 @@ export default function AdminProductsPage() {
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="Or paste image URL (e.g. https://.../logo.png)"
-                  className="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+                  className="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500 font-mono"
                 />
                 {imageUrl && (
                   <button
@@ -230,15 +435,15 @@ export default function AdminProductsPage() {
 
               {/* Image Preview */}
               {imageUrl ? (
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0 bg-emerald-50/50 p-1.5 rounded-xl border border-emerald-100">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={imageUrl}
                     alt="Preview"
-                    className="w-10 h-10 rounded-xl object-contain border border-slate-200 bg-slate-50 p-1 shadow-xs"
+                    className="w-8 h-8 rounded-lg object-contain bg-white border border-slate-200 p-0.5 shadow-xs"
                     onError={(e) => (e.currentTarget.style.display = 'none')}
                   />
-                  <span className="text-[10px] text-emerald-600 font-bold">Image Set</span>
+                  <span className="text-[10px] text-emerald-700 font-extrabold pr-1">Image Set</span>
                 </div>
               ) : (
                 <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 shrink-0 text-[10px] font-bold">
@@ -320,7 +525,7 @@ export default function AdminProductsPage() {
             <button
               onClick={handleSave}
               disabled={saving || !name.trim() || !provider.trim()}
-              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-xs"
+              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-xs cursor-pointer"
             >
               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
               <span>{editingId ? 'Update Product' : 'Add Product'}</span>
@@ -381,14 +586,14 @@ export default function AdminProductsPage() {
               <div className="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => handleEdit(p)}
-                  className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-blue-600 transition-colors"
+                  className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-blue-600 transition-colors cursor-pointer"
                   title="Edit"
                 >
                   <Edit3 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => handleDelete(p.id)}
-                  className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-rose-600 transition-colors"
+                  className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                   title="Delete"
                 >
                   <Trash2 className="w-4 h-4" />
