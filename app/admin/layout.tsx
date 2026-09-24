@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { ShieldCheck, LogOut, Loader2, Menu } from 'lucide-react';
+import { LogOut, Loader2 } from 'lucide-react';
 import { AdminSidebarNav } from '@/components/AdminSidebarNav';
 import { supabase } from '@/lib/supabase';
 
@@ -11,17 +11,25 @@ const ADMIN_EMAILS = ['abis@datacrumbs.org'];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
 
+  const isLoginPage = pathname === '/admin/login';
+
   useEffect(() => {
+    if (isLoginPage) {
+      setLoading(false);
+      return;
+    }
+
     const checkAdmin = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
       const email = user?.email ?? null;
       if (!email || !ADMIN_EMAILS.includes(email.toLowerCase())) {
-        router.replace('/');
+        router.replace('/admin/login');
         return;
       }
       setIsAuthorized(true);
@@ -30,10 +38,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     checkAdmin();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (isLoginPage) return;
       setUser(session?.user ?? null);
       const email = session?.user?.email ?? null;
       if (!email || !ADMIN_EMAILS.includes(email.toLowerCase())) {
-        router.replace('/');
+        router.replace('/admin/login');
         return;
       }
       setIsAuthorized(true);
@@ -41,7 +50,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     });
 
     return () => subscription.unsubscribe();
-  }, [router]);
+  }, [router, isLoginPage, pathname]);
+
+  // If viewing the dedicated login page, render it directly
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (
@@ -63,7 +77,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen flex bg-[#f5f9f7] text-slate-900 font-sans">
       
-      {/* Desktop Dark Rail Sidebar (Matches Portal Theme) */}
+      {/* Desktop Dark Rail Sidebar */}
       <aside className="w-64 shrink-0 hidden md:flex flex-col h-screen bg-[#091715] border-r border-[#15342e] select-none justify-between p-4 text-[#a8b8b5]">
         <div className="space-y-6">
           {/* Header Logo */}
