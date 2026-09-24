@@ -122,22 +122,10 @@ export const InternshipSidebar: React.FC<InternshipSidebarProps> = ({
       {/* Top Header Logo */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="font-black text-xl text-white tracking-tight flex items-center gap-1.5">
-              <span>Cortexa</span>
-              <span className="text-emerald-400 text-xs font-bold font-mono">AI</span>
-            </div>
-            <span className="px-2 py-0.5 rounded-full bg-[#163a34] border border-[#23534b] text-emerald-300 text-[11px] font-semibold">
-              Intern
-            </span>
+          <div className="font-black text-xl text-white tracking-tight flex items-center gap-1.5">
+            <span>Cortexa</span>
+            <span className="text-emerald-400 text-xs font-bold font-mono">AI</span>
           </div>
-
-          <button 
-            aria-label="Play video overview"
-            className="w-8 h-8 rounded-full bg-[#163a34] hover:bg-[#1d4b43] border border-[#23534b] flex items-center justify-center text-emerald-300 transition-colors"
-          >
-            <Play className="w-3.5 h-3.5 fill-emerald-300" />
-          </button>
         </div>
 
         {/* Navigation List */}
