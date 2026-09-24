@@ -1,7 +1,6 @@
-import { currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-export async function isAdmin(email: string | null): Promise<boolean> {
+export function isAdminEmail(email: string | null): boolean {
   if (!email) return false;
   const adminEmails = (process.env.ADMIN_EMAILS || '')
     .split(',')
@@ -10,12 +9,17 @@ export async function isAdmin(email: string | null): Promise<boolean> {
   return adminEmails.includes(email.toLowerCase());
 }
 
+// Legacy alias used by old Profile Builder admin pages
+export const isAdmin = isAdminEmail;
+
+/**
+ * Legacy requireAdmin guard for old API routes.
+ * Returns { userId: string } on success, or a 403 NextResponse on failure.
+ * NOTE: This is a server-side stub. Old Clerk-based routes calling this
+ * will get a 403 since we no longer have Clerk server auth.
+ */
 export async function requireAdmin(): Promise<{ userId: string } | NextResponse> {
-  const user = await currentUser();
-  const email = user?.emailAddresses[0]?.emailAddress ?? null;
-  
-  if (!user || !(await isAdmin(email))) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-  return { userId: user.id };
+  // Without Clerk server auth, we cannot verify the user server-side via cookies.
+  // Old API routes using this will return 403. New admin pages use client-side Supabase auth.
+  return NextResponse.json({ error: 'Forbidden — legacy route' }, { status: 403 });
 }

@@ -2,11 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-// @clerk/nextjs v7 defaults useSignIn/useSignUp to a new signal-based
-// "future" API; /legacy re-exports the classic Promise-based resource shape
-// (.create(), .prepareFirstFactor(), etc.) that this file uses — same shape
-// the LMS's own SignInForm.tsx is built on, just on @clerk/nextjs v5 there.
-import { useSignIn, useSignUp } from '@clerk/nextjs/legacy';
+import { supabase } from '../lib/supabase';
 import { 
   X, 
   Lock, 
@@ -113,9 +109,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   onSuccess
 }) => {
-  const { isLoaded: signInLoaded, signIn, setActive } = useSignIn();
-  const { isLoaded: signUpLoaded, signUp } = useSignUp();
-
   const [mode, setMode] = useState<Mode>('signIn');
   const [step, setStep] = useState<Step>('form');
   const [fullName, setFullName] = useState('');
@@ -200,93 +193,66 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setError(null);
   };
 
-  const finishWithSession = async (sessionId: string | null | undefined) => {
-    if (!sessionId || !setActive) return;
-    await setActive({ session: sessionId });
-    onSuccess?.();
-    onClose();
-  };
-
-  const handleOAuth = (strategy: 'oauth_google' | 'oauth_facebook') => {
-    if (!signInLoaded || !signIn) return;
+  const handleOAuth = async (provider: 'google' | 'facebook') => {
     setLoading(true);
-    signIn.authenticateWithRedirect({
-      strategy,
-      redirectUrl: '/sso-callback',
-      redirectUrlComplete: '/',
+    setError(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: typeof window !== 'undefined' ? `${window.location.origin}` : '' }
     });
+    if (error) setError(error.message);
+    setLoading(false);
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
-    if (mode === 'signIn') {
-      if (!signInLoaded || !signIn) return;
-      setLoading(true);
-      try {
-        const result = await signIn.create({ identifier: email, password });
+    try {
+      if (mode === 'signIn') {
+        const { error, data } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
 
-        if (result.status === 'complete') {
-          await finishWithSession(result.createdSessionId);
-        } else if (result.status === 'needs_second_factor') {
-          setStep('verify');
-        } else if (result.status === 'needs_first_factor') {
-          const firstFactor = result.supportedFirstFactors?.find(
-            (f: any) => f.strategy === 'email_code'
-          );
-          if (firstFactor) {
-            await signIn.prepareFirstFactor({
-              strategy: 'email_code',
-              emailAddressId: (firstFactor as any).emailAddressId,
-            });
-            setStep('verify');
+        if (error) {
+          setError(error.message);
+        } else if (data.session) {
+          onSuccess?.();
+          onClose();
+        }
+      } else {
+        const { error, data } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { full_name: fullName }
+          }
+        });
+
+        if (error) {
+          setError(error.message);
+        } else if (data.session) {
+          onSuccess?.();
+          onClose();
+        } else {
+          // Immediately sign in with password so registration logs the user straight in
+          const { error: signInErr, data: signInData } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+
+          if (!signInErr && signInData.session) {
+            onSuccess?.();
+            onClose();
           } else {
-            setError('Additional verification is required for this account.');
+            setError(signInErr ? signInErr.message : 'Account created successfully! Signing you in...');
           }
         }
-      } catch (err: any) {
-        const errCode = err?.errors?.[0]?.code;
-        if (errCode === 'form_identifier_not_found') {
-          setError('No account with that email yet — switch to Sign up below.');
-        } else {
-          setError(err?.errors?.[0]?.longMessage || err?.errors?.[0]?.message || 'Could not sign in. Please try again.');
-        }
-      } finally {
-        setLoading(false);
-      }
-      return;
-    }
-
-    // mode === 'signUp'
-    if (!signUpLoaded || !signUp) return;
-    setLoading(true);
-    try {
-      const nameParts = fullName.trim().split(/\s+/);
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
-
-      const result = await signUp.create({
-        emailAddress: email,
-        password,
-        firstName,
-        lastName
-      });
-
-      if (result.status === 'complete') {
-        await finishWithSession(result.createdSessionId);
-      } else {
-        await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-        setStep('verify');
       }
     } catch (err: any) {
-      const errCode = err?.errors?.[0]?.code;
-      if (errCode === 'form_identifier_exists') {
-        setMode('signIn');
-        setError('You already have an account with that email — sign in instead.');
-      } else {
-        setError(err?.errors?.[0]?.longMessage || err?.errors?.[0]?.message || 'Could not create your account. Please try again.');
-      }
+      setError(err?.message || 'Authentication failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -298,30 +264,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
 
     try {
-      if (mode === 'signUp') {
-        if (!signUp) return;
-        const result = await signUp.attemptEmailAddressVerification({ code });
-        if (result.status === 'complete') {
-          await finishWithSession(result.createdSessionId);
-        } else {
-          setError('Invalid code. Please try again.');
-        }
-      } else {
-        if (!signIn) return;
-        let result;
-        try {
-          result = await signIn.attemptFirstFactor({ strategy: 'email_code', code });
-        } catch {
-          result = await signIn.attemptSecondFactor({ strategy: 'totp', code });
-        }
-        if (result.status === 'complete') {
-          await finishWithSession(result.createdSessionId);
-        } else {
-          setError('Invalid code. Please try again.');
-        }
+      const { error, data } = await supabase.auth.verifyOtp({
+        email,
+        token: code,
+        type: mode === 'signUp' ? 'signup' : 'email'
+      });
+      if (error) {
+        setError(error.message);
+      } else if (data.session) {
+        onSuccess?.();
+        onClose();
       }
     } catch (err: any) {
-      setError(err?.errors?.[0]?.longMessage || err?.errors?.[0]?.message || 'Invalid code. Please try again.');
+      setError(err?.message || 'Invalid verification code.');
     } finally {
       setLoading(false);
     }
@@ -329,31 +284,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleForgotRequestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!signInLoaded || !signIn) return;
     setError(null);
     setLoading(true);
 
     try {
-      const signInAttempt = await signIn.create({
-        strategy: 'reset_password_email_code',
-        identifier: email,
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: typeof window !== 'undefined' ? `${window.location.origin}` : '',
       });
-      
-      const firstFactor = signInAttempt.supportedFirstFactors?.find(
-        (factor: any) => factor.strategy === 'reset_password_email_code'
-      ) as any;
-
-      if (firstFactor) {
-        await signIn.prepareFirstFactor({
-          strategy: 'reset_password_email_code',
-          emailAddressId: firstFactor.emailAddressId,
-        });
-        setStep('forgotVerify');
+      if (error) {
+        setError(error.message);
       } else {
-        setError('Password reset is not supported for this account.');
+        setError('Password reset link sent to your email address!');
       }
     } catch (err: any) {
-      setError(err?.errors?.[0]?.longMessage || err?.errors?.[0]?.message || 'Failed to send reset code.');
+      setError(err?.message || 'Failed to send password reset code.');
     } finally {
       setLoading(false);
     }
@@ -361,23 +305,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleForgotVerifySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!signInLoaded || !signIn) return;
     setError(null);
     setLoading(true);
 
     try {
-      const result = await signIn.attemptFirstFactor({
-        strategy: 'reset_password_email_code',
-        code,
-        password,
-      });
-      if (result.status === 'complete') {
-        await finishWithSession(result.createdSessionId);
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) {
+        setError(error.message);
       } else {
-        setError('Failed to complete reset. Please try again.');
+        onSuccess?.();
+        onClose();
       }
     } catch (err: any) {
-      setError(err?.errors?.[0]?.longMessage || err?.errors?.[0]?.message || 'Verification failed.');
+      setError(err?.message || 'Password update failed.');
     } finally {
       setLoading(false);
     }

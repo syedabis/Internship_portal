@@ -159,16 +159,23 @@ export const InternshipResourcesView: React.FC = () => {
     <div className="space-y-8 pb-16">
       
       {/* Top Banner Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-[#0d2621] to-emerald-950 text-white rounded-2xl p-6 sm:p-8 shadow-md relative overflow-hidden">
+      <div className="relative text-white rounded-2xl p-6 sm:p-8 shadow-md overflow-hidden bg-slate-950">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/image_card.jpeg"
+          alt="Resources Background"
+          className="absolute inset-0 w-full h-full object-cover object-center scale-x-[-1]"
+        />
+
         <div className="relative z-10 max-w-2xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 backdrop-blur-xs border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Cortexa Intern Academy</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
             Exclusive AI Masterclasses & Technical Resources
           </h1>
-          <p className="text-sm text-slate-300 leading-relaxed font-normal">
+          <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
             Accelerate your technical rank. Watch hands-on masterclasses led by industry research engineers and download production code templates.
           </p>
         </div>

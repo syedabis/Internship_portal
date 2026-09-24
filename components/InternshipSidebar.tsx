@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useClerk, useUser } from '@clerk/nextjs';
+import { supabase } from '../lib/supabase';
 import {
   BookOpen,
   Sparkles,
@@ -37,10 +37,7 @@ export type InternshipTab =
   | 'projects'
   | 'documents'
   | 'linkedinaudit'
-  | 'cvaudit'
-  | 'submissions'
-  | 'questions'
-  | 'myapplication';
+  | 'cvaudit';
 
 interface NavItem {
   id: InternshipTab;
@@ -69,22 +66,29 @@ export const InternshipSidebar: React.FC<InternshipSidebarProps> = ({
   isMobileOpen = false,
   onCloseMobile,
 }) => {
-  const { user } = useUser();
-  const { signOut } = useClerk();
-  const isLoggedIn = !!user;
+  const [user, setUser] = useState<any>(null);
 
+  React.useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const isLoggedIn = !!user;
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
-  const userName = user?.fullName || user?.firstName || 'Nmesoma Anita';
-  const userEmail = user?.primaryEmailAddress?.emailAddress || 'nmesoanita@gmail.com';
-  const userAvatar = user?.imageUrl || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80';
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Nmesoma Anita';
+  const userEmail = user?.email || 'nmesoanita@gmail.com';
+  const userAvatar = user?.user_metadata?.avatar_url || (typeof window !== 'undefined' && localStorage.getItem('user_avatar_url')) || '/profile_image.png';
 
   const navSections: NavSection[] = [
     {
       title: null,
       items: [
         { id: 'resources', label: 'Resources', icon: BookOpen },
-        { id: 'freetier', label: 'Free Tier', icon: Sparkles },
+        { id: 'freetier', label: 'Products & Perks', icon: Sparkles },
       ],
     },
     {
@@ -104,14 +108,6 @@ export const InternshipSidebar: React.FC<InternshipSidebarProps> = ({
         { id: 'documents', label: 'Documents', icon: FileText, badge: 'Beta' },
         { id: 'linkedinaudit', label: 'LinkedIn Audit', icon: LinkedinIcon, badge: 'Beta' },
         { id: 'cvaudit', label: 'CV Audit', icon: FileSearch, badge: 'Beta' },
-      ],
-    },
-    {
-      title: 'RECORDS',
-      items: [
-        { id: 'submissions', label: 'Submissions', icon: UploadCloud },
-        { id: 'questions', label: 'Questions', icon: MessageSquare },
-        { id: 'myapplication', label: 'My application', icon: UserCheck },
       ],
     },
   ];
@@ -194,7 +190,7 @@ export const InternshipSidebar: React.FC<InternshipSidebarProps> = ({
               <button
                 onClick={async () => {
                   setIsUserMenuOpen(false);
-                  await signOut();
+                  await supabase.auth.signOut();
                 }}
                 className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-rose-500/10 text-rose-400 font-semibold transition-colors text-left"
               >

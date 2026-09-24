@@ -2,61 +2,72 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Users, CreditCard, Ticket, FileText, Clock, CheckCircle, TrendingUp, ArrowRight } from 'lucide-react';
+import { Bell, ShoppingBag, BookOpen, HelpCircle, ArrowRight, Plus, Loader2, Users } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
-type Analytics = {
-  totalUnlocked: number;
-  pendingPayments: number;
-  totalProofs: number;
-  totalCoupons: number;
-  totalRedemptions: number;
-  totalResumes: number;
+type Stats = {
+  announcements: number;
+  products: number;
+  resources: number;
+  openTickets: number;
 };
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<Analytics | null>(null);
+  const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/admin/analytics')
-      .then((r) => r.json())
-      .then(setStats)
-      .finally(() => setLoading(false));
+    const fetchStats = async () => {
+      const [annRes, prodRes, resRes, ticketRes] = await Promise.all([
+        supabase.from('announcements').select('id', { count: 'exact', head: true }),
+        supabase.from('products').select('id', { count: 'exact', head: true }),
+        supabase.from('resources').select('id', { count: 'exact', head: true }),
+        supabase.from('support_messages').select('id', { count: 'exact', head: true }).eq('status', 'open'),
+      ]);
+      setStats({
+        announcements: annRes.count ?? 0,
+        products: prodRes.count ?? 0,
+        resources: resRes.count ?? 0,
+        openTickets: ticketRes.count ?? 0,
+      });
+      setLoading(false);
+    };
+    fetchStats();
   }, []);
 
   const cards = [
     {
-      label: 'Unlocked Users',
-      value: stats?.totalUnlocked,
-      icon: Users,
+      label: 'Announcements',
+      value: stats?.announcements,
+      icon: Bell,
       color: 'from-emerald-500 to-emerald-600',
-      href: '/admin/unlocked',
-      desc: 'Paid or coupon unlocked',
+      href: '/admin/announcements',
+      desc: 'Published updates',
     },
     {
-      label: 'Pending Payments',
-      value: stats?.pendingPayments,
-      icon: Clock,
-      color: stats?.pendingPayments ? 'from-amber-500 to-orange-500' : 'from-slate-600 to-slate-700',
-      href: '/admin/payments',
-      desc: 'Awaiting your review',
-      urgent: (stats?.pendingPayments ?? 0) > 0,
-    },
-    {
-      label: 'Total Coupons',
-      value: stats?.totalCoupons,
-      icon: Ticket,
+      label: 'Products & Perks',
+      value: stats?.products,
+      icon: ShoppingBag,
       color: 'from-blue-500 to-blue-600',
-      href: '/admin/coupons',
-      desc: `${stats?.totalRedemptions ?? 0} redeemed`,
+      href: '/admin/products',
+      desc: 'Listed in catalogue',
     },
     {
-      label: 'Saved Resumes',
-      value: stats?.totalResumes,
-      icon: FileText,
+      label: 'Resources',
+      value: stats?.resources,
+      icon: BookOpen,
       color: 'from-violet-500 to-violet-600',
-      href: '#',
-      desc: 'Total across all users',
+      href: '/admin/resources',
+      desc: 'Masterclasses & tutorials',
+    },
+    {
+      label: 'Open Tickets',
+      value: stats?.openTickets,
+      icon: HelpCircle,
+      color: stats?.openTickets ? 'from-amber-500 to-orange-500' : 'from-slate-600 to-slate-700',
+      href: '/admin/support',
+      desc: 'Awaiting your reply',
+      urgent: (stats?.openTickets ?? 0) > 0,
     },
   ];
 
@@ -64,8 +75,8 @@ export default function AdminDashboard() {
     <div className="p-8 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-        <p className="text-slate-400 text-sm mt-1">Profile Builder overview at a glance</p>
+        <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
+        <p className="text-slate-400 text-sm mt-1">Cortexa AI Internship Portal — manage content at a glance</p>
       </div>
 
       {/* Stat Cards */}
@@ -95,12 +106,12 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Quick Links */}
+      {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { href: '/admin/coupons', label: 'Create a Coupon', desc: 'Generate a new coupon code for students', icon: Ticket, action: 'Go to Coupons' },
-          { href: '/admin/payments', label: 'Review Payments', desc: 'Approve or reject pending payment proofs', icon: CreditCard, action: 'Review Now' },
-          { href: '/admin/unlocked', label: 'View Unlocked Users', desc: 'See all users with full access', icon: CheckCircle, action: 'View Users' },
+          { href: '/admin/announcements', label: 'Post Announcement', desc: 'Publish news to all interns', icon: Bell, action: 'Go to Announcements' },
+          { href: '/admin/products', label: 'Add Product', desc: 'List a new AI tool or software perk', icon: ShoppingBag, action: 'Manage Products' },
+          { href: '/admin/support', label: 'View Support Inbox', desc: 'Reply to intern queries and issues', icon: HelpCircle, action: 'Open Inbox' },
         ].map(({ href, label, desc, icon: Icon, action }) => (
           <Link
             key={href}
@@ -111,11 +122,11 @@ export default function AdminDashboard() {
               <div className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center">
                 <Icon className="w-4 h-4 text-slate-300" />
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
             </div>
             <p className="mt-3 font-semibold text-white text-sm">{label}</p>
             <p className="text-slate-400 text-xs mt-1">{desc}</p>
-            <p className="text-blue-400 text-xs font-semibold mt-3 group-hover:underline">{action} →</p>
+            <p className="text-emerald-400 text-xs font-semibold mt-3 group-hover:underline">{action} →</p>
           </Link>
         ))}
       </div>

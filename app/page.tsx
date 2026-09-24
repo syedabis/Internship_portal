@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { useUser } from '@clerk/nextjs';
+import { supabase } from '../lib/supabase';
 import { Menu, UserCheck } from 'lucide-react';
 import { InternshipSidebar, InternshipTab } from '../components/InternshipSidebar';
 
@@ -12,11 +12,11 @@ const JobOpportunitiesView = dynamic(() => import('../components/JobOpportunitie
 const CvAuditView = dynamic(() => import('../components/CvAuditView').then(m => ({ default: m.CvAuditView })), { ssr: false });
 const LinkedinAuditView = dynamic(() => import('../components/LinkedinAuditView').then(m => ({ default: m.LinkedinAuditView })), { ssr: false });
 const InternshipDocumentsView = dynamic(() => import('../components/InternshipDocumentsView').then(m => ({ default: m.InternshipDocumentsView })), { ssr: false });
-const InternshipSubmissionsView = dynamic(() => import('../components/InternshipSubmissionsView').then(m => ({ default: m.InternshipSubmissionsView })), { ssr: false });
 const InternshipCommunityView = dynamic(() => import('../components/InternshipCommunityView').then(m => ({ default: m.InternshipCommunityView })), { ssr: false });
 const InternshipResourcesView = dynamic(() => import('../components/InternshipResourcesView').then(m => ({ default: m.InternshipResourcesView })), { ssr: false });
 const InternshipInboxView = dynamic(() => import('../components/InternshipInboxView').then(m => ({ default: m.InternshipInboxView })), { ssr: false });
 const InternshipProjectsView = dynamic(() => import('../components/InternshipProjectsView').then(m => ({ default: m.InternshipProjectsView })), { ssr: false });
+const ProductMarketplaceView = dynamic(() => import('../components/ProductMarketplaceView').then(m => ({ default: m.ProductMarketplaceView })), { ssr: false });
 const AuthModal = dynamic(() => import('../components/AuthModal').then(m => ({ default: m.AuthModal })), { ssr: false });
 
 export default function Home() {
@@ -33,15 +33,38 @@ export default function Home() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
-  const { user, isLoaded } = useUser();
-  const userEmail = user?.primaryEmailAddress?.emailAddress || 'nmesoanita@gmail.com';
-  const userName = user?.fullName || user?.firstName || 'Nmesoma Anita';
+  const [user, setUser] = useState<any>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      setIsLoaded(true);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setIsLoaded(true);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const userEmail = user?.email || 'nmesoanita@gmail.com';
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Nmesoma Anita';
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('internship_portal_active_tab', activeTab);
     }
   }, [activeTab]);
+
+  // Auth Gate: Automatically prompt AuthModal for unauthenticated visitors
+  useEffect(() => {
+    if (isLoaded && !user) {
+      setIsAuthOpen(true);
+    }
+  }, [isLoaded, user]);
 
 
 
@@ -109,13 +132,13 @@ export default function Home() {
 
               {activeTab === 'documents' && <InternshipDocumentsView />}
 
-              {activeTab === 'submissions' && <InternshipSubmissionsView />}
-
               {activeTab === 'resources' && <InternshipResourcesView />}
 
               {activeTab === 'inbox' && <InternshipInboxView />}
 
-              {['announcements', 'support', 'freetier', 'questions', 'myapplication'].includes(activeTab) && (
+              {activeTab === 'freetier' && <ProductMarketplaceView />}
+
+              {['announcements', 'support'].includes(activeTab) && (
                 <InternshipCommunityView type={activeTab as any} />
               )}
             </div>

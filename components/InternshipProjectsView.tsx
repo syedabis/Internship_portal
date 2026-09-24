@@ -749,11 +749,11 @@ export const InternshipProjectsView: React.FC = () => {
     <div className="space-y-6 pb-12">
       {/* Page Header */}
       <div className="space-y-1.5">
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2.5">
           <BookOpen className="w-6 h-6 text-emerald-600" />
           <span>Internship Projects</span>
         </h1>
-        <p className="text-sm text-slate-500 font-medium max-w-2xl">
+        <p className="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed max-w-2xl">
           Select a project aligned with your domain (HR, Sales, Marketing, Finance, Operations, Product, CS, Design), generate a detailed execution plan, and earn leaderboard points upon completion.
         </p>
       </div>
@@ -761,17 +761,20 @@ export const InternshipProjectsView: React.FC = () => {
       {/* Stats Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Total Projects', value: PROJECTS.length.toString(), icon: Layers, accent: 'text-blue-600' },
-          { label: 'Domains', value: (DOMAINS.length - 1).toString(), icon: Globe, accent: 'text-emerald-600' },
-          { label: 'Max Points', value: '500', icon: Star, accent: 'text-amber-600' },
-          { label: 'Avg Duration', value: '4.2 wks', icon: Clock, accent: 'text-purple-600' },
+          { label: 'Total Projects', value: PROJECTS.length.toString(), icon: '/Icons/4.png' },
+          { label: 'Domains', value: (DOMAINS.length - 1).toString(), icon: '/Icons/5.png' },
+          { label: 'Max Points', value: '500', icon: '/Icons/6.png' },
+          { label: 'Avg Duration', value: '4.2 wks', icon: '/Icons/7.png' },
         ].map((stat) => (
-          <div key={stat.label} className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-            <div className="flex items-center gap-2 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-              <stat.icon className={`w-3.5 h-3.5 ${stat.accent}`} />
-              <span>{stat.label}</span>
+          <div key={stat.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex items-center gap-3.5">
+            <div className="p-2 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={stat.icon} alt={stat.label} className="w-9 h-9 object-contain" />
             </div>
-            <div className="text-xl font-black text-slate-900 mt-1">{stat.value}</div>
+            <div className="min-w-0">
+              <div className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-none">{stat.value}</div>
+              <div className="text-[10px] font-semibold text-slate-500 tracking-wider uppercase mt-1 truncate">{stat.label}</div>
+            </div>
           </div>
         ))}
       </div>
@@ -790,7 +793,7 @@ export const InternshipProjectsView: React.FC = () => {
               <button
                 key={domain.id}
                 onClick={() => setActiveDomain(domain.id)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 border ${
                   isActive
                     ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
                     : `${domain.bgColor} ${domain.color} ${domain.borderColor} hover:shadow-xs`
@@ -862,7 +865,7 @@ export const InternshipProjectsView: React.FC = () => {
                       {project.difficulty}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1 text-xs font-black text-amber-600">
+                  <div className="flex items-center gap-1 text-xs font-bold text-amber-600">
                     <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                     <span>{project.points} pts</span>
                   </div>
@@ -870,10 +873,10 @@ export const InternshipProjectsView: React.FC = () => {
 
                 {/* Title & Description */}
                 <div>
-                  <h3 className="text-base font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors tracking-tight">
+                  <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors tracking-tight">
                     {project.title}
                   </h3>
-                  <p className="text-xs text-slate-500 font-normal leading-relaxed mt-1.5 line-clamp-3">
+                  <p className="text-xs text-slate-600 font-normal leading-relaxed mt-1.5 line-clamp-3">
                     {project.description}
                   </p>
                 </div>

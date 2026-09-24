@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Trophy,
   HelpCircle,
@@ -18,7 +18,10 @@ import {
   ArrowRight,
   ChevronDown,
   Gift,
+  Camera,
 } from 'lucide-react';
+import { PfpCropModal } from './PfpCropModal';
+import { supabase } from '../lib/supabase';
 
 // ── Personal milestone tiers (non-competitive, self-paced) ──────────────
 interface MilestoneTier {
@@ -90,16 +93,61 @@ interface PointCategory {
 interface InternshipLeaderboardViewProps {
   userName?: string;
   userEmail?: string;
+  userAvatar?: string;
   onNavigateToTab?: (tab: string) => void;
+  onUpdateAvatar?: (avatarUrl: string) => void;
 }
 
 export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps> = ({
   userName = 'Nmesoma Anita',
   userEmail = 'nmesoanita@gmail.com',
+  userAvatar,
   onNavigateToTab,
+  onUpdateAvatar,
 }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<string>(() => {
+    if (userAvatar) return userAvatar;
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('user_avatar_url');
+      if (stored) return stored;
+    }
+    return '/profile_image.png';
+  });
+
   const [achievementFilter, setAchievementFilter] = useState<'all' | 'earned' | 'locked'>('all');
   const [expandedTier, setExpandedTier] = useState<string | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setSelectedImage(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleConfirmCrop = async (croppedDataUrl: string) => {
+    setSelectedImage(null);
+    setAvatar(croppedDataUrl);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('user_avatar_url', croppedDataUrl);
+    }
+    onUpdateAvatar?.(croppedDataUrl);
+
+    try {
+      await supabase.auth.updateUser({
+        data: { avatar_url: croppedDataUrl }
+      });
+    } catch {
+      // offline / demo fallback
+    }
+  };
 
   const totalPoints = 997;
   const scoringCap = 2400;
@@ -138,7 +186,7 @@ export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps>
     <div className="space-y-6 pb-12">
 
       {/* Top Banner */}
-      <div className="p-4 rounded-xl bg-slate-100/90 border border-slate-200/80 text-slate-700 text-xs leading-relaxed font-normal shadow-2xs">
+      <div className="p-4 rounded-xl bg-slate-100/90 border border-slate-200/80 text-slate-600 text-xs sm:text-sm leading-relaxed font-normal shadow-2xs">
         Your progress dashboard tracks your personal growth throughout the internship. Earn points by completing modules, submitting work, and participating — there are no rankings or competition. Focus on your own learning journey. Points refresh every six hours. Last updated 2026-08-16 18:15 UTC.
       </div>
 
@@ -146,28 +194,47 @@ export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
         {/* Left: Your Progress Card */}
-        <div className="lg:col-span-7 bg-gradient-to-br from-[#e6f7ec] to-[#d4f0de] border border-[#caedd4] rounded-2xl p-6 shadow-xs relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-400/5 rounded-full blur-3xl" />
-          <div className="relative">
+        <div 
+          className="lg:col-span-7 border border-emerald-900/50 rounded-2xl p-6 shadow-lg relative overflow-hidden bg-cover bg-center"
+          style={{ backgroundImage: "url('/progress_card_bg.jpeg')" }}
+        >
+          {/* Subtle dark backdrop filter for high legibility */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
+
+          <div className="relative z-10 text-white">
             {/* Header */}
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-xs shrink-0">
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-emerald-400/60 shadow-md shrink-0 cursor-pointer group"
+                  title="Click to change profile picture"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80"
+                    src={avatar}
                     alt={userName}
                     className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Camera className="w-4 h-4 text-white" />
+                  </div>
                 </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
                 <div>
-                  <div className="text-[11px] font-bold tracking-wider text-emerald-800 uppercase">
+                  <div className="text-[11px] font-bold tracking-wider text-emerald-300 uppercase">
                     YOUR PROGRESS
                   </div>
-                  <h2 className="text-lg font-bold text-slate-900 tracking-tight mt-0.5">
+                  <h2 className="text-xl font-extrabold text-white tracking-tight mt-0.5">
                     {userName}
                   </h2>
-                  <div className="text-xs text-emerald-800/90 font-medium flex items-center gap-1.5 mt-0.5">
+                  <div className="text-xs text-emerald-100/90 font-medium flex items-center gap-1.5 mt-0.5">
                     <span>Machine Learning</span>
                     <span>•</span>
                     <span>🇳🇬 Nigeria</span>
@@ -175,47 +242,48 @@ export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps>
                 </div>
               </div>
 
-              <div className={`px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 ${currentTier.bgColor} ${currentTier.color} ${currentTier.borderColor}`}>
-                <span>{currentTier.icon}</span>
+              <div className={`px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 shadow-sm ${currentTier.bgColor} ${currentTier.color} ${currentTier.borderColor}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/Icons/Thunder.png" alt="Achiever Tier" className="w-4 h-4 object-contain" />
                 <span>{currentTier.name} Tier</span>
               </div>
             </div>
 
             {/* Metrics Row */}
-            <div className="grid grid-cols-3 gap-4 my-6 pt-4 border-t border-emerald-200/60">
+            <div className="grid grid-cols-3 gap-4 my-6 pt-4 border-t border-emerald-500/20">
               <div>
-                <div className="text-[10px] font-bold tracking-wider text-emerald-800/80 uppercase">
+                <div className="text-[10px] font-bold tracking-wider text-emerald-300/90 uppercase">
                   TOTAL POINTS
                 </div>
-                <div className="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tracking-tight">
+                <div className="text-2xl sm:text-3xl font-extrabold text-white mt-1 tracking-tight">
                   {totalPoints.toLocaleString()}
                 </div>
-                <div className="text-[11px] text-emerald-900/80 font-medium">
+                <div className="text-[11px] text-emerald-100/80 font-medium">
                   of {scoringCap.toLocaleString()} possible
                 </div>
               </div>
 
               <div>
-                <div className="text-[10px] font-bold tracking-wider text-emerald-800/80 uppercase">
+                <div className="text-[10px] font-bold tracking-wider text-emerald-300/90 uppercase">
                   ACHIEVEMENTS
                 </div>
-                <div className="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tracking-tight">
+                <div className="text-2xl sm:text-3xl font-extrabold text-white mt-1 tracking-tight">
                   {earnedCount}/{ACHIEVEMENTS.length}
                 </div>
-                <div className="text-[11px] text-emerald-900/80 font-medium">
+                <div className="text-[11px] text-emerald-100/80 font-medium">
                   badges earned
                 </div>
               </div>
 
               <div>
-                <div className="text-[10px] font-bold tracking-wider text-emerald-800/80 uppercase">
+                <div className="text-[10px] font-bold tracking-wider text-emerald-300/90 uppercase">
                   STREAK
                 </div>
-                <div className="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tracking-tight flex items-center gap-1.5">
+                <div className="text-2xl sm:text-3xl font-extrabold text-white mt-1 tracking-tight flex items-center gap-1.5">
                   {currentStreak}
-                  <Flame className="w-5 h-5 text-orange-500" />
+                  <Flame className="w-5 h-5 text-orange-400 fill-orange-400/20" />
                 </div>
-                <div className="text-[11px] text-emerald-900/80 font-medium">
+                <div className="text-[11px] text-emerald-100/80 font-medium">
                   active days
                 </div>
               </div>
@@ -223,17 +291,17 @@ export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps>
 
             {/* Next Tier Progress */}
             {nextTier && (
-              <div className="pt-4 border-t border-emerald-200/60">
+              <div className="pt-4 border-t border-emerald-500/20">
                 <div className="flex items-center justify-between mb-2">
-                  <div className="text-[11px] font-bold text-emerald-800/80 uppercase tracking-wider flex items-center gap-1.5">
-                    <Target className="w-3.5 h-3.5" />
+                  <div className="text-[11px] font-bold text-emerald-300/90 uppercase tracking-wider flex items-center gap-1.5">
+                    <Target className="w-3.5 h-3.5 text-emerald-400" />
                     Next: {nextTier.icon} {nextTier.name} Tier
                   </div>
-                  <span className="text-xs font-bold text-slate-900">{pointsToNextTier} pts away</span>
+                  <span className="text-xs font-bold text-white">{pointsToNextTier} pts away</span>
                 </div>
-                <div className="w-full h-3 bg-white/80 rounded-full overflow-hidden border border-emerald-200/60">
+                <div className="w-full h-3 bg-slate-900/60 rounded-full overflow-hidden border border-emerald-500/30">
                   <div
-                    className="h-full bg-emerald-600 rounded-full transition-all duration-500"
+                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500 shadow-xs"
                     style={{ width: `${tierProgress}%` }}
                   />
                 </div>
@@ -247,7 +315,7 @@ export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps>
           {/* Activity Heatmap */}
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
             <div className="flex items-center justify-between mb-4">
-              <div className="text-[11px] font-bold tracking-wider text-slate-500 uppercase flex items-center gap-1.5">
+              <div className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-blue-600" />
                 This Week&apos;s Activity
               </div>
@@ -278,19 +346,30 @@ export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps>
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => onNavigateToTab?.('projects')}
-              className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all text-left group"
+              className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all text-left group flex items-center gap-3.5"
             >
-              <Zap className="w-5 h-5 text-amber-500 mb-2" />
-              <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800">Start a Project</div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Earn up to 550 pts</div>
+              <div className="p-2 rounded-xl bg-amber-50/80 border border-amber-200/60 flex items-center justify-center shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/Icons/Mechanic.png" alt="Start a Project" className="w-9 h-9 object-contain" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800 tracking-tight leading-tight">Start a Project</div>
+                <div className="text-[10px] font-medium text-slate-500 mt-1">Earn up to 550 pts</div>
+              </div>
             </button>
+
             <button
               onClick={() => onNavigateToTab?.('resources')}
-              className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all text-left group"
+              className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all text-left group flex items-center gap-3.5"
             >
-              <BookOpen className="w-5 h-5 text-blue-500 mb-2" />
-              <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800">Learn More</div>
-              <div className="text-[10px] text-slate-500 mt-0.5">+500 pts available</div>
+              <div className="p-2 rounded-xl bg-blue-50/80 border border-blue-200/60 flex items-center justify-center shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/Icons/brain, learning, intelligence, study, knowledge.png" alt="Learn More" className="w-9 h-9 object-contain" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800 tracking-tight leading-tight">Learn More</div>
+                <div className="text-[10px] font-medium text-slate-500 mt-1">+500 pts available</div>
+              </div>
             </button>
           </div>
         </div>
@@ -300,10 +379,10 @@ export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps>
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs">
         <div className="flex items-center justify-between mb-1">
           <div>
-            <div className="text-[11px] font-bold tracking-wider text-slate-500 uppercase">
+            <div className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
               YOUR POINT BREAKDOWN
             </div>
-            <div className="text-2xl font-black text-slate-900 mt-1 tracking-tight">
+            <div className="text-2xl font-bold text-slate-900 mt-1 tracking-tight">
               {totalPoints} points
             </div>
             <div className="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-3">
@@ -312,8 +391,9 @@ export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps>
               <span>{overallProgress}% complete</span>
             </div>
           </div>
-          <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
-            <TrendingUp className="w-6 h-6 text-emerald-600" />
+          <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/Icons/Chart.png" alt="Point Breakdown" className="w-10 h-10 object-contain" />
           </div>
         </div>
 
@@ -358,8 +438,22 @@ export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps>
           Points reflect your personal internship activity across categories. There is no competition — focus on completing as many learning areas as you can at your own pace.
         </div>
       </div>
-
-
+      {/* Photo Cropper Modal */}
+      {selectedImage && (
+        <PfpCropModal
+          key={selectedImage}
+          imageUrl={selectedImage}
+          onCancel={() => setSelectedImage(null)}
+          onConfirm={handleConfirmCrop}
+          onChangePhoto={(file) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              if (e.target?.result) setSelectedImage(e.target.result as string);
+            };
+            reader.readAsDataURL(file);
+          }}
+        />
+      )}
     </div>
   );
 };

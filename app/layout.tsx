@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Geist, Geist_Mono, Poppins, Bricolage_Grotesque, Dancing_Script, Playfair_Display } from "next/font/google";
+import { Geist, Geist_Mono, Poppins, Bricolage_Grotesque, Dancing_Script, Playfair_Display, Plus_Jakarta_Sans, Inter } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
   subsets: ["latin"],
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
@@ -41,8 +41,8 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Cortexa AI Intern Portal — Internship Dashboard & Leaderboard",
-  description: "Empowering interns with AI career tools, real-time leaderboard rankings, CV & LinkedIn audits, project submissions, and top job opportunities.",
+  title: "Cortexa AI — Career Acceleration Hub",
+  description: "Empowering interns with AI career tools, business project execution, personal growth tracking, CV & LinkedIn audits, and top job opportunities.",
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",
@@ -62,7 +62,7 @@ export default function RootLayout({
     <ClerkProvider publishableKey={publishableKey}>
       <html
         lang="en"
-        className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${bricolageGrotesque.variable} ${dancingScript.variable} ${playfairDisplay.variable} h-full antialiased`}
+        className={`${plusJakartaSans.variable} ${inter.variable} ${poppins.variable} ${bricolageGrotesque.variable} ${dancingScript.variable} ${playfairDisplay.variable} h-full antialiased`}
       >
         {/* suppressHydrationWarning covers only <body>'s own attributes, not
             its children. Browser extensions (ColorZilla adds

@@ -195,8 +195,9 @@ export const InternshipInboxView: React.FC = () => {
       {/* Top Header Banner */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 shrink-0">
-            <Mail className="w-6 h-6" />
+          <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 shrink-0 flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/Icons/Message.png" alt="E-Mail Inbox" className="w-7 h-7 object-contain" />
           </div>
           <div>
             <div className="flex items-center gap-2">
