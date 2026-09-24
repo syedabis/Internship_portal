@@ -35,6 +35,7 @@ export type InternshipTab =
   | 'support'
   | 'jobopportunities'
   | 'projects'
+  | 'chapters'
   | 'documents'
   | 'linkedinaudit'
   | 'cvaudit';
@@ -94,6 +95,7 @@ export const InternshipSidebar: React.FC<InternshipSidebarProps> = ({
     {
       title: 'CONNECT',
       items: [
+        { id: 'chapters', label: 'Chapters & Ambassadors', icon: Users, badge: 'New' },
         { id: 'announcements', label: 'Announcements', icon: Bell, badge: '1' },
         { id: 'inbox', label: 'E-Mail Inbox', icon: Mail, badge: '9' },
         { id: 'support', label: 'Support', icon: HelpCircle },

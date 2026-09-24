@@ -2,10 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Bell, ShoppingBag, BookOpen, HelpCircle } from 'lucide-react';
+import { LayoutDashboard, Bell, ShoppingBag, BookOpen, HelpCircle, Briefcase, Users } from 'lucide-react';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/chapters', label: 'Ambassadors & Chapters', icon: Users },
+  { href: '/admin/projects', label: 'Projects', icon: Briefcase },
   { href: '/admin/announcements', label: 'Announcements', icon: Bell },
   { href: '/admin/products', label: 'Products & Perks', icon: ShoppingBag },
   { href: '/admin/resources', label: 'Resources', icon: BookOpen },

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Sparkles,
@@ -440,6 +440,7 @@ function getDifficultyStyles(diff: string) {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
 export const InternshipProjectsView: React.FC = () => {
+  const [projectsList, setProjectsList] = useState<Project[]>(PROJECTS);
   const [activeDomain, setActiveDomain] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<'All' | 'Beginner' | 'Intermediate' | 'Advanced'>('All');
@@ -449,14 +450,37 @@ export const InternshipProjectsView: React.FC = () => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [expandedWeek, setExpandedWeek] = useState<number | null>(1);
 
+  const loadProjects = () => {
+    try {
+      const saved = localStorage.getItem('cortexa_projects_list');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setProjectsList(parsed);
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('Error reading local projects:', err);
+    }
+    setProjectsList(PROJECTS);
+  };
+
+  useEffect(() => {
+    loadProjects();
+    const handleUpdate = () => loadProjects();
+    window.addEventListener('cortexa_projects_updated', handleUpdate);
+    return () => window.removeEventListener('cortexa_projects_updated', handleUpdate);
+  }, []);
+
   // ── Filtering ──────────────────────────────────────────────────────────
-  const filteredProjects = PROJECTS.filter((p) => {
+  const filteredProjects = projectsList.filter((p) => {
     const matchesDomain = activeDomain === 'all' || p.domain === activeDomain;
     const matchesDifficulty = difficultyFilter === 'All' || p.difficulty === difficultyFilter;
     const matchesSearch =
       p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.techStack.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+      (p.techStack && p.techStack.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase())));
     return matchesDomain && matchesDifficulty && matchesSearch;
   });
 

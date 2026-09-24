@@ -17,6 +17,7 @@ const InternshipResourcesView = dynamic(() => import('../components/InternshipRe
 const InternshipInboxView = dynamic(() => import('../components/InternshipInboxView').then(m => ({ default: m.InternshipInboxView })), { ssr: false });
 const InternshipProjectsView = dynamic(() => import('../components/InternshipProjectsView').then(m => ({ default: m.InternshipProjectsView })), { ssr: false });
 const ProductMarketplaceView = dynamic(() => import('../components/ProductMarketplaceView').then(m => ({ default: m.ProductMarketplaceView })), { ssr: false });
+const ChaptersAmbassadorsView = dynamic(() => import('../components/ChaptersAmbassadorsView').then(m => ({ default: m.ChaptersAmbassadorsView })), { ssr: false });
 const AuthModal = dynamic(() => import('../components/AuthModal').then(m => ({ default: m.AuthModal })), { ssr: false });
 
 export default function Home() {
@@ -137,6 +138,8 @@ export default function Home() {
               {activeTab === 'inbox' && <InternshipInboxView />}
 
               {activeTab === 'freetier' && <ProductMarketplaceView />}
+
+              {activeTab === 'chapters' && <ChaptersAmbassadorsView />}
 
               {['announcements', 'support'].includes(activeTab) && (
                 <InternshipCommunityView type={activeTab as any} />

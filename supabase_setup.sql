@@ -127,7 +127,36 @@ INSERT INTO products (name, provider, category, description, badge, features, ic
 INSERT INTO resources (title, instructor, role, duration, level, category, description, youtube_id, thumbnail_url, avatar_url, resource_links, rating, enrolled_count) VALUES
 ('Building & Fine-Tuning Multi-Agent LLMs with QLoRA', 'Dr. Aris Thorne', 'Head of AI Research @ Cortexa', '2h 15m', 'Advanced', 'Generative AI & LLMs', 'Learn how to fine-tune open-source models like Llama 3 and Mistral using QLoRA techniques. We build an automated multi-agent collaboration framework from scratch.', NULL, 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80', '[{"name":"PyTorch QLoRA Fine-tuning Notebook","type":"code","url":"#"},{"name":"Multi-Agent System Architecture Slides (PDF)","type":"pdf","url":"#"}]', 4.9, 1420),
 ('Production Computer Vision: ResNet to Vision Transformers', 'Elena Rostova', 'Senior Vision Engineer @ DataLab', '1h 45m', 'Intermediate', 'Computer Vision', 'Deep dive into computer vision pipelines. Transfer learning, data augmentation strategies, and deploying ViT models with TensorRT.', NULL, 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80', '[{"name":"OpenCV & PyTorch Vision Repo","type":"code","url":"#"},{"name":"Data Augmentation Cheat Sheet","type":"pdf","url":"#"}]', 4.8, 980),
-('NLP Mastery: Transformers, RAG & Vector Databases', 'Prof. Kenji Takahashi', 'NLP Lead @ LangChain Labs', '2h 30m', 'Intermediate', 'NLP & Transformers', 'Build production retrieval-augmented generation systems using LangChain, Pinecone, and HuggingFace Transformers.', NULL, 'https://images.unsplash.com/photo-1639322537228-f710d846310a?w=600&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80', '[{"name":"RAG Pipeline Implementation","type":"code","url":"#"},{"name":"Vector DB Comparison Guide","type":"pdf","url":"#"},{"name":"HuggingFace Course","type":"link","url":"#"}]', 4.85, 2100),
-('MLOps Pipeline Design: From Notebook to Production', 'Sarah Chen', 'MLOps Lead @ Scale AI', '1h 50m', 'Advanced', 'MLOps & Deployment', 'Design and deploy end-to-end ML pipelines with Docker, Kubernetes, MLflow, and CI/CD for model serving.', NULL, 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80', '[{"name":"Docker + K8s ML Deployment Guide","type":"code","url":"#"},{"name":"MLflow Tracking Setup","type":"pdf","url":"#"}]', 4.7, 870),
-('Reinforcement Learning: From Q-Learning to PPO Agents', 'Dr. Marcus Webb', 'Research Scientist @ DeepMind', '3h 10m', 'Advanced', 'Reinforcement Learning', 'Comprehensive RL course covering Q-learning, policy gradients, and Proximal Policy Optimization with OpenAI Gym environments.', NULL, 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80', '[{"name":"RL Algorithms from Scratch","type":"code","url":"#"},{"name":"PPO Paper Summary","type":"pdf","url":"#"}]', 4.95, 650),
-('Data Engineering Fundamentals: ETL, Spark & Airflow', 'Priya Sharma', 'Data Engineering Manager @ Databricks', '2h 00m', 'Beginner', 'Data Engineering', 'Learn to build scalable data pipelines using Apache Spark, Airflow, and modern lakehouse architectures.', NULL, 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&auto=format&fit=crop&q=80', '[{"name":"Spark + Airflow Project Starter","type":"code","url":"#"},{"name":"ETL Best Practices Guide","type":"pdf","url":"#"}]', 4.75, 1560);
+('NLP Mastery: Transformers, RAG & Vector Databases', 'Prof. Kenji Takahashi', 'NLP Lead @ LangChain Labs', '2h 30m', 'Intermediate', 'NLP & Transformers', 'Build production retrieval-augmented generation systems using LangChain, Pinecone, and HuggingFace Transformers.', NULL, 'https://images.unsplash.com/photo-1639322537228-f710d846310a?w=600&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80', -- =====================================================
+-- Table 7: Chapters & Ambassadors
+-- =====================================================
+CREATE TABLE IF NOT EXISTS chapters (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  city TEXT NOT NULL DEFAULT 'City',
+  lead_name TEXT NOT NULL DEFAULT 'Lead',
+  whatsapp_link TEXT NOT NULL,
+  members_count INTEGER DEFAULT 0,
+  badge TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE chapters ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow select on chapters" ON chapters FOR SELECT USING (true);
+CREATE POLICY "Allow all updates/inserts on chapters" ON chapters FOR ALL USING (true);
+
+CREATE TABLE IF NOT EXISTS ambassadors (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT,
+  phone TEXT NOT NULL,
+  university TEXT,
+  chapter_id TEXT,
+  chapter_name TEXT NOT NULL,
+  status TEXT DEFAULT 'Active',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE ambassadors ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow select on ambassadors" ON ambassadors FOR SELECT USING (true);
+CREATE POLICY "Allow all updates/inserts on ambassadors" ON ambassadors FOR ALL USING (true);

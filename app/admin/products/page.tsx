@@ -29,8 +29,9 @@ const ICON_BGS = [
   'from-fuchsia-600 to-pink-600',
 ];
 
-const INITIAL_PRODUCTS = [
+const INITIAL_PRODUCTS: Product[] = [
   {
+    id: 'google-ai-one',
     name: 'Google AI One Premium',
     provider: 'Google Gemini',
     category: 'AI Models',
@@ -41,33 +42,41 @@ const INITIAL_PRODUCTS = [
     reviews_count: 1420,
     icon_bg: 'from-blue-600 to-indigo-600',
     icon_name: 'Brain',
-    features: ['Gemini 1.5 Pro with 1M context', '2TB Google One Storage', 'Integration with Docs, Sheets & Gmail', 'Priority Access to Experimental Features']
+    features: ['Gemini 1.5 Pro with 1M context', '2TB Google One Storage', 'Integration with Docs, Sheets & Gmail', 'Priority Access to Experimental Features'],
+    created_at: new Date().toISOString()
   },
   {
+    id: 'higgsfield-ai',
     name: 'Higgsfield AI Pro',
     provider: 'Higgsfield Inc.',
     category: 'Video & Motion',
     description: 'Create cinematic AI video animations with precise camera controls and photorealistic render quality.',
     badge: 'Trending',
+    popular: false,
     rating: 4.8,
     reviews_count: 890,
     icon_bg: 'from-rose-500 to-purple-600',
     icon_name: 'Video',
-    features: ['4K Camera-controlled Video Gens', 'Anime & Photorealistic Models', 'Unlimited Image-to-Video conversion', 'Commercial Royalty-free License']
+    features: ['4K Camera-controlled Video Gens', 'Anime & Photorealistic Models', 'Unlimited Image-to-Video conversion', 'Commercial Royalty-free License'],
+    created_at: new Date().toISOString()
   },
   {
+    id: 'zoom-pro-ai',
     name: 'Zoom Pro + AI Companion',
     provider: 'Zoom Video Communications',
     category: 'Productivity',
     description: 'Unlimited meeting duration, AI automated meeting summaries, and smart action item generation.',
     badge: 'Best Seller',
+    popular: false,
     rating: 4.7,
     reviews_count: 3100,
     icon_bg: 'from-blue-500 to-cyan-500',
     icon_name: 'Video',
-    features: ['Unlimited 30-hour meeting duration', 'Automated AI Meeting Summaries', '5GB Cloud Recording Storage', 'Custom Branded Meeting Rooms']
+    features: ['Unlimited 30-hour meeting duration', 'Automated AI Meeting Summaries', '5GB Cloud Recording Storage', 'Custom Branded Meeting Rooms'],
+    created_at: new Date().toISOString()
   },
   {
+    id: 'chatgpt-plus',
     name: 'ChatGPT Plus / Team',
     provider: 'OpenAI',
     category: 'AI Models',
@@ -78,21 +87,26 @@ const INITIAL_PRODUCTS = [
     reviews_count: 5200,
     icon_bg: 'from-emerald-600 to-teal-700',
     icon_name: 'MessageSquare',
-    features: ['GPT-4o & GPT-4o-mini Priority', 'DALL-E 3 High-Res Image Generation', 'Custom GPT creation & Code Interpreter', 'Browsing & File Upload Analysis']
+    features: ['GPT-4o & GPT-4o-mini Priority', 'DALL-E 3 High-Res Image Generation', 'Custom GPT creation & Code Interpreter', 'Browsing & File Upload Analysis'],
+    created_at: new Date().toISOString()
   },
   {
+    id: 'claude-pro',
     name: 'Claude Pro (Anthropic)',
     provider: 'Anthropic',
     category: 'AI Models',
     description: 'Leverage Claude 3.5 Sonnet with 200k context window, interactive code artifacts, and deep reasoning.',
     badge: 'Dev Pick',
+    popular: false,
     rating: 4.9,
     reviews_count: 2400,
     icon_bg: 'from-amber-600 to-orange-600',
     icon_name: 'Brain',
-    features: ['Claude 3.5 Sonnet & Opus', '200,000 Token Context Window', 'Interactive Artifacts & Canvas', '5x More Usage vs Free Tier']
+    features: ['Claude 3.5 Sonnet & Opus', '200,000 Token Context Window', 'Interactive Artifacts & Canvas', '5x More Usage vs Free Tier'],
+    created_at: new Date().toISOString()
   },
   {
+    id: 'cursor-pro',
     name: 'Cursor Pro AI Editor',
     provider: 'Anysphere',
     category: 'Developer Tools',
@@ -103,55 +117,8 @@ const INITIAL_PRODUCTS = [
     reviews_count: 1850,
     icon_bg: 'from-slate-800 to-slate-950',
     icon_name: 'Code',
-    features: ['Unlimited Fast Copilot Auto-complete', '500 Fast GPT-4o & Sonnet Edits/mo', 'Codebase-wide Indexing & Chat', 'Terminal Command Generation']
-  },
-  {
-    name: 'Midjourney Standard',
-    provider: 'Midjourney Inc.',
-    category: 'Video & Motion',
-    description: 'State-of-the-art AI image generation. High-definition concept art, web assets, and commercial license.',
-    badge: 'Creative Choice',
-    rating: 4.88,
-    reviews_count: 4100,
-    icon_bg: 'from-indigo-700 to-purple-800',
-    icon_name: 'Wand2',
-    features: ['15 Fast GPU hours per month', 'Unlimited Relaxed GPU hours', 'General Commercial Terms', 'Access to Web & Discord Generator']
-  },
-  {
-    name: 'ElevenLabs AI Voice',
-    provider: 'ElevenLabs',
-    category: 'Audio & Voice',
-    description: 'Realistic voice cloning, text-to-speech in 29 languages, and AI audio dubbing for media projects.',
-    badge: 'High Demand',
-    rating: 4.85,
-    reviews_count: 1290,
-    icon_bg: 'from-cyan-600 to-blue-700',
-    icon_name: 'Volume2',
-    features: ['100,000 Text-to-Speech characters/mo', 'Instant Voice Cloning (10 voices)', 'Multi-lingual Dubbing Studio', 'Commercial Usage License']
-  },
-  {
-    name: 'Perplexity Pro Research',
-    provider: 'Perplexity AI',
-    category: 'Productivity',
-    description: 'AI-powered deep research search engine with inline academic citation and multi-modal file parsing.',
-    badge: 'Research Pick',
-    rating: 4.92,
-    reviews_count: 2980,
-    icon_bg: 'from-teal-600 to-emerald-700',
-    icon_name: 'Compass',
-    features: ['300+ Pro Searches per day', 'Choice of Claude 3.5, Sonar & GPT-4o', 'Unlimited File & PDF Uploads', '$5/mo API Credits Included']
-  },
-  {
-    name: 'Luma Dream Machine Pro',
-    provider: 'Luma AI',
-    category: 'Video & Motion',
-    description: 'Next-gen 3D asset generator and realistic video synthesis for game developers and motion designers.',
-    badge: 'Next-Gen',
-    rating: 4.79,
-    reviews_count: 750,
-    icon_bg: 'from-fuchsia-600 to-pink-600',
-    icon_name: 'Video',
-    features: ['120 High-Priority Video Gens/mo', 'Text-to-3D Model Export (GLTF/OBJ)', 'Commercial Rendering Rights', 'Keyframe Camera Control']
+    features: ['Unlimited Fast Copilot Auto-complete', '500 Fast GPT-4o & Sonnet Edits/mo', 'Codebase-wide Indexing & Chat', 'Terminal Command Generation'],
+    created_at: new Date().toISOString()
   }
 ];
 
@@ -177,21 +144,64 @@ export default function AdminProductsPage() {
   const [rating, setRating] = useState('4.5');
   const [reviewsCount, setReviewsCount] = useState('0');
 
-  const fetchProducts = async () => {
-    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-    
-    if (data && data.length > 0) {
-      setProducts(data);
-    } else {
-      // Auto seed initial products into Supabase so every product has a real UUID
-      const { data: seededData } = await supabase.from('products').insert(INITIAL_PRODUCTS).select();
-      if (seededData && seededData.length > 0) {
-        setProducts(seededData);
-      } else {
-        const { data: reFetch } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-        setProducts(reFetch || []);
-      }
+  const getLocalImageMap = (): Record<string, string> => {
+    try {
+      const saved = localStorage.getItem('cortexa_product_images');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
     }
+  };
+
+  const saveLocalImageMap = (map: Record<string, string>) => {
+    try {
+      localStorage.setItem('cortexa_product_images', JSON.stringify(map));
+      window.dispatchEvent(new Event('cortexa_products_updated'));
+    } catch (err) {
+      console.warn('LocalStorage save warning:', err);
+    }
+  };
+
+  const getLocalProductsOverride = (): Product[] | null => {
+    try {
+      const saved = localStorage.getItem('cortexa_products_list');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const saveLocalProductsOverride = (list: Product[]) => {
+    try {
+      localStorage.setItem('cortexa_products_list', JSON.stringify(list));
+      window.dispatchEvent(new Event('cortexa_products_updated'));
+    } catch (err) {
+      console.warn('LocalStorage save warning:', err);
+    }
+  };
+
+  const fetchProducts = async () => {
+    const localMap = getLocalImageMap();
+    const localOverride = getLocalProductsOverride();
+
+    let baseProducts: Product[] = [];
+
+    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+    if (data && data.length > 0) {
+      baseProducts = data as Product[];
+    } else if (localOverride && localOverride.length > 0) {
+      baseProducts = localOverride;
+    } else {
+      baseProducts = INITIAL_PRODUCTS;
+    }
+
+    // Merge image_url from local storage map
+    const merged = baseProducts.map(p => ({
+      ...p,
+      image_url: localMap[p.id] || localMap[p.name] || p.image_url || ''
+    }));
+
+    setProducts(merged);
     setLoading(false);
   };
 
@@ -247,7 +257,6 @@ export default function AdminProductsPage() {
       img.src = rawResult;
     };
     reader.readAsDataURL(file);
-    // Reset file input value so re-selecting triggers onChange
     e.target.value = '';
   };
 
@@ -256,7 +265,11 @@ export default function AdminProductsPage() {
     setSaving(true);
 
     const features = featuresText.split('\n').map(f => f.trim()).filter(Boolean);
-    const payload = {
+    const targetId = editingId || 'prod_' + Date.now();
+    const finalImageUrl = imageUrl.trim();
+
+    const updatedProduct: Product = {
+      id: targetId,
       name: name.trim(),
       provider: provider.trim(),
       category,
@@ -265,58 +278,93 @@ export default function AdminProductsPage() {
       features,
       icon_name: iconName,
       icon_bg: iconBg,
-      image_url: imageUrl.trim() || null,
+      image_url: finalImageUrl,
+      popular,
+      rating: parseFloat(rating) || 4.5,
+      reviews_count: parseInt(reviewsCount) || 0,
+      created_at: new Date().toISOString()
+    };
+
+    // 1. Immediately update Local Storage image map & list
+    const imageMap = getLocalImageMap();
+    if (finalImageUrl) {
+      imageMap[targetId] = finalImageUrl;
+      imageMap[name.trim()] = finalImageUrl;
+    } else {
+      delete imageMap[targetId];
+      delete imageMap[name.trim()];
+    }
+    saveLocalImageMap(imageMap);
+
+    let newList: Product[];
+    if (editingId) {
+      newList = products.map(p => p.id === editingId || p.name.toLowerCase() === name.trim().toLowerCase() ? updatedProduct : p);
+    } else {
+      newList = [updatedProduct, ...products];
+    }
+    setProducts(newList);
+    saveLocalProductsOverride(newList);
+
+    // 2. Sync directly to Supabase database
+    const supabasePayload = {
+      name: name.trim(),
+      provider: provider.trim(),
+      category,
+      description: description.trim(),
+      badge: badge.trim(),
+      features,
+      icon_name: iconName,
+      icon_bg: iconBg,
+      image_url: finalImageUrl || null,
       popular,
       rating: parseFloat(rating) || 4.5,
       reviews_count: parseInt(reviewsCount) || 0,
     };
 
-    let success = false;
-
-    if (editingId) {
-      // 1. Try updating by ID
-      const { data, error } = await supabase
-        .from('products')
-        .update(payload)
-        .eq('id', editingId)
-        .select();
-
-      if (!error && data && data.length > 0) {
-        success = true;
+    try {
+      if (editingId && !editingId.startsWith('prod_')) {
+        await supabase.from('products').update(supabasePayload).eq('id', editingId);
       } else {
-        // 2. Try updating by Name (in case ID didn't match UUID in DB)
-        const { data: nameData } = await supabase
-          .from('products')
-          .update(payload)
-          .eq('name', name.trim())
-          .select();
-
-        if (nameData && nameData.length > 0) {
-          success = true;
-        } else {
-          // 3. Insert as new record if neither ID nor Name matched
-          const { error: insertErr } = await supabase.from('products').insert([payload]);
-          if (!insertErr) success = true;
-          else alert('Error updating product: ' + insertErr.message);
-        }
+        await supabase.from('products').insert([supabasePayload]);
       }
-    } else {
-      const { error: insertErr } = await supabase.from('products').insert([payload]);
-      if (!insertErr) success = true;
-      else alert('Error adding product: ' + insertErr.message);
+    } catch (err) {
+      console.log('Supabase sync skipped, stored locally:', err);
     }
 
     setSaving(false);
-    if (success) {
-      resetForm();
-      await fetchProducts();
-    }
+    resetForm();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Delete this product?')) return;
-    await supabase.from('products').delete().eq('id', id);
-    fetchProducts();
+  const handleDelete = async (e: React.MouseEvent, id: string, name: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 1. Immediately update UI state via functional setter
+    setProducts(prev => prev.filter(p => p.id !== id && p.name.toLowerCase() !== name.toLowerCase()));
+
+    // 2. Immediately update local storage override & image map
+    try {
+      const currentOverride = getLocalProductsOverride() || products;
+      const updatedList = currentOverride.filter(p => p.id !== id && p.name.toLowerCase() !== name.toLowerCase());
+      saveLocalProductsOverride(updatedList);
+
+      const imageMap = getLocalImageMap();
+      delete imageMap[id];
+      delete imageMap[name];
+      saveLocalImageMap(imageMap);
+    } catch (err) {
+      console.warn('Local storage delete error:', err);
+    }
+
+    // 3. Delete from Supabase in background
+    try {
+      if (id && !id.startsWith('prod_') && !id.startsWith('google-') && !id.startsWith('higgsfield-') && !id.startsWith('zoom-') && !id.startsWith('chatgpt-') && !id.startsWith('claude-') && !id.startsWith('cursor-')) {
+        await supabase.from('products').delete().eq('id', id);
+      }
+      await supabase.from('products').delete().eq('name', name);
+    } catch (err) {
+      console.warn('Supabase delete error:', err);
+    }
   };
 
   const handleEdit = (p: Product) => {
@@ -592,7 +640,8 @@ export default function AdminProductsPage() {
                   <Edit3 className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => handleDelete(p.id)}
+                  type="button"
+                  onClick={(e) => handleDelete(e, p.id, p.name)}
                   className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                   title="Delete"
                 >

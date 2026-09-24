@@ -185,17 +185,54 @@ export const ProductMarketplaceView: React.FC = () => {
 
   const categories = ['All', 'AI Models', 'Video & Motion', 'Developer Tools', 'Productivity', 'Audio & Voice'];
 
+  const getLocalImageMap = (): Record<string, string> => {
+    try {
+      const saved = localStorage.getItem('cortexa_product_images');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const getLocalProductsOverride = (): Product[] | null => {
+    try {
+      const saved = localStorage.getItem('cortexa_products_list');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const loadProducts = async () => {
+    const localMap = getLocalImageMap();
+    const localOverride = getLocalProductsOverride();
+
+    let base: Product[] = [];
+    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+    
+    if (localOverride && localOverride.length > 0) {
+      base = localOverride;
+    } else if (data && data.length > 0) {
+      base = data as Product[];
+    } else {
+      base = STATIC_PRODUCTS;
+    }
+
+    const merged = base.map(p => ({
+      ...p,
+      image_url: localMap[p.id] || localMap[p.name] || p.image_url || null
+    }));
+
+    setProducts(merged);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-      if (data && data.length > 0) {
-        setProducts(data as Product[]);
-      } else {
-        setProducts(STATIC_PRODUCTS);
-      }
-      setLoading(false);
-    };
-    fetchProducts();
+    loadProducts();
+
+    const handleUpdate = () => loadProducts();
+    window.addEventListener('cortexa_products_updated', handleUpdate);
+    return () => window.removeEventListener('cortexa_products_updated', handleUpdate);
   }, []);
 
   const getIconComponent = (iconName?: string) => {
