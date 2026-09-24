@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Plus, Trash2, Edit3, X, Save, ShoppingBag, Loader2, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Plus, Trash2, Edit3, X, Save, ShoppingBag, Loader2, Sparkles, Image as ImageIcon, UploadCloud } from 'lucide-react';
 
 type Product = {
   id: string;
@@ -35,6 +35,7 @@ export default function AdminProductsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form fields
   const [name, setName] = useState('');
@@ -63,6 +64,25 @@ export default function AdminProductsPage() {
     setBadge(''); setFeaturesText(''); setIconName('Brain'); setIconBg(ICON_BGS[0]);
     setImageUrl(''); setPopular(false); setRating('4.5'); setReviewsCount('0');
     setEditingId(null); setShowForm(false);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 3 * 1024 * 1024) {
+      alert('File size is too large. Please select an image under 3MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      if (base64) {
+        setImageUrl(base64);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSave = async () => {
@@ -163,34 +183,66 @@ export default function AdminProductsPage() {
             />
           </div>
 
-          {/* Image / Logo URL Field */}
-          <div className="space-y-1">
+          {/* Upload Image Section */}
+          <div className="space-y-1.5">
             <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
-              Product Image / Logo URL (Optional)
+              Product Logo / Image
             </label>
-            <div className="flex gap-3 items-center">
+            
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept="image/*"
+              className="hidden"
+            />
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              {/* Upload Button */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="px-4 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shrink-0"
+              >
+                <UploadCloud className="w-4 h-4 text-emerald-600" />
+                <span>Upload Image File</span>
+              </button>
+
+              {/* Or URL input */}
               <div className="relative flex-1">
                 <ImageIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://.../logo.png or /Icons/Notification.png"
-                  className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+                  placeholder="Or paste image URL (e.g. https://.../logo.png)"
+                  className="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
                 />
+                {imageUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setImageUrl('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
 
-              {/* Preview Thumbnail */}
+              {/* Image Preview */}
               {imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={imageUrl}
-                  alt="Preview"
-                  className="w-10 h-10 rounded-xl object-contain border border-slate-200 bg-slate-50 p-1 shrink-0"
-                  onError={(e) => (e.currentTarget.style.display = 'none')}
-                />
+                <div className="flex items-center gap-2 shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={imageUrl}
+                    alt="Preview"
+                    className="w-10 h-10 rounded-xl object-contain border border-slate-200 bg-slate-50 p-1 shadow-xs"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
+                  <span className="text-[10px] text-emerald-600 font-bold">Image Set</span>
+                </div>
               ) : (
                 <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 shrink-0 text-[10px] font-bold">
-                  Icon
+                  No Image
                 </div>
               )}
             </div>
