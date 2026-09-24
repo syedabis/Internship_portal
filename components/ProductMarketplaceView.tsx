@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   CheckCircle2,
@@ -18,8 +18,10 @@ import {
   Volume2,
   Compass,
   Headphones,
-  Users
+  ShoppingBag,
+  Loader2
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export interface Product {
   id: string;
@@ -29,14 +31,17 @@ export interface Product {
   description: string;
   badge?: string;
   rating: number;
-  reviewsCount: number;
-  iconBg: string;
-  iconComponent: React.ElementType;
+  reviews_count?: number;
+  reviewsCount?: number;
+  icon_bg?: string;
+  iconBg?: string;
+  icon_name?: string;
+  image_url?: string | null;
   features: string[];
   popular?: boolean;
 }
 
-const PRODUCTS: Product[] = [
+const STATIC_PRODUCTS: Product[] = [
   {
     id: 'google-ai-one',
     name: 'Google AI One Premium',
@@ -48,7 +53,7 @@ const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 1420,
     iconBg: 'from-blue-600 to-indigo-600',
-    iconComponent: Brain,
+    icon_name: 'Brain',
     features: ['Gemini 1.5 Pro with 1M context', '2TB Google One Storage', 'Integration with Docs, Sheets & Gmail', 'Priority Access to Experimental Features']
   },
   {
@@ -61,7 +66,7 @@ const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 890,
     iconBg: 'from-rose-500 to-purple-600',
-    iconComponent: Video,
+    icon_name: 'Video',
     features: ['4K Camera-controlled Video Gens', 'Anime & Photorealistic Models', 'Unlimited Image-to-Video conversion', 'Commercial Royalty-free License']
   },
   {
@@ -74,7 +79,7 @@ const PRODUCTS: Product[] = [
     rating: 4.7,
     reviewsCount: 3100,
     iconBg: 'from-blue-500 to-cyan-500',
-    iconComponent: Video,
+    icon_name: 'Video',
     features: ['Unlimited 30-hour meeting duration', 'Automated AI Meeting Summaries', '5GB Cloud Recording Storage', 'Custom Branded Meeting Rooms']
   },
   {
@@ -88,7 +93,7 @@ const PRODUCTS: Product[] = [
     rating: 4.95,
     reviewsCount: 5200,
     iconBg: 'from-emerald-600 to-teal-700',
-    iconComponent: MessageSquare,
+    icon_name: 'MessageSquare',
     features: ['GPT-4o & GPT-4o-mini Priority', 'DALL-E 3 High-Res Image Generation', 'Custom GPT creation & Code Interpreter', 'Browsing & File Upload Analysis']
   },
   {
@@ -101,7 +106,7 @@ const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewsCount: 2400,
     iconBg: 'from-amber-600 to-orange-600',
-    iconComponent: Brain,
+    icon_name: 'Brain',
     features: ['Claude 3.5 Sonnet & Opus', '200,000 Token Context Window', 'Interactive Artifacts & Canvas', '5x More Usage vs Free Tier']
   },
   {
@@ -115,7 +120,7 @@ const PRODUCTS: Product[] = [
     rating: 4.98,
     reviewsCount: 1850,
     iconBg: 'from-slate-800 to-slate-950',
-    iconComponent: Code,
+    icon_name: 'Code',
     features: ['Unlimited Fast Copilot Auto-complete', '500 Fast GPT-4o & Sonnet Edits/mo', 'Codebase-wide Indexing & Chat', 'Terminal Command Generation']
   },
   {
@@ -128,7 +133,7 @@ const PRODUCTS: Product[] = [
     rating: 4.88,
     reviewsCount: 4100,
     iconBg: 'from-indigo-700 to-purple-800',
-    iconComponent: Wand2,
+    icon_name: 'Wand2',
     features: ['15 Fast GPU hours per month', 'Unlimited Relaxed GPU hours', 'General Commercial Terms', 'Access to Web & Discord Generator']
   },
   {
@@ -141,7 +146,7 @@ const PRODUCTS: Product[] = [
     rating: 4.85,
     reviewsCount: 1290,
     iconBg: 'from-cyan-600 to-blue-700',
-    iconComponent: Volume2,
+    icon_name: 'Volume2',
     features: ['100,000 Text-to-Speech characters/mo', 'Instant Voice Cloning (10 voices)', 'Multi-lingual Dubbing Studio', 'Commercial Usage License']
   },
   {
@@ -154,7 +159,7 @@ const PRODUCTS: Product[] = [
     rating: 4.92,
     reviewsCount: 2980,
     iconBg: 'from-teal-600 to-emerald-700',
-    iconComponent: Compass,
+    icon_name: 'Compass',
     features: ['300+ Pro Searches per day', 'Choice of Claude 3.5, Sonar & GPT-4o', 'Unlimited File & PDF Uploads', '$5/mo API Credits Included']
   },
   {
@@ -167,18 +172,45 @@ const PRODUCTS: Product[] = [
     rating: 4.79,
     reviewsCount: 750,
     iconBg: 'from-fuchsia-600 to-pink-600',
-    iconComponent: Video,
+    icon_name: 'Video',
     features: ['120 High-Priority Video Gens/mo', 'Text-to-3D Model Export (GLTF/OBJ)', 'Commercial Rendering Rights', 'Keyframe Camera Control']
   }
 ];
 
 export const ProductMarketplaceView: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   const categories = ['All', 'AI Models', 'Video & Motion', 'Developer Tools', 'Productivity', 'Audio & Voice'];
 
-  const filteredProducts = PRODUCTS.filter((p) => {
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+      if (data && data.length > 0) {
+        setProducts(data as Product[]);
+      } else {
+        setProducts(STATIC_PRODUCTS);
+      }
+      setLoading(false);
+    };
+    fetchProducts();
+  }, []);
+
+  const getIconComponent = (iconName?: string) => {
+    switch (iconName) {
+      case 'Video': return Video;
+      case 'Code': return Code;
+      case 'MessageSquare': return MessageSquare;
+      case 'Wand2': return Wand2;
+      case 'Volume2': return Volume2;
+      case 'Compass': return Compass;
+      default: return Brain;
+    }
+  };
+
+  const filteredProducts = products.filter((p) => {
     const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           p.provider.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -275,84 +307,101 @@ export const ProductMarketplaceView: React.FC = () => {
         </div>
       </div>
 
-      {/* Product Cards Grid (10 Products) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => {
-          const IconComponent = product.iconComponent;
+      {/* Product Cards Grid */}
+      {loading ? (
+        <div className="flex justify-center items-center py-24 bg-white rounded-3xl border border-slate-200">
+          <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProducts.map((product) => {
+            const IconComponent = getIconComponent(product.icon_name);
+            const bgClass = product.icon_bg || product.iconBg || 'from-blue-600 to-indigo-600';
+            const reviews = product.reviews_count ?? product.reviewsCount ?? 0;
 
-          return (
-            <div
-              key={product.id}
-              className={`bg-white rounded-2xl border transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between overflow-hidden relative ${
-                product.popular ? 'border-emerald-500/60 ring-2 ring-emerald-500/20' : 'border-slate-200/90'
-              }`}
-            >
-              {/* Card Content */}
-              <div className="p-6 pb-4">
-                <div className="flex items-start justify-between gap-3 mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${product.iconBg} text-white flex items-center justify-center shadow-md shrink-0`}>
-                      <IconComponent className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                        {product.provider}
+            return (
+              <div
+                key={product.id}
+                className={`bg-white rounded-2xl border transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between overflow-hidden relative ${
+                  product.popular ? 'border-emerald-500/60 ring-2 ring-emerald-500/20' : 'border-slate-200/90'
+                }`}
+              >
+                {/* Card Content */}
+                <div className="p-6 pb-4">
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-3">
+                      {product.image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={product.image_url}
+                          alt={product.name}
+                          className="w-12 h-12 rounded-2xl object-cover p-1 bg-slate-50 border border-slate-200 shrink-0 shadow-md"
+                        />
+                      ) : (
+                        <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${bgClass} text-white flex items-center justify-center shadow-md shrink-0`}>
+                          <IconComponent className="w-6 h-6" />
+                        </div>
+                      )}
+                      <div>
+                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                          {product.provider}
+                        </div>
+                        <h3 className="text-base font-bold text-slate-900 leading-tight">
+                          {product.name}
+                        </h3>
                       </div>
-                      <h3 className="text-base font-bold text-slate-900 leading-tight">
-                        {product.name}
-                      </h3>
                     </div>
+
+                    {product.badge && (
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shrink-0 ${
+                        product.popular 
+                          ? 'bg-emerald-500/10 text-emerald-700 border border-emerald-500/30' 
+                          : 'bg-slate-100 text-slate-700 border border-slate-200'
+                      }`}>
+                        {product.badge}
+                      </span>
+                    )}
                   </div>
 
-                  {product.badge && (
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shrink-0 ${
-                      product.popular 
-                        ? 'bg-emerald-500/10 text-emerald-700 border border-emerald-500/30' 
-                        : 'bg-slate-100 text-slate-700 border border-slate-200'
-                    }`}>
-                      {product.badge}
-                    </span>
-                  )}
+                  <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 mb-4">
+                    {product.description}
+                  </p>
+
+                  {/* Rating */}
+                  <div className="flex items-center gap-1 text-amber-500 font-bold text-xs pt-2 border-t border-slate-100 mb-4">
+                    <Star className="w-3.5 h-3.5 fill-amber-400" />
+                    <span>{product.rating}</span>
+                    <span className="text-[11px] text-slate-400 font-normal">({reviews} reviews)</span>
+                  </div>
+
+                  {/* Feature Bullet points */}
+                  <div className="space-y-2 bg-slate-50/70 p-3 rounded-xl border border-slate-100 text-xs">
+                    {(product.features || []).map((feat, idx) => (
+                      <div key={idx} className="flex items-start gap-2 text-slate-700">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                        <span className="text-[11px] leading-tight font-medium">{feat}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                <p className="text-xs text-slate-600 leading-relaxed line-clamp-2 mb-4">
-                  {product.description}
-                </p>
-
-                {/* Rating */}
-                <div className="flex items-center gap-1 text-amber-500 font-bold text-xs pt-2 border-t border-slate-100 mb-4">
-                  <Star className="w-3.5 h-3.5 fill-amber-400" />
-                  <span>{product.rating}</span>
-                  <span className="text-[11px] text-slate-400 font-normal">({product.reviewsCount} reviews)</span>
-                </div>
-
-                {/* Feature Bullet points */}
-                <div className="space-y-2 bg-slate-50/70 p-3 rounded-xl border border-slate-100 text-xs">
-                  {product.features.map((feat, idx) => (
-                    <div key={idx} className="flex items-start gap-2 text-slate-700">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                      <span className="text-[11px] leading-tight font-medium">{feat}</span>
-                    </div>
-                  ))}
+                {/* Card Footer: Chat on WhatsApp Action */}
+                <div className="p-5 pt-3 bg-slate-50/50 border-t border-slate-100">
+                  <button
+                    onClick={() => handleOpenWhatsApp(product.name)}
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+                  >
+                    <MessageCircle className="w-4 h-4 fill-white text-emerald-700" />
+                    <span>Chat on WhatsApp</span>
+                  </button>
                 </div>
               </div>
+            );
+          })}
+        </div>
+      )}
 
-              {/* Card Footer: Chat on WhatsApp Action */}
-              <div className="p-5 pt-3 bg-slate-50/50 border-t border-slate-100">
-                <button
-                  onClick={() => handleOpenWhatsApp(product.name)}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
-                >
-                  <MessageCircle className="w-4 h-4 fill-white text-emerald-700" />
-                  <span>Chat on WhatsApp</span>
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {filteredProducts.length === 0 && (
+      {filteredProducts.length === 0 && !loading && (
         <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 p-8 space-y-3">
           <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
             <Search className="w-6 h-6" />

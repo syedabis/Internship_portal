@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Plus, Trash2, Edit3, X, Save, ShoppingBag, Loader2, Sparkles, Star } from 'lucide-react';
+import { Plus, Trash2, Edit3, X, Save, ShoppingBag, Loader2, Sparkles, Image as ImageIcon } from 'lucide-react';
 
 type Product = {
   id: string;
@@ -14,6 +14,7 @@ type Product = {
   features: string[];
   icon_name: string;
   icon_bg: string;
+  image_url?: string;
   popular: boolean;
   rating: number;
   reviews_count: number;
@@ -21,7 +22,6 @@ type Product = {
 };
 
 const CATEGORIES = ['AI Models', 'Video & Motion', 'Developer Tools', 'Productivity', 'Audio & Voice'];
-const ICONS = ['Brain', 'Video', 'Code', 'MessageSquare', 'Wand2', 'Volume2', 'Compass'];
 const ICON_BGS = [
   'from-blue-600 to-indigo-600', 'from-rose-500 to-purple-600', 'from-blue-500 to-cyan-500',
   'from-emerald-600 to-teal-700', 'from-amber-600 to-orange-600', 'from-slate-800 to-slate-950',
@@ -45,6 +45,7 @@ export default function AdminProductsPage() {
   const [featuresText, setFeaturesText] = useState('');
   const [iconName, setIconName] = useState('Brain');
   const [iconBg, setIconBg] = useState(ICON_BGS[0]);
+  const [imageUrl, setImageUrl] = useState('');
   const [popular, setPopular] = useState(false);
   const [rating, setRating] = useState('4.5');
   const [reviewsCount, setReviewsCount] = useState('0');
@@ -60,7 +61,7 @@ export default function AdminProductsPage() {
   const resetForm = () => {
     setName(''); setProvider(''); setCategory('AI Models'); setDescription('');
     setBadge(''); setFeaturesText(''); setIconName('Brain'); setIconBg(ICON_BGS[0]);
-    setPopular(false); setRating('4.5'); setReviewsCount('0');
+    setImageUrl(''); setPopular(false); setRating('4.5'); setReviewsCount('0');
     setEditingId(null); setShowForm(false);
   };
 
@@ -71,7 +72,7 @@ export default function AdminProductsPage() {
     const features = featuresText.split('\n').map(f => f.trim()).filter(Boolean);
     const payload = {
       name, provider, category, description, badge, features,
-      icon_name: iconName, icon_bg: iconBg, popular,
+      icon_name: iconName, icon_bg: iconBg, image_url: imageUrl.trim() || null, popular,
       rating: parseFloat(rating) || 4.5,
       reviews_count: parseInt(reviewsCount) || 0,
     };
@@ -103,6 +104,7 @@ export default function AdminProductsPage() {
     setFeaturesText(Array.isArray(p.features) ? p.features.join('\n') : '');
     setIconName(p.icon_name || 'Brain');
     setIconBg(p.icon_bg || ICON_BGS[0]);
+    setImageUrl(p.image_url || '');
     setPopular(p.popular);
     setRating(String(p.rating));
     setReviewsCount(String(p.reviews_count));
@@ -120,7 +122,7 @@ export default function AdminProductsPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-slate-900">Products & Perks Catalogue</h1>
-            <p className="text-xs text-slate-500 mt-0.5">Manage AI tools, software subscriptions, and developer perks.</p>
+            <p className="text-xs text-slate-500 mt-0.5">Manage AI tools, software subscriptions, product images, and developer perks.</p>
           </div>
         </div>
 
@@ -159,6 +161,39 @@ export default function AdminProductsPage() {
               placeholder="Provider (e.g. Google Gemini)"
               className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
             />
+          </div>
+
+          {/* Image / Logo URL Field */}
+          <div className="space-y-1">
+            <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
+              Product Image / Logo URL (Optional)
+            </label>
+            <div className="flex gap-3 items-center">
+              <div className="relative flex-1">
+                <ImageIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="https://.../logo.png or /Icons/Notification.png"
+                  className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              {/* Preview Thumbnail */}
+              {imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={imageUrl}
+                  alt="Preview"
+                  className="w-10 h-10 rounded-xl object-contain border border-slate-200 bg-slate-50 p-1 shrink-0"
+                  onError={(e) => (e.currentTarget.style.display = 'none')}
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 shrink-0 text-[10px] font-bold">
+                  Icon
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -259,9 +294,18 @@ export default function AdminProductsPage() {
               className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs flex items-center justify-between gap-4 group hover:border-emerald-500/40 transition-all"
             >
               <div className="flex items-center gap-4 flex-1 min-w-0">
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${p.icon_bg} flex items-center justify-center text-white shrink-0 shadow-xs`}>
-                  <ShoppingBag className="w-6 h-6" />
-                </div>
+                {p.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={p.image_url}
+                    alt={p.name}
+                    className="w-12 h-12 rounded-2xl object-cover p-1 bg-slate-50 border border-slate-200 shrink-0 shadow-xs"
+                  />
+                ) : (
+                  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${p.icon_bg} flex items-center justify-center text-white shrink-0 shadow-xs`}>
+                    <ShoppingBag className="w-6 h-6" />
+                  </div>
+                )}
                 <div className="min-w-0 space-y-0.5">
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold text-slate-900 text-sm truncate">{p.name}</h3>
