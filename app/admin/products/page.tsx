@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Plus, Trash2, Edit3, X, Save, ShoppingBag, Loader2, Star } from 'lucide-react';
+import { Plus, Trash2, Edit3, X, Save, ShoppingBag, Loader2, Sparkles, Star } from 'lucide-react';
 
 type Product = {
   id: string;
@@ -110,83 +110,133 @@ export default function AdminProductsPage() {
   };
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <ShoppingBag className="w-6 h-6 text-emerald-400" />
-            Products & Perks
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">Manage the AI tools catalogue shown to interns</p>
+    <div className="space-y-6 pb-16 font-sans max-w-5xl mx-auto">
+      
+      {/* Header */}
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-700 flex items-center justify-center shrink-0">
+            <ShoppingBag className="w-6 h-6 text-blue-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-slate-900">Products & Perks Catalogue</h1>
+            <p className="text-xs text-slate-500 mt-0.5">Manage AI tools, software subscriptions, and developer perks.</p>
+          </div>
         </div>
+
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all"
+          className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-xs shrink-0"
         >
-          <Plus className="w-4 h-4" />
-          Add Product
+          <Plus className="w-4 h-4 text-emerald-400" />
+          <span>Add Product</span>
         </button>
       </div>
 
-      {/* Form */}
+      {/* Form Card */}
       {showForm && (
-        <div className="mb-8 bg-slate-800 border border-slate-700 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-white">{editingId ? 'Edit Product' : 'Add New Product'}</h3>
-            <button onClick={resetForm} className="text-slate-400 hover:text-white"><X className="w-4 h-4" /></button>
+        <div className="bg-white border border-emerald-500/40 rounded-2xl p-6 shadow-xl space-y-4 ring-2 ring-emerald-500/10">
+          <div className="flex items-center justify-between border-b pb-3">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-600" />
+              <span>{editingId ? 'Edit Product' : 'Add New Product'}</span>
+            </h3>
+            <button onClick={resetForm} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Product Name"
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
-            <input value={provider} onChange={(e) => setProvider(e.target.value)} placeholder="Provider (e.g., Google Gemini)"
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Product Name (e.g. Google AI One Premium)"
+              className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
+            <input
+              value={provider}
+              onChange={(e) => setProvider(e.target.value)}
+              placeholder="Provider (e.g. Google Gemini)"
+              className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <select value={category} onChange={(e) => setCategory(e.target.value)}
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500">
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+            >
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
-            <input value={badge} onChange={(e) => setBadge(e.target.value)} placeholder="Badge (e.g., Popular, Trending)"
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
-            <div className="flex items-center gap-4">
-              <input value={rating} onChange={(e) => setRating(e.target.value)} placeholder="Rating" type="number" step="0.01" min="0" max="5"
-                className="flex-1 p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
-              <input value={reviewsCount} onChange={(e) => setReviewsCount(e.target.value)} placeholder="Reviews" type="number"
-                className="flex-1 p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+
+            <input
+              value={badge}
+              onChange={(e) => setBadge(e.target.value)}
+              placeholder="Badge (e.g. Popular, Trending)"
+              className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
+
+            <div className="flex items-center gap-2">
+              <input
+                value={rating}
+                onChange={(e) => setRating(e.target.value)}
+                placeholder="Rating"
+                type="number"
+                step="0.01"
+                min="0"
+                max="5"
+                className="w-1/2 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+              />
+              <input
+                value={reviewsCount}
+                onChange={(e) => setReviewsCount(e.target.value)}
+                placeholder="Reviews"
+                type="number"
+                className="w-1/2 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+              />
             </div>
           </div>
 
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description..." rows={2}
-            className="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Product description summary..."
+            rows={2}
+            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-normal text-slate-800 focus:outline-none focus:border-emerald-500"
+          />
 
           <div>
-            <label className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">Features (one per line)</label>
-            <textarea value={featuresText} onChange={(e) => setFeaturesText(e.target.value)} placeholder="Feature 1&#10;Feature 2&#10;Feature 3" rows={4}
-              className="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <select value={iconName} onChange={(e) => setIconName(e.target.value)}
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500">
-              {ICONS.map(i => <option key={i} value={i}>{i}</option>)}
-            </select>
-            <select value={iconBg} onChange={(e) => setIconBg(e.target.value)}
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500">
-              {ICON_BGS.map(bg => <option key={bg} value={bg}>{bg.replace(/from-|to-/g, '').replace(/-\d+/g, '')}</option>)}
-            </select>
-            <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer p-3">
-              <input type="checkbox" checked={popular} onChange={(e) => setPopular(e.target.checked)} className="accent-emerald-500" />
-              Mark as Popular
+            <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block">
+              Features (one bullet per line)
             </label>
+            <textarea
+              value={featuresText}
+              onChange={(e) => setFeaturesText(e.target.value)}
+              placeholder="Gemini 1.5 Pro with 1M context&#10;2TB Google One Storage&#10;Integration with Docs & Gmail"
+              rows={3}
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
           </div>
 
-          <div className="flex justify-end">
-            <button onClick={handleSave} disabled={saving || !name.trim() || !provider.trim()}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all">
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+            <label className="flex items-center gap-2 text-xs text-slate-700 font-semibold cursor-pointer">
+              <input
+                type="checkbox"
+                checked={popular}
+                onChange={(e) => setPopular(e.target.checked)}
+                className="accent-emerald-600 rounded"
+              />
+              <span>Highlight card as Popular</span>
+            </label>
+
+            <button
+              onClick={handleSave}
+              disabled={saving || !name.trim() || !provider.trim()}
+              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-xs"
+            >
               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-              {editingId ? 'Update Product' : 'Add Product'}
+              <span>{editingId ? 'Update Product' : 'Add Product'}</span>
             </button>
           </div>
         </div>
@@ -194,33 +244,58 @@ export default function AdminProductsPage() {
 
       {/* Product List */}
       {loading ? (
-        <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 text-emerald-400 animate-spin" /></div>
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 flex justify-center items-center">
+          <Loader2 className="w-6 h-6 text-emerald-600 animate-spin" />
+        </div>
       ) : products.length === 0 ? (
-        <div className="text-center py-16 text-slate-500 text-sm">No products yet.</div>
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-xs text-slate-500">
+          No products listed yet. Click "Add Product" to add your first catalogue tool.
+        </div>
       ) : (
         <div className="space-y-3">
           {products.map((p) => (
-            <div key={p.id} className="bg-slate-800/60 border border-slate-700 rounded-xl p-5 flex items-center justify-between gap-4 group hover:border-slate-600 transition-all">
+            <div
+              key={p.id}
+              className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs flex items-center justify-between gap-4 group hover:border-emerald-500/40 transition-all"
+            >
               <div className="flex items-center gap-4 flex-1 min-w-0">
-                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${p.icon_bg} flex items-center justify-center shrink-0`}>
-                  <ShoppingBag className="w-5 h-5 text-white" />
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${p.icon_bg} flex items-center justify-center text-white shrink-0 shadow-xs`}>
+                  <ShoppingBag className="w-6 h-6" />
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-white text-sm truncate">{p.name}</h3>
-                    {p.popular && <span className="px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold rounded">POPULAR</span>}
-                    {p.badge && <span className="px-1.5 py-0.5 bg-slate-700 text-slate-300 text-[10px] font-bold rounded">{p.badge}</span>}
+                    <h3 className="font-bold text-slate-900 text-sm truncate">{p.name}</h3>
+                    {p.popular && (
+                      <span className="px-2 py-0.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-extrabold rounded-full">
+                        POPULAR
+                      </span>
+                    )}
+                    {p.badge && (
+                      <span className="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-bold rounded-full">
+                        {p.badge}
+                      </span>
+                    )}
                   </div>
-                  <p className="text-[11px] text-slate-500">{p.provider} · {p.category} · ★ {p.rating}</p>
+                  <p className="text-xs text-slate-500">
+                    {p.provider} · <span className="font-semibold text-slate-700">{p.category}</span> · ★ {p.rating} ({p.reviews_count} reviews)
+                  </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => handleEdit(p)} className="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-blue-400 transition-colors" title="Edit">
-                  <Edit3 className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={() => handleEdit(p)}
+                  className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-blue-600 transition-colors"
+                  title="Edit"
+                >
+                  <Edit3 className="w-4 h-4" />
                 </button>
-                <button onClick={() => handleDelete(p.id)} className="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-red-400 transition-colors" title="Delete">
-                  <Trash2 className="w-3.5 h-3.5" />
+                <button
+                  onClick={() => handleDelete(p.id)}
+                  className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-rose-600 transition-colors"
+                  title="Delete"
+                >
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>

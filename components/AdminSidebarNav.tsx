@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Bell, ShoppingBag, BookOpen, MessageSquare, HelpCircle } from 'lucide-react';
+import { LayoutDashboard, Bell, ShoppingBag, BookOpen, HelpCircle } from 'lucide-react';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -16,7 +16,11 @@ export function AdminSidebarNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex-1 p-3 space-y-0.5">
+    <nav className="space-y-1 text-xs">
+      <div className="text-[10px] font-bold tracking-widest text-[#5c736f] uppercase px-2 mb-2">
+        ADMINISTRATION
+      </div>
+
       {navItems.map(({ href, label, icon: Icon }) => {
         const isActive = href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
 
@@ -24,18 +28,16 @@ export function AdminSidebarNav() {
           <Link
             key={href}
             href={href}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors group ${
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all cursor-pointer font-medium ${
               isActive
-                ? 'bg-emerald-600/10 text-emerald-400 font-medium'
-                : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                ? 'bg-[#1b3d37] text-white font-bold shadow-xs border border-[#26554d]'
+                : 'text-[#9cb0ab] hover:text-white hover:bg-[#132d28]'
             }`}
           >
-            <Icon 
-              className={`w-4 h-4 transition-colors ${
-                isActive ? 'text-emerald-400' : 'text-slate-400 group-hover:text-emerald-400'
-              }`} 
-            />
-            {label}
+            <div className="flex items-center gap-3">
+              <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-[#758e89]'}`} />
+              <span className="truncate">{label}</span>
+            </div>
           </Link>
         );
       })}

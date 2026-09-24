@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Plus, Trash2, Pin, PinOff, Edit3, X, Save, Bell, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Pin, PinOff, Edit3, X, Save, Bell, Loader2, Sparkles } from 'lucide-react';
 
 type Announcement = {
   id: string;
@@ -80,32 +80,38 @@ export default function AdminAnnouncementsPage() {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Bell className="w-6 h-6 text-emerald-400" />
-            Announcements
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">Create and manage announcements visible to all interns</p>
+    <div className="space-y-6 pb-16 font-sans max-w-5xl mx-auto">
+      
+      {/* Page Header */}
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 flex items-center justify-center shrink-0">
+            <Bell className="w-6 h-6 text-emerald-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-slate-900">Announcements Management</h1>
+            <p className="text-xs text-slate-500 mt-0.5">Publish news updates visible to all intern dashboards in real-time.</p>
+          </div>
         </div>
+
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all"
+          className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-xs shrink-0"
         >
-          <Plus className="w-4 h-4" />
-          New Announcement
+          <Plus className="w-4 h-4 text-emerald-400" />
+          <span>New Announcement</span>
         </button>
       </div>
 
-      {/* Form Modal */}
+      {/* Form Modal / Card */}
       {showForm && (
-        <div className="mb-8 bg-slate-800 border border-slate-700 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-white">
-              {editingId ? 'Edit Announcement' : 'New Announcement'}
+        <div className="bg-white border border-emerald-500/40 rounded-2xl p-6 shadow-xl space-y-4 ring-2 ring-emerald-500/10">
+          <div className="flex items-center justify-between border-b pb-3">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-600" />
+              <span>{editingId ? 'Edit Announcement' : 'New Announcement'}</span>
             </h3>
-            <button onClick={resetForm} className="text-slate-400 hover:text-white">
+            <button onClick={resetForm} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -113,84 +119,94 @@ export default function AdminAnnouncementsPage() {
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Announcement Title"
-            className="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+            placeholder="Announcement Title (e.g. Weekly Scoring Refresh Policy)"
+            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 font-medium"
           />
+
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            placeholder="Announcement body..."
+            placeholder="Write announcement body message..."
             rows={4}
-            className="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 leading-relaxed font-normal"
           />
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+            <label className="flex items-center gap-2 text-xs text-slate-700 font-semibold cursor-pointer">
               <input
                 type="checkbox"
                 checked={pinned}
                 onChange={(e) => setPinned(e.target.checked)}
-                className="accent-emerald-500"
+                className="accent-emerald-600 rounded"
               />
-              Pin to top
+              <span>Pin to top of intern dashboard</span>
             </label>
+
             <button
               onClick={handleSave}
               disabled={saving || !title.trim() || !body.trim()}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all"
+              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-xs"
             >
               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-              {editingId ? 'Update' : 'Publish'}
+              <span>{editingId ? 'Update Announcement' : 'Publish Announcement'}</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* List */}
+      {/* Announcements List */}
       {loading ? (
-        <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 text-emerald-400 animate-spin" /></div>
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 flex justify-center items-center">
+          <Loader2 className="w-6 h-6 text-emerald-600 animate-spin" />
+        </div>
       ) : announcements.length === 0 ? (
-        <div className="text-center py-16 text-slate-500 text-sm">No announcements yet. Create your first one!</div>
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-xs text-slate-500">
+          No announcements published yet. Click "New Announcement" to post your first update.
+        </div>
       ) : (
         <div className="space-y-3">
           {announcements.map((a) => (
-            <div key={a.id} className="bg-slate-800/60 border border-slate-700 rounded-xl p-5 flex items-start justify-between gap-4 group hover:border-slate-600 transition-all">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+            <div
+              key={a.id}
+              className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs flex items-start justify-between gap-4 group hover:border-emerald-500/40 transition-all"
+            >
+              <div className="flex-1 min-w-0 space-y-1">
+                <div className="flex items-center gap-2">
                   {a.pinned && (
-                    <span className="px-1.5 py-0.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] font-bold rounded">
+                    <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-extrabold rounded-full">
                       PINNED
                     </span>
                   )}
-                  <h3 className="font-semibold text-white text-sm truncate">{a.title}</h3>
+                  <h3 className="font-bold text-slate-900 text-sm truncate">{a.title}</h3>
                 </div>
-                <p className="text-xs text-slate-400 line-clamp-2">{a.body}</p>
-                <p className="text-[10px] text-slate-500 mt-2">
-                  {new Date(a.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">{a.body}</p>
+                <div className="text-[10px] text-slate-400 font-medium pt-1">
+                  Posted {new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   {a.author_email && ` · ${a.author_email}`}
-                </p>
+                </div>
               </div>
 
-              <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => handleTogglePin(a.id, a.pinned)}
-                  className="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-amber-400 transition-colors"
-                  title={a.pinned ? 'Unpin' : 'Pin'}
+                  className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-amber-600 transition-colors"
+                  title={a.pinned ? 'Unpin' : 'Pin to top'}
                 >
-                  {a.pinned ? <PinOff className="w-3.5 h-3.5" /> : <Pin className="w-3.5 h-3.5" />}
+                  {a.pinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
                 </button>
                 <button
                   onClick={() => handleEdit(a)}
-                  className="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-blue-400 transition-colors"
+                  className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-blue-600 transition-colors"
                   title="Edit"
                 >
-                  <Edit3 className="w-3.5 h-3.5" />
+                  <Edit3 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => handleDelete(a.id)}
-                  className="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-red-400 transition-colors"
+                  className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-rose-600 transition-colors"
                   title="Delete"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>

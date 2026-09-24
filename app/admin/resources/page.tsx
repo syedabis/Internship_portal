@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Plus, Trash2, Edit3, X, Save, BookOpen, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Edit3, X, Save, BookOpen, Loader2, Sparkles } from 'lucide-react';
 
 type Resource = {
   id: string;
@@ -115,114 +115,190 @@ export default function AdminResourcesPage() {
   };
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-emerald-400" />
-            Learning Resources
-          </h1>
-          <p className="text-slate-400 text-sm mt-1">Manage masterclasses and tutorials visible to interns</p>
+    <div className="space-y-6 pb-16 font-sans max-w-5xl mx-auto">
+      
+      {/* Header */}
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-700 flex items-center justify-center shrink-0">
+            <BookOpen className="w-6 h-6 text-purple-600" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-slate-900">Learning & Masterclasses</h1>
+            <p className="text-xs text-slate-500 mt-0.5">Manage educational videos, tutorials, notebook templates, and documentation.</p>
+          </div>
         </div>
-        <button onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all">
-          <Plus className="w-4 h-4" /> Add Resource
+
+        <button
+          onClick={() => { resetForm(); setShowForm(true); }}
+          className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-xs shrink-0"
+        >
+          <Plus className="w-4 h-4 text-emerald-400" />
+          <span>Add Resource</span>
         </button>
       </div>
 
-      {/* Form */}
+      {/* Form Card */}
       {showForm && (
-        <div className="mb-8 bg-slate-800 border border-slate-700 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-white">{editingId ? 'Edit Resource' : 'Add New Resource'}</h3>
-            <button onClick={resetForm} className="text-slate-400 hover:text-white"><X className="w-4 h-4" /></button>
+        <div className="bg-white border border-emerald-500/40 rounded-2xl p-6 shadow-xl space-y-4 ring-2 ring-emerald-500/10">
+          <div className="flex items-center justify-between border-b pb-3">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-600" />
+              <span>{editingId ? 'Edit Resource' : 'Add New Resource'}</span>
+            </h3>
+            <button onClick={resetForm} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title (e.g., Building LLMs with QLoRA)"
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
-            <input value={instructor} onChange={(e) => setInstructor(e.target.value)} placeholder="Instructor Name"
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Title (e.g. Building LLMs with QLoRA)"
+              className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
+            <input
+              value={instructor}
+              onChange={(e) => setInstructor(e.target.value)}
+              placeholder="Instructor Name (e.g. Dr. Aris Thorne)"
+              className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input value={role} onChange={(e) => setRole(e.target.value)} placeholder="Role (e.g., AI Lead @ Cortexa)"
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
-            <input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Category (e.g., Generative AI)"
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
-            <div className="flex gap-3">
-              <select value={level} onChange={(e) => setLevel(e.target.value)}
-                className="flex-1 p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500">
+            <input
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              placeholder="Role (e.g. Head of AI @ Cortexa)"
+              className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
+            <input
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              placeholder="Category (e.g. Generative AI)"
+              className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
+            <div className="flex gap-2">
+              <select
+                value={level}
+                onChange={(e) => setLevel(e.target.value)}
+                className="w-1/2 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+              >
                 {LEVELS.map(l => <option key={l} value={l}>{l}</option>)}
               </select>
-              <input value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="Duration"
-                className="w-28 p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+              <input
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                placeholder="Duration (e.g. 2h 15m)"
+                className="w-1/2 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+              />
             </div>
           </div>
 
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description..." rows={2}
-            className="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Course overview description..."
+            rows={2}
+            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-normal text-slate-800 focus:outline-none focus:border-emerald-500"
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value)} placeholder="Thumbnail Image URL"
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
-            <input value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} placeholder="Instructor Avatar URL"
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
-            <input value={youtubeId} onChange={(e) => setYoutubeId(e.target.value)} placeholder="YouTube Video ID (optional)"
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+            <input
+              value={thumbnailUrl}
+              onChange={(e) => setThumbnailUrl(e.target.value)}
+              placeholder="Thumbnail Image URL"
+              className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
+            <input
+              value={avatarUrl}
+              onChange={(e) => setAvatarUrl(e.target.value)}
+              placeholder="Instructor Avatar URL"
+              className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
+            <input
+              value={youtubeId}
+              onChange={(e) => setYoutubeId(e.target.value)}
+              placeholder="YouTube Video ID (optional)"
+              className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
           </div>
 
           <div>
-            <label className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">
-              Resource Links (format: Name | type | url, one per line)
+            <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block">
+              Downloadable Attachments (format: Title | type | url)
             </label>
-            <textarea value={linksText} onChange={(e) => setLinksText(e.target.value)}
-              placeholder="PyTorch Notebook | code | https://...&#10;Slides PDF | pdf | https://..." rows={3}
-              className="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono" />
+            <textarea
+              value={linksText}
+              onChange={(e) => setLinksText(e.target.value)}
+              placeholder="PyTorch QLoRA Notebook | code | https://...&#10;Architecture Slides | pdf | https://..."
+              rows={3}
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <input value={rating} onChange={(e) => setRating(e.target.value)} placeholder="Rating" type="number" step="0.01" min="0" max="5"
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
-            <input value={enrolledCount} onChange={(e) => setEnrolledCount(e.target.value)} placeholder="Enrolled Count" type="number"
-              className="p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
-          </div>
-
-          <div className="flex justify-end">
-            <button onClick={handleSave} disabled={saving || !title.trim() || !instructor.trim()}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all">
+          <div className="flex items-center justify-end pt-2 border-t border-slate-100">
+            <button
+              onClick={handleSave}
+              disabled={saving || !title.trim() || !instructor.trim()}
+              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-xs"
+            >
               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-              {editingId ? 'Update' : 'Add Resource'}
+              <span>{editingId ? 'Update Resource' : 'Add Resource'}</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* List */}
+      {/* Resource List */}
       {loading ? (
-        <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 text-emerald-400 animate-spin" /></div>
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 flex justify-center items-center">
+          <Loader2 className="w-6 h-6 text-emerald-600 animate-spin" />
+        </div>
       ) : resources.length === 0 ? (
-        <div className="text-center py-16 text-slate-500 text-sm">No resources yet.</div>
+        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-xs text-slate-500">
+          No resources listed yet. Click "Add Resource" to create your first tutorial.
+        </div>
       ) : (
         <div className="space-y-3">
           {resources.map((r) => (
-            <div key={r.id} className="bg-slate-800/60 border border-slate-700 rounded-xl p-5 flex items-center justify-between gap-4 group hover:border-slate-600 transition-all">
+            <div
+              key={r.id}
+              className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs flex items-center justify-between gap-4 group hover:border-emerald-500/40 transition-all"
+            >
               <div className="flex items-center gap-4 flex-1 min-w-0">
-                {r.thumbnail_url && (
+                {r.thumbnail_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={r.thumbnail_url} alt={r.title} className="w-16 h-10 rounded-lg object-cover shrink-0" />
+                  <img src={r.thumbnail_url} alt={r.title} className="w-16 h-12 rounded-xl object-cover shrink-0 border border-slate-200" />
+                ) : (
+                  <div className="w-16 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 font-bold text-xs border border-purple-100">
+                    <BookOpen className="w-5 h-5" />
+                  </div>
                 )}
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-white text-sm truncate">{r.title}</h3>
-                  <p className="text-[11px] text-slate-500">{r.instructor} · {r.level} · {r.category} · {r.duration}</p>
+
+                <div className="min-w-0 space-y-0.5">
+                  <h3 className="font-bold text-slate-900 text-sm truncate">{r.title}</h3>
+                  <p className="text-xs text-slate-500">
+                    Instructor: <span className="font-semibold text-slate-700">{r.instructor}</span> ({r.role}) · <span className="font-semibold text-emerald-700">{r.level}</span> · {r.duration}
+                  </p>
                 </div>
               </div>
-              <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => handleEdit(r)} className="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-blue-400 transition-colors" title="Edit">
-                  <Edit3 className="w-3.5 h-3.5" />
+
+              <div className="flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={() => handleEdit(r)}
+                  className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-blue-600 transition-colors"
+                  title="Edit"
+                >
+                  <Edit3 className="w-4 h-4" />
                 </button>
-                <button onClick={() => handleDelete(r.id)} className="w-8 h-8 rounded-lg hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-red-400 transition-colors" title="Delete">
-                  <Trash2 className="w-3.5 h-3.5" />
+                <button
+                  onClick={() => handleDelete(r.id)}
+                  className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-rose-600 transition-colors"
+                  title="Delete"
+                >
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
