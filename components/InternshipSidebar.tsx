@@ -89,7 +89,7 @@ export const InternshipSidebar: React.FC<InternshipSidebarProps> = ({
     {
       title: null,
       items: [
-        { id: 'resources', label: 'Resources', icon: BookOpen },
+        { id: 'resources', label: 'Resources', icon: BookOpen, badge: 'Beta' },
         { id: 'freetier', label: 'Products & Perks', icon: Sparkles },
       ],
     },
@@ -98,17 +98,17 @@ export const InternshipSidebar: React.FC<InternshipSidebarProps> = ({
       items: [
         { id: 'chapters', label: 'Chapters & Ambassadors', icon: Users, badge: 'New' },
         { id: 'announcements', label: 'Announcements', icon: Bell, badge: '1' },
-        { id: 'inbox', label: 'E-Mail Inbox', icon: Mail, badge: '9' },
+        { id: 'inbox', label: 'E-Mail Inbox', icon: Mail, badge: 'Beta' },
         { id: 'support', label: 'Support', icon: HelpCircle },
       ],
     },
     {
       title: 'CAREER',
       items: [
-        { id: 'jobopportunities', label: 'Job Opportunities', icon: Briefcase },
+        { id: 'jobopportunities', label: 'Job Opportunities', icon: Briefcase, badge: 'Beta' },
         { id: 'projects', label: 'Projects', icon: FolderKanban, badge: 'New' },
         { id: 'leaderboard', label: 'Leaderboard', icon: Award, badge: 'Beta' },
-        { id: 'documents', label: 'Documents', icon: FileText, badge: 'Beta' },
+        { id: 'documents', label: 'Documents', icon: FileText },
         { id: 'linkedinaudit', label: 'LinkedIn Audit', icon: LinkedinIcon, badge: 'Beta' },
         { id: 'cvaudit', label: 'CV Audit', icon: FileSearch, badge: 'Beta' },
       ],
@@ -129,15 +129,7 @@ export const InternshipSidebar: React.FC<InternshipSidebarProps> = ({
 
         {/* Navigation List */}
         <nav className="space-y-5 text-xs">
-          {navSections
-            .map((section) => ({
-              ...section,
-              items: section.items.filter((item) =>
-                isFeatureAllowedForUser(userEmail, item.id)
-              ),
-            }))
-            .filter((section) => section.items.length > 0)
-            .map((section, idx) => (
+          {navSections.map((section, idx) => (
             <div key={idx} className="space-y-1">
               {section.title && (
                 <div className="text-[10px] font-bold tracking-widest text-[#5c736f] uppercase px-2 mb-2">
