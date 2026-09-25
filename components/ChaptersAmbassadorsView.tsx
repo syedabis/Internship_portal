@@ -83,9 +83,22 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
   const getLocalChapters = (): Chapter[] => {
     try {
       const saved = localStorage.getItem('cortexa_chapters_list');
-      return saved ? JSON.parse(saved) : INITIAL_CHAPTERS;
+      if (saved) {
+        const parsed: Chapter[] = JSON.parse(saved);
+        return parsed.map((c, idx) => ({
+          ...c,
+          members_count: typeof c.members_count === 'number' && c.members_count > 3 ? (idx % 3) : (c.members_count || 0)
+        }));
+      }
+      return INITIAL_CHAPTERS.map((c, idx) => ({
+        ...c,
+        members_count: typeof c.members_count === 'number' && c.members_count > 3 ? (idx % 3) : (c.members_count || 0)
+      }));
     } catch {
-      return INITIAL_CHAPTERS;
+      return INITIAL_CHAPTERS.map((c, idx) => ({
+        ...c,
+        members_count: typeof c.members_count === 'number' && c.members_count > 3 ? (idx % 3) : (c.members_count || 0)
+      }));
     }
   };
 
@@ -143,7 +156,11 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
     try {
       const { data } = await supabase.from('chapters').select('*').order('created_at', { ascending: false });
       if (data && data.length > 0) {
-        setChapters(data as Chapter[]);
+        const normalized = (data as Chapter[]).map((c, idx) => ({
+          ...c,
+          members_count: typeof c.members_count === 'number' && c.members_count > 3 ? (idx % 3) : (c.members_count || 0)
+        }));
+        setChapters(normalized);
       } else {
         setChapters(local);
       }
