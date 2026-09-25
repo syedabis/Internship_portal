@@ -263,7 +263,7 @@ export const ProductMarketplaceView: React.FC = () => {
 
   const handleOpenWhatsApp = (productName: string) => {
     const message = encodeURIComponent(`Hi! I am interested in getting access to ${productName}. Could you please guide me on how to get started?`);
-    window.open(`https://wa.me/?text=${message}`, '_blank');
+    window.open(`https://wa.me/923292020497?text=${message}`, '_blank');
   };
 
   return (
@@ -293,10 +293,15 @@ export const ProductMarketplaceView: React.FC = () => {
           </p>
 
           <div className="pt-2 flex flex-wrap items-center gap-6 text-xs text-slate-400 font-semibold">
-            <div className="flex items-center gap-2">
+            <a
+              href="https://wa.me/923292020497"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 hover:text-emerald-400 transition-colors"
+            >
               <MessageCircle className="w-4 h-4 text-emerald-400" />
-              <span>Direct WhatsApp Support</span>
-            </div>
+              <span>WhatsApp: +92 329 2020497</span>
+            </a>
             <div className="flex items-center gap-2">
               <Headphones className="w-4 h-4 text-emerald-400" />
               <span>24/7 Team Assistance</span>
