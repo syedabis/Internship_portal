@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LinkedinIcon } from './icons';
+import { isFeatureAllowedForUser } from '../lib/accessConfig';
 
 export type InternshipTab = 
   | 'leaderboard'
@@ -128,7 +129,15 @@ export const InternshipSidebar: React.FC<InternshipSidebarProps> = ({
 
         {/* Navigation List */}
         <nav className="space-y-5 text-xs">
-          {navSections.map((section, idx) => (
+          {navSections
+            .map((section) => ({
+              ...section,
+              items: section.items.filter((item) =>
+                isFeatureAllowedForUser(userEmail, item.id)
+              ),
+            }))
+            .filter((section) => section.items.length > 0)
+            .map((section, idx) => (
             <div key={idx} className="space-y-1">
               {section.title && (
                 <div className="text-[10px] font-bold tracking-widest text-[#5c736f] uppercase px-2 mb-2">

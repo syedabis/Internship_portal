@@ -2,11 +2,19 @@ import { NextResponse } from 'next/server';
 import { getCurrentUserId } from '../../../lib/serverAuth';
 import { db } from '../../../lib/db';
 import type { LinkedinProfileData } from '../../../types';
+import { currentUser } from '@clerk/nextjs/server';
+import { isFeatureAllowedForUser } from '../../../lib/accessConfig';
 
 export const runtime = 'nodejs';
 
 /** Newest-first list of the current user's saved LinkedIn profiles (metadata only). */
 export async function GET() {
+  const user = await currentUser();
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress;
+  if (!userEmail || !isFeatureAllowedForUser(userEmail, 'linkedinaudit')) {
+    return NextResponse.json({ error: 'Forbidden — Feature in Private Beta' }, { status: 403 });
+  }
+
   const userId = await getCurrentUserId();
   if (!userId) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
@@ -20,6 +28,12 @@ export async function GET() {
 
 /** Saves the current LinkedIn profile as a named version. */
 export async function POST(request: Request) {
+  const user = await currentUser();
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress;
+  if (!userEmail || !isFeatureAllowedForUser(userEmail, 'linkedinaudit')) {
+    return NextResponse.json({ error: 'Forbidden — Feature in Private Beta' }, { status: 403 });
+  }
+
   const userId = await getCurrentUserId();
   if (!userId) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 

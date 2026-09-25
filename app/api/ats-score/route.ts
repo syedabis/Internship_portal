@@ -1,4 +1,6 @@
 import type { CvData } from '../../../lib/cvTypes';
+import { currentUser } from '@clerk/nextjs/server';
+import { isFeatureAllowedForUser } from '../../../lib/accessConfig';
 
 export const runtime = 'nodejs';
 
@@ -156,6 +158,16 @@ const STOP_WORDS = new Set([
 ]);
 
 export async function POST(request: Request) {
+  const user = await currentUser();
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress;
+
+  if (!userEmail || !isFeatureAllowedForUser(userEmail, 'cvaudit')) {
+    return Response.json(
+      { error: 'Forbidden — CV Audit is currently in Private Beta for authorized testers only.' },
+      { status: 403 }
+    );
+  }
+
   try {
     const body = (await request.json()) as { cv?: CvData; jobDescription?: string };
     if (!body.cv) return Response.json({ error: 'Missing resume data' }, { status: 400 });

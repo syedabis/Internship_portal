@@ -3,8 +3,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { supabase } from '../lib/supabase';
-import { Menu, UserCheck } from 'lucide-react';
+import { Menu, UserCheck, Sparkles } from 'lucide-react';
 import { InternshipSidebar, InternshipTab } from '../components/InternshipSidebar';
+import { isFeatureAllowedForUser } from '../lib/accessConfig';
 
 // ── Lazy-load all tab views so Turbopack only compiles what's needed ──
 const InternshipLeaderboardView = dynamic(() => import('../components/InternshipLeaderboardView').then(m => ({ default: m.InternshipLeaderboardView })), { ssr: false });
@@ -28,7 +29,7 @@ export default function Home() {
       const saved = localStorage.getItem('internship_portal_active_tab');
       if (saved) return saved as InternshipTab;
     }
-    return 'leaderboard';
+    return 'documents';
   });
 
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -105,6 +106,29 @@ export default function Home() {
     </div>
   );
 
+  // ── Private Beta Locked Screen Component ──
+  const RenderPrivateBetaCard = ({ featureName }: { featureName: string }) => (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] py-12 px-4 text-center font-sans">
+      <div className="relative max-w-md w-full bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-5 overflow-hidden">
+        <div className="w-14 h-14 rounded-2xl bg-amber-100 border border-amber-200 text-amber-700 flex items-center justify-center mx-auto shadow-sm">
+          <Sparkles className="w-7 h-7" />
+        </div>
+
+        <div className="space-y-2">
+          <span className="px-3 py-1 bg-amber-100 text-amber-800 text-[10px] font-extrabold uppercase tracking-wider rounded-full border border-amber-200">
+            Private Beta
+          </span>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-2 font-mono">
+            Feature Under Testing
+          </h2>
+          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-sm mx-auto">
+            Access to this feature is currently in private beta and limited to authorized testing accounts ({userEmail}).
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex bg-[#f5f9f7] text-slate-900 font-sans">
       
@@ -153,6 +177,8 @@ export default function Home() {
             </div>
           ) : !user ? (
             <RenderLockScreen />
+          ) : !isFeatureAllowedForUser(userEmail, activeTab) ? (
+            <RenderPrivateBetaCard featureName={activeTab} />
           ) : (
             <div
               key={activeTab}

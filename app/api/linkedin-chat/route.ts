@@ -2,6 +2,7 @@ import OpenAI from 'openai';
 import type { LinkedinProfileData } from '../../../types';
 import { db } from '@/lib/db';
 import { currentUser } from '@clerk/nextjs/server';
+import { isFeatureAllowedForUser } from '../../../lib/accessConfig';
 
 export const runtime = 'nodejs';
 
@@ -38,6 +39,16 @@ interface ChatMessage {
 }
 
 export async function POST(request: Request) {
+  const user = await currentUser();
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress;
+
+  if (!userEmail || !isFeatureAllowedForUser(userEmail, 'linkedinaudit')) {
+    return Response.json(
+      { error: 'Forbidden — LinkedIn Studio is currently in Private Beta for authorized testers only.' },
+      { status: 403 }
+    );
+  }
+
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return Response.json({
