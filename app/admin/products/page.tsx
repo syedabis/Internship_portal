@@ -18,6 +18,7 @@ type Product = {
   popular: boolean;
   rating: number;
   reviews_count: number;
+  price?: number;
   created_at: string;
 };
 
@@ -40,6 +41,7 @@ const INITIAL_PRODUCTS: Product[] = [
     popular: true,
     rating: 4.9,
     reviews_count: 1420,
+    price: 0,
     icon_bg: 'from-blue-600 to-indigo-600',
     icon_name: 'Brain',
     features: ['Gemini 1.5 Pro with 1M context', '2TB Google One Storage', 'Integration with Docs, Sheets & Gmail', 'Priority Access to Experimental Features'],
@@ -55,6 +57,7 @@ const INITIAL_PRODUCTS: Product[] = [
     popular: false,
     rating: 4.8,
     reviews_count: 890,
+    price: 0,
     icon_bg: 'from-rose-500 to-purple-600',
     icon_name: 'Video',
     features: ['4K Camera-controlled Video Gens', 'Anime & Photorealistic Models', 'Unlimited Image-to-Video conversion', 'Commercial Royalty-free License'],
@@ -70,6 +73,7 @@ const INITIAL_PRODUCTS: Product[] = [
     popular: false,
     rating: 4.7,
     reviews_count: 3100,
+    price: 0,
     icon_bg: 'from-blue-500 to-cyan-500',
     icon_name: 'Video',
     features: ['Unlimited 30-hour meeting duration', 'Automated AI Meeting Summaries', '5GB Cloud Recording Storage', 'Custom Branded Meeting Rooms'],
@@ -85,6 +89,7 @@ const INITIAL_PRODUCTS: Product[] = [
     popular: true,
     rating: 4.95,
     reviews_count: 5200,
+    price: 0,
     icon_bg: 'from-emerald-600 to-teal-700',
     icon_name: 'MessageSquare',
     features: ['GPT-4o & GPT-4o-mini Priority', 'DALL-E 3 High-Res Image Generation', 'Custom GPT creation & Code Interpreter', 'Browsing & File Upload Analysis'],
@@ -100,6 +105,7 @@ const INITIAL_PRODUCTS: Product[] = [
     popular: false,
     rating: 4.9,
     reviews_count: 2400,
+    price: 0,
     icon_bg: 'from-amber-600 to-orange-600',
     icon_name: 'Brain',
     features: ['Claude 3.5 Sonnet & Opus', '200,000 Token Context Window', 'Interactive Artifacts & Canvas', '5x More Usage vs Free Tier'],
@@ -115,6 +121,7 @@ const INITIAL_PRODUCTS: Product[] = [
     popular: true,
     rating: 4.98,
     reviews_count: 1850,
+    price: 0,
     icon_bg: 'from-slate-800 to-slate-950',
     icon_name: 'Code',
     features: ['Unlimited Fast Copilot Auto-complete', '500 Fast GPT-4o & Sonnet Edits/mo', 'Codebase-wide Indexing & Chat', 'Terminal Command Generation'],
@@ -143,6 +150,7 @@ export default function AdminProductsPage() {
   const [popular, setPopular] = useState(false);
   const [rating, setRating] = useState('4.5');
   const [reviewsCount, setReviewsCount] = useState('0');
+  const [price, setPrice] = useState('0');
 
   const getLocalImageMap = (): Record<string, string> => {
     try {
@@ -210,7 +218,7 @@ export default function AdminProductsPage() {
   const resetForm = () => {
     setName(''); setProvider(''); setCategory('AI Models'); setDescription('');
     setBadge(''); setFeaturesText(''); setIconName('Brain'); setIconBg(ICON_BGS[0]);
-    setImageUrl(''); setPopular(false); setRating('4.5'); setReviewsCount('0');
+    setImageUrl(''); setPopular(false); setRating('4.5'); setReviewsCount('0'); setPrice('0');
     setEditingId(null); setShowForm(false);
   };
 
@@ -268,6 +276,10 @@ export default function AdminProductsPage() {
     const targetId = editingId || 'prod_' + Date.now();
     const finalImageUrl = imageUrl.trim();
 
+    // Strict numeric price parsing & validation
+    const parsedPrice = parseFloat(price);
+    const validatedPrice = isNaN(parsedPrice) || parsedPrice < 0 ? 0 : Number(parsedPrice.toFixed(2));
+
     const updatedProduct: Product = {
       id: targetId,
       name: name.trim(),
@@ -282,6 +294,7 @@ export default function AdminProductsPage() {
       popular,
       rating: parseFloat(rating) || 4.5,
       reviews_count: parseInt(reviewsCount) || 0,
+      price: validatedPrice,
       created_at: new Date().toISOString()
     };
 
@@ -319,6 +332,7 @@ export default function AdminProductsPage() {
       popular,
       rating: parseFloat(rating) || 4.5,
       reviews_count: parseInt(reviewsCount) || 0,
+      price: validatedPrice,
     };
 
     try {
@@ -381,6 +395,7 @@ export default function AdminProductsPage() {
     setPopular(p.popular);
     setRating(String(p.rating));
     setReviewsCount(String(p.reviews_count || 0));
+    setPrice(String(p.price ?? 0));
     setShowForm(true);
   };
 
@@ -501,7 +516,7 @@ export default function AdminProductsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -516,6 +531,25 @@ export default function AdminProductsPage() {
               placeholder="Badge (e.g. Popular, Trending)"
               className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
             />
+
+            {/* Price ($ USD) - Strict Numeric Validation */}
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">$</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={price}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || (!isNaN(Number(val)) && Number(val) >= 0)) {
+                    setPrice(val);
+                  }
+                }}
+                placeholder="Price ($ USD, 0 = Free)"
+                className="w-full pl-8 pr-3 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500 font-mono"
+              />
+            </div>
 
             <div className="flex items-center gap-2">
               <input
@@ -624,6 +658,9 @@ export default function AdminProductsPage() {
                         {p.badge}
                       </span>
                     )}
+                    <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 text-blue-800 text-[10px] font-extrabold rounded-full font-mono">
+                      {p.price && p.price > 0 ? `$${p.price.toFixed(2)}` : 'FREE PERK'}
+                    </span>
                   </div>
                   <p className="text-xs text-slate-500">
                     {p.provider} · <span className="font-semibold text-slate-700">{p.category}</span> · ★ {p.rating} ({p.reviews_count} reviews)

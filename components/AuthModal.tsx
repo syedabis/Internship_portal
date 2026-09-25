@@ -20,6 +20,7 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  allowClose?: boolean;
 }
 
 type Mode = 'signIn' | 'signUp';
@@ -107,7 +108,8 @@ const companyLogos = [
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
-  onSuccess
+  onSuccess,
+  allowClose = true
 }) => {
   const [mode, setMode] = useState<Mode>('signIn');
   const [step, setStep] = useState<Step>('form');
@@ -333,7 +335,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          onClick={onClose}
+          onClick={allowClose ? onClose : undefined}
           className="fixed inset-0 bg-slate-950/65 backdrop-blur-md"
         />
 
@@ -346,16 +348,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           className="relative w-full max-w-4xl bg-white rounded-[32px] p-3 sm:p-4 shadow-2xl overflow-hidden flex flex-col md:flex-row gap-4 sm:gap-6 border border-slate-200/80 z-10 max-h-[92vh] overflow-y-auto hide-scrollbar"
         >
 
-          {/* Close Button */}
-          <motion.button
-            whileHover={{ scale: 1.1, rotate: 90 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={onClose}
-            className="absolute top-5 right-5 z-30 text-slate-400 hover:text-slate-900 p-2 rounded-full bg-slate-100/80 hover:bg-slate-200 transition-colors cursor-pointer"
-            title="Close modal"
-          >
-            <X className="w-4 h-4" />
-          </motion.button>
+          {/* Close Button (Hidden if unauthenticated strictly gated) */}
+          {allowClose && (
+            <motion.button
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={onClose}
+              className="absolute top-5 right-5 z-30 text-slate-400 hover:text-slate-900 p-2 rounded-full bg-slate-100/80 hover:bg-slate-200 transition-colors cursor-pointer"
+              title="Close modal"
+            >
+              <X className="w-4 h-4" />
+            </motion.button>
+          )}
 
           {/* LEFT COLUMN: Dark Visual Banner */}
           <div className="hidden md:flex w-full md:w-[48%] bg-slate-950 rounded-2xl p-6 sm:p-8 text-white flex-col justify-between relative overflow-hidden min-h-[440px] border border-slate-800/80">

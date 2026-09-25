@@ -39,6 +39,7 @@ export interface Product {
   image_url?: string | null;
   features: string[];
   popular?: boolean;
+  price?: number;
 }
 
 const STATIC_PRODUCTS: Product[] = [
@@ -404,11 +405,19 @@ export const ProductMarketplaceView: React.FC = () => {
                     {product.description}
                   </p>
 
-                  {/* Rating */}
-                  <div className="flex items-center gap-1 text-amber-500 font-bold text-xs pt-2 border-t border-slate-100 mb-4">
-                    <Star className="w-3.5 h-3.5 fill-amber-400" />
-                    <span>{product.rating}</span>
-                    <span className="text-[11px] text-slate-400 font-normal">({reviews} reviews)</span>
+                  {/* Rating & Optional Price */}
+                  <div className="flex items-center justify-between gap-1 text-amber-500 font-bold text-xs pt-2 border-t border-slate-100 mb-4">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-3.5 h-3.5 fill-amber-400" />
+                      <span>{product.rating}</span>
+                      <span className="text-[11px] text-slate-400 font-normal">({reviews} reviews)</span>
+                    </div>
+
+                    {product.price && product.price > 0 ? (
+                      <span className="px-2 py-0.5 bg-emerald-50 border border-emerald-200 text-emerald-700 font-mono text-[10px] font-extrabold rounded-full">
+                        ${product.price.toFixed(2)}/mo
+                      </span>
+                    ) : null}
                   </div>
 
                   {/* Feature Bullet points */}

@@ -15,7 +15,9 @@ import {
   ExternalLink,
   ChevronRight,
   Send,
-  Loader2
+  Loader2,
+  Copy,
+  Check
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { INITIAL_CHAPTERS } from '@/lib/chaptersData';
@@ -43,19 +45,40 @@ export interface Ambassador {
   created_at?: string;
 }
 
-export const ChaptersAmbassadorsView: React.FC = () => {
+interface ChaptersAmbassadorsViewProps {
+  userName?: string;
+  userEmail?: string;
+}
+
+export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = ({
+  userName,
+  userEmail
+}) => {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
 
-  // Ambassador registration form
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  // Dynamic user profile resolution
+  const [resolvedName, setResolvedName] = useState<string>(userName || '');
+  const [resolvedEmail, setResolvedEmail] = useState<string>(userEmail || '');
+
   const [phone, setPhone] = useState('');
-  const [university, setUniversity] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState(false);
+  const [isExistingMember, setIsExistingMember] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = (url: string) => {
+    if (!url) return;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Phone Validation Regex (E.164 compliant: + followed by 10-15 digits, or standard local number)
+  const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+  const isPhoneValid = /^\+?[1-9]\d{9,14}$/.test(cleanPhone);
 
   const getLocalChapters = (): Chapter[] => {
     try {
@@ -93,6 +116,28 @@ export const ChaptersAmbassadorsView: React.FC = () => {
     }
   };
 
+  // Dynamically resolve logged-in user profile from Supabase auth if props are omitted
+  useEffect(() => {
+    const resolveUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Intern Ambassador';
+          const email = user.email || 'intern@cortexa.ai';
+          setResolvedName(userName || name);
+          setResolvedEmail(userEmail || email);
+        } else {
+          setResolvedName(userName || 'Intern Ambassador');
+          setResolvedEmail(userEmail || 'intern@cortexa.ai');
+        }
+      } catch {
+        setResolvedName(userName || 'Intern Ambassador');
+        setResolvedEmail(userEmail || 'intern@cortexa.ai');
+      }
+    };
+    resolveUser();
+  }, [userName, userEmail]);
+
   const loadChapters = async () => {
     const local = getLocalChapters();
     try {
@@ -117,70 +162,77 @@ export const ChaptersAmbassadorsView: React.FC = () => {
 
   const handleOpenJoinModal = (chapter: Chapter) => {
     setSelectedChapter(chapter);
-    setName('');
-    setEmail('');
     setPhone('');
-    setUniversity('');
     setSuccessMsg(false);
+    setIsExistingMember(false);
   };
 
   const handleRegisterAndJoin = async () => {
-    if (!selectedChapter || !name.trim() || !phone.trim()) return;
+    if (!selectedChapter || !isPhoneValid) return;
     setSubmitting(true);
 
-    const newAmbassador: Ambassador = {
-      id: 'amb_' + Date.now(),
-      name: name.trim(),
-      email: email.trim() || 'ambassador@cortexa.ai',
-      phone: phone.trim(),
-      university: university.trim() || 'University',
-      chapter_id: selectedChapter.id,
-      chapter_name: selectedChapter.name,
-      status: 'Active',
-      created_at: new Date().toISOString()
-    };
+    const ambName = resolvedName || 'Intern Ambassador';
+    const ambEmail = resolvedEmail || 'intern@cortexa.ai';
+    const ambUni = selectedChapter.name;
+    const formattedPhone = cleanPhone.startsWith('+') ? cleanPhone : `+92${cleanPhone.replace(/^0/, '')}`;
 
-    // 1. Save locally
     const existingAmbassadors = getLocalAmbassadors();
-    const updatedAmbassadors = [newAmbassador, ...existingAmbassadors];
-    saveLocalAmbassadors(updatedAmbassadors);
-
-    // 2. Increment members count locally
-    const updatedChapters = chapters.map(c => 
-      c.id === selectedChapter.id ? { ...c, members_count: (c.members_count || 0) + 1 } : c
+    
+    // Check if ambassador has ALREADY registered for this specific chapter
+    const alreadyRegistered = existingAmbassadors.some(
+      a => (a.email.toLowerCase() === ambEmail.toLowerCase() || a.phone === formattedPhone) &&
+           (a.chapter_id === selectedChapter.id || a.chapter_name.toLowerCase() === selectedChapter.name.toLowerCase())
     );
-    setChapters(updatedChapters);
-    saveLocalChapters(updatedChapters);
 
-    // 3. Save to Supabase asynchronously
-    try {
-      await supabase.from('ambassadors').insert([{
-        name: name.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-        university: university.trim(),
+    if (alreadyRegistered) {
+      // User is already a member; do NOT inflate members_count
+      setIsExistingMember(true);
+    } else {
+      // New registration: add ambassador and increment members count once
+      const newAmbassador: Ambassador = {
+        id: 'amb_' + Date.now(),
+        name: ambName,
+        email: ambEmail,
+        phone: formattedPhone,
+        university: ambUni,
         chapter_id: selectedChapter.id,
         chapter_name: selectedChapter.name,
-        status: 'Active'
-      }]);
+        status: 'Active',
+        created_at: new Date().toISOString()
+      };
 
-      await supabase.from('chapters')
-        .update({ members_count: (selectedChapter.members_count || 0) + 1 })
-        .eq('id', selectedChapter.id);
-    } catch (err) {
-      console.log('Supabase sync skipped:', err);
+      const updatedAmbassadors = [newAmbassador, ...existingAmbassadors];
+      saveLocalAmbassadors(updatedAmbassadors);
+
+      // Increment members count locally
+      const updatedChapters = chapters.map(c => 
+        c.id === selectedChapter.id ? { ...c, members_count: (c.members_count || 0) + 1 } : c
+      );
+      setChapters(updatedChapters);
+      saveLocalChapters(updatedChapters);
+
+      // Save to Supabase
+      try {
+        await supabase.from('ambassadors').insert([{
+          name: ambName,
+          email: ambEmail,
+          phone: formattedPhone,
+          university: ambUni,
+          chapter_id: selectedChapter.id,
+          chapter_name: selectedChapter.name,
+          status: 'Active'
+        }]);
+
+        await supabase.from('chapters')
+          .update({ members_count: (selectedChapter.members_count || 0) + 1 })
+          .eq('id', selectedChapter.id);
+      } catch (err) {
+        console.log('Supabase sync skipped:', err);
+      }
     }
 
     setSubmitting(false);
     setSuccessMsg(true);
-
-    // 4. Automatically open WhatsApp link after 1 second
-    setTimeout(() => {
-      if (selectedChapter.whatsapp_link) {
-        window.open(selectedChapter.whatsapp_link, '_blank');
-      }
-      setSelectedChapter(null);
-    }, 1200);
   };
 
   const filteredChapters = chapters.filter(c =>
@@ -194,6 +246,10 @@ export const ChaptersAmbassadorsView: React.FC = () => {
       
       {/* Hero Banner */}
       <div className="relative rounded-3xl p-8 sm:p-10 overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl">
+        <div 
+          className="absolute inset-0 opacity-40 bg-cover bg-center pointer-events-none -scale-x-100"
+          style={{ backgroundImage: "url('/image_card.jpeg')" }}
+        />
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -286,14 +342,10 @@ export const ChaptersAmbassadorsView: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5 text-xs text-slate-600">
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs text-slate-600">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] text-slate-400 font-semibold">Chapter Lead:</span>
                     <span className="font-bold text-slate-800">{chapter.lead_name}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-slate-400 font-semibold">Ambassadors Joined:</span>
-                    <span className="font-extrabold text-emerald-700">{chapter.members_count} Members</span>
                   </div>
                 </div>
               </div>
@@ -314,77 +366,153 @@ export const ChaptersAmbassadorsView: React.FC = () => {
       {/* Registration Modal */}
       {selectedChapter && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5 animate-[fadeSlideIn_0.2s_ease-out]">
+          <div className="relative bg-white border border-slate-200/90 rounded-[28px] p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5 overflow-hidden animate-[fadeSlideIn_0.2s_ease-out]">
             
-            <div className="flex items-start justify-between border-b pb-4">
+            {/* Ambient Success Glow Background */}
+            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-72 h-72 bg-gradient-to-b from-emerald-500/15 via-teal-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 flex items-start justify-between">
               <div>
-                <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                  Ambassador Registration
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold text-emerald-800 bg-emerald-100/80 border border-emerald-300/60 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                  <Sparkles className="w-3 h-3 text-emerald-600" />
+                  <span>Ambassador Registration</span>
                 </span>
-                <h3 className="text-lg font-bold text-slate-900 mt-1">{selectedChapter.name}</h3>
+                <h3 className="text-xl font-extrabold text-slate-900 mt-2 tracking-tight">
+                  {selectedChapter.name.replace(/Chap$/i, 'Chapter')}
+                </h3>
               </div>
-              <button onClick={() => setSelectedChapter(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
+              <button
+                onClick={() => setSelectedChapter(null)}
+                className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                title="Close modal"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {successMsg ? (
-              <div className="py-8 text-center space-y-3">
-                <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
-                  <CheckCircle2 className="w-8 h-8" />
+              <div className="relative z-10 py-3 text-center space-y-5">
+                
+                {/* Animated Pulsing Success Icon */}
+                <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
+                  <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping opacity-60" />
+                  <div className="relative w-16 h-16 bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-400 text-white rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                    <CheckCircle2 className="w-9 h-9" />
+                  </div>
                 </div>
-                <h4 className="text-base font-bold text-slate-900">Registration Successful!</h4>
-                <p className="text-xs text-slate-500">Opening your Chapter WhatsApp group link...</p>
+
+                <div className="space-y-1">
+                  <h4 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                    {isExistingMember ? 'Welcome Back!' : 'Registration Confirmed! 🎉'}
+                  </h4>
+                  <p className="text-xs text-slate-600 leading-relaxed max-w-sm mx-auto font-medium">
+                    {isExistingMember ? (
+                      <>You are already registered as an official Ambassador for <strong className="text-slate-900 font-bold">{selectedChapter.name.replace(/Chap$/i, 'Chapter')}</strong>.</>
+                    ) : (
+                      <>You are now officially registered as an Ambassador for <strong className="text-slate-900 font-bold">{selectedChapter.name.replace(/Chap$/i, 'Chapter')}</strong>.</>
+                    )}
+                  </p>
+                </div>
+
+                {/* "What's Next" Summary Card */}
+                <div className="bg-slate-50/90 border border-slate-200/80 rounded-2xl p-4 text-left space-y-2.5 shadow-xs">
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                    ⚡ What Happens Next
+                  </span>
+                  <div className="space-y-2 text-xs text-slate-700 font-medium">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <span>Join official WhatsApp group for mentorship & updates</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <span>Connect with Chapter Lead <strong className="text-slate-900 font-bold">{selectedChapter.lead_name}</strong></span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <span>Eligible for Ambassador Certificates & Perks</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Primary CTA & Copy Link */}
+                <div className="pt-1 space-y-2.5">
+                  <div className="flex flex-col sm:flex-row items-center gap-2">
+                    <a
+                      href={selectedChapter.whatsapp_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full sm:flex-1 py-3.5 px-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-extrabold rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 hover:shadow-emerald-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer min-w-0"
+                    >
+                      <MessageCircle className="w-4 h-4 fill-white text-emerald-700 shrink-0" />
+                      <span className="truncate">Join WhatsApp Group</span>
+                      <ExternalLink className="w-3.5 h-3.5 opacity-90 shrink-0" />
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => handleCopyLink(selectedChapter.whatsapp_link)}
+                      className={`w-full sm:w-auto py-3.5 px-4 rounded-2xl text-xs font-bold flex items-center justify-center gap-1.5 border transition-all cursor-pointer shrink-0 ${
+                        copied
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-xs'
+                          : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'
+                      }`}
+                      title="Copy WhatsApp Group Link"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span>Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4 text-slate-500 shrink-0" />
+                          <span>Copy Link</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <p className="text-[10px] text-slate-400 font-medium text-center sm:text-left">
+                    Direct access link & clipboard copy for verified ambassadors
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Enter your details to register as an Ambassador for <strong className="text-slate-900">{selectedChapter.name}</strong> and get instant access to the WhatsApp group.
+                  Please enter your WhatsApp Phone Number to register for <strong className="text-slate-900">{selectedChapter.name}</strong> and access the official WhatsApp group link.
                 </p>
+
+                {resolvedName && (
+                  <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 flex items-center justify-between text-xs">
+                    <span className="text-slate-500 font-medium">Registering as:</span>
+                    <span className="font-bold text-slate-800">{resolvedName} ({resolvedEmail})</span>
+                  </div>
+                )}
 
                 <div className="space-y-3">
                   <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Full Name *</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                      WhatsApp Phone Number *
+                    </label>
                     <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g. Zainab Fatima"
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">WhatsApp Phone Number *</label>
-                    <input
-                      type="text"
+                      type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="e.g. +92 300 1234567"
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+                      className={`w-full p-3 bg-slate-50 border rounded-xl text-xs font-medium text-slate-800 focus:outline-none transition-all ${
+                        phone.trim() && !isPhoneValid
+                          ? 'border-rose-400 focus:border-rose-500 bg-rose-50/30'
+                          : 'border-slate-200 focus:border-emerald-500'
+                      }`}
+                      autoFocus
                     />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">University / Institute Name</label>
-                    <input
-                      type="text"
-                      value={university}
-                      onChange={(e) => setUniversity(e.target.value)}
-                      placeholder="e.g. FAST NUCES Lahore"
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Email Address</label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="e.g. ambassador@gmail.com"
-                      className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
-                    />
+                    {phone.trim() !== '' && !isPhoneValid && (
+                      <span className="text-[11px] font-semibold text-rose-500 mt-1.5 block">
+                        Please enter a valid phone number (e.g. +92 300 1234567)
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -399,11 +527,11 @@ export const ChaptersAmbassadorsView: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleRegisterAndJoin}
-                    disabled={submitting || !name.trim() || !phone.trim()}
-                    className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-extrabold rounded-xl flex items-center gap-2 shadow-md cursor-pointer"
+                    disabled={submitting || !phone.trim() || !isPhoneValid}
+                    className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-extrabold rounded-xl flex items-center gap-2 shadow-md cursor-pointer transition-all"
                   >
                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                    <span>Confirm & Join Group</span>
+                    <span>Confirm</span>
                   </button>
                 </div>
               </div>

@@ -19,6 +19,11 @@ import {
   ChevronDown,
   Gift,
   Camera,
+  UserCheck,
+  FileText,
+  MessageSquare,
+  ExternalLink,
+  ShieldCheck,
 } from 'lucide-react';
 import { PfpCropModal } from './PfpCropModal';
 import { supabase } from '../lib/supabase';
@@ -80,12 +85,13 @@ const WEEKLY_ACTIVITY = [
   { day: 'Sun', active: true, points: 40 },
 ];
 
-// ── Point categories for the progress breakdown ─────────────────────────
 interface PointCategory {
   label: string;
   earned: number;
   max: number;
   color: string;
+  gradient?: string;
+  icon?: React.ReactNode;
   linkTab?: string;
   linkLabel?: string;
 }
@@ -167,13 +173,13 @@ export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps>
   const weeklyPoints = WEEKLY_ACTIVITY.reduce((sum, d) => sum + d.points, 0);
 
   const pointCategories: PointCategory[] = [
-    { label: 'Profile Completion', earned: 60, max: 60, color: 'bg-emerald-600' },
-    { label: 'Onboarding', earned: 40, max: 40, color: 'bg-emerald-600' },
-    { label: 'Learning Modules', earned: 240, max: 500, color: 'bg-blue-600' },
-    { label: 'Work Submissions', earned: 80, max: 1000, color: 'bg-purple-600' },
-    { label: 'Participation', earned: 480, max: 600, color: 'bg-amber-600' },
-    { label: 'CV Audit Score', earned: 51, max: 100, color: 'bg-teal-600', linkTab: 'cvaudit', linkLabel: 'View report' },
-    { label: 'LinkedIn Audit Score', earned: 46, max: 100, color: 'bg-indigo-600', linkTab: 'linkedinaudit', linkLabel: 'View report' },
+    { label: 'Profile Completion', earned: 60, max: 60, color: 'bg-emerald-600', gradient: 'from-emerald-500 via-teal-500 to-emerald-600', icon: <UserCheck className="w-3.5 h-3.5 text-emerald-600" /> },
+    { label: 'Onboarding', earned: 40, max: 40, color: 'bg-emerald-600', gradient: 'from-emerald-500 via-teal-500 to-emerald-600', icon: <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> },
+    { label: 'Learning Modules', earned: 240, max: 500, color: 'bg-blue-600', gradient: 'from-blue-600 via-indigo-500 to-cyan-500', icon: <BookOpen className="w-3.5 h-3.5 text-blue-600" /> },
+    { label: 'Work Submissions', earned: 80, max: 1000, color: 'bg-purple-600', gradient: 'from-purple-600 via-violet-500 to-indigo-500', icon: <FileText className="w-3.5 h-3.5 text-purple-600" /> },
+    { label: 'Participation', earned: 480, max: 600, color: 'bg-amber-600', gradient: 'from-amber-500 via-orange-500 to-amber-600', icon: <MessageSquare className="w-3.5 h-3.5 text-amber-600" /> },
+    { label: 'CV Audit Score', earned: 51, max: 100, color: 'bg-teal-600', gradient: 'from-teal-600 via-emerald-500 to-teal-500', icon: <Award className="w-3.5 h-3.5 text-teal-600" />, linkTab: 'cvaudit', linkLabel: 'View report' },
+    { label: 'LinkedIn Audit Score', earned: 46, max: 100, color: 'bg-indigo-600', gradient: 'from-indigo-600 via-blue-500 to-indigo-500', icon: <Star className="w-3.5 h-3.5 text-indigo-600" />, linkTab: 'linkedinaudit', linkLabel: 'View report' },
   ];
 
   const filteredAchievements = ACHIEVEMENTS.filter(a => {
@@ -376,56 +382,111 @@ export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps>
       </div>
 
       {/* Points Breakdown Card */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs">
-        <div className="flex items-center justify-between mb-1">
-          <div>
-            <div className="text-[11px] font-semibold tracking-wider text-slate-500 uppercase">
-              YOUR POINT BREAKDOWN
+      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs space-y-6">
+        
+        {/* Header Header & Tier Badge */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                Personal Progress
+              </span>
+              <span className="inline-flex items-center gap-1 text-[11px] font-extrabold text-amber-800 bg-amber-50 border border-amber-200/80 px-2.5 py-1 rounded-full">
+                <span>{currentTier.icon}</span>
+                <span>{currentTier.name} Tier</span>
+              </span>
             </div>
-            <div className="text-2xl font-bold text-slate-900 mt-1 tracking-tight">
-              {totalPoints} points
-            </div>
-            <div className="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-3">
-              <span>Scoring cap: {scoringCap.toLocaleString()} points</span>
-              <span>•</span>
-              <span>{overallProgress}% complete</span>
-            </div>
+            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-baseline gap-2 pt-1">
+              <span>{totalPoints.toLocaleString()} points</span>
+              <span className="text-xs font-semibold text-slate-400">/ {scoringCap.toLocaleString()} max</span>
+            </h3>
+            <p className="text-xs text-slate-500 font-medium">
+              You have completed <strong className="text-emerald-700 font-bold">{overallProgress}%</strong> of your internship scoring capacity.
+            </p>
           </div>
-          <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/Icons/Chart.png" alt="Point Breakdown" className="w-10 h-10 object-contain" />
+
+          <div className="flex items-center gap-4 bg-slate-50 border border-slate-200/80 p-3 rounded-2xl shrink-0">
+            {/* Radial / Arc Stat Summary */}
+            <div className="text-right">
+              <div className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Scoring Cap</div>
+              <div className="text-sm font-extrabold text-slate-800 font-mono">{overallProgress}% Done</div>
+            </div>
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center font-extrabold shadow-md shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/Icons/Chart.png" alt="Point Breakdown" className="w-8 h-8 object-contain" />
+            </div>
           </div>
         </div>
 
         {/* Overall progress bar */}
-        <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden mt-4 mb-6">
-          <div className="h-full bg-emerald-600 rounded-full transition-all duration-500" style={{ width: `${overallProgress}%` }} />
+        <div className="space-y-1.5">
+          <div className="flex justify-between items-center text-xs font-bold text-slate-600">
+            <span>Overall Completion Status</span>
+            <span className="font-mono text-emerald-700 font-extrabold">{overallProgress}%</span>
+          </div>
+          <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/60">
+            <div
+              className="h-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 rounded-full transition-all duration-500 shadow-xs"
+              style={{ width: `${overallProgress}%` }}
+            />
+          </div>
         </div>
 
-        <div className="space-y-3.5">
+        {/* Categories List */}
+        <div className="space-y-4 pt-2">
           {pointCategories.map((cat) => {
             const pct = Math.round((cat.earned / cat.max) * 100);
+            const isCompleted = cat.earned === cat.max;
+
             return (
-              <div key={cat.label}>
-                <div className="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1">
-                  <span className="flex items-center gap-1">
-                    {cat.label} <HelpCircle className="w-3 h-3 text-slate-400" />
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-slate-900 font-bold">{cat.earned} / {cat.max}</span>
+              <div
+                key={cat.label}
+                className="bg-slate-50/60 border border-slate-200/70 hover:border-slate-300 rounded-2xl p-4 transition-all duration-200 space-y-2.5 group"
+              >
+                <div className="flex justify-between items-center text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 bg-white rounded-xl border border-slate-200/80 shadow-2xs group-hover:scale-105 transition-transform">
+                      {cat.icon}
+                    </div>
+                    <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                      {cat.label}
+                      <span className="text-[10px] text-slate-400 font-normal hover:text-slate-600 cursor-help" title={`Earn up to ${cat.max} points in this category`}>
+                        <HelpCircle className="w-3 h-3 text-slate-400" />
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2.5">
+                    {isCompleted ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100/80 border border-emerald-300/60 text-emerald-800 text-[10px] font-extrabold uppercase">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        <span>Completed</span>
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 bg-slate-200/70 text-slate-700 font-mono text-[10px] font-extrabold rounded-md">
+                        {pct}%
+                      </span>
+                    )}
+
+                    <span className="font-mono text-slate-900 font-extrabold text-xs">
+                      {cat.earned} <span className="text-slate-400 font-normal">/ {cat.max}</span>
+                    </span>
+
                     {cat.linkTab && (
                       <button
                         onClick={() => onNavigateToTab?.(cat.linkTab!)}
-                        className="text-[11px] font-semibold text-emerald-800 hover:underline flex items-center gap-0.5"
+                        className="px-2.5 py-1 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-800 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all shadow-2xs cursor-pointer ml-1"
                       >
-                        {cat.linkLabel}
+                        <span>{cat.linkLabel}</span>
+                        <ExternalLink className="w-3 h-3 text-slate-400" />
                       </button>
                     )}
                   </div>
                 </div>
-                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+
+                <div className="w-full h-2.5 bg-slate-200/60 rounded-full overflow-hidden">
                   <div
-                    className={`h-full ${cat.color} rounded-full transition-all duration-500`}
+                    className={`h-full bg-gradient-to-r ${cat.gradient || 'from-emerald-500 to-teal-500'} rounded-full transition-all duration-500 shadow-2xs`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>
@@ -434,8 +495,14 @@ export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps>
           })}
         </div>
 
-        <div className="mt-5 pt-3 border-t border-slate-100 text-[11px] text-slate-500 leading-snug">
-          Points reflect your personal internship activity across categories. There is no competition — focus on completing as many learning areas as you can at your own pace.
+        {/* Footer info tip */}
+        <div className="pt-2">
+          <div className="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl flex items-start gap-2.5 text-xs text-slate-600 font-medium">
+            <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <span className="leading-relaxed">
+              Points reflect your personal internship activity across categories. There is no competition — focus on completing as many learning areas as you can at your own pace.
+            </span>
+          </div>
         </div>
       </div>
       {/* Photo Cropper Modal */}

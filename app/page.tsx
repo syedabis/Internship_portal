@@ -69,6 +69,42 @@ export default function Home() {
 
 
 
+  // ── Unauthenticated Lock Screen Component ──
+  const RenderLockScreen = () => (
+    <div className="flex flex-col items-center justify-center min-h-[75vh] py-16 px-4 text-center font-sans">
+      <div className="relative max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 sm:p-10 shadow-2xl space-y-6 text-white overflow-hidden">
+        <div className="absolute -top-24 -right-24 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center mx-auto shadow-xl">
+          <UserCheck className="w-8 h-8" />
+        </div>
+
+        <div className="space-y-2 relative z-10">
+          <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full uppercase tracking-wider">
+            Protected Portal Access
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mt-2">
+            Authentication Required
+          </h2>
+          <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-md mx-auto">
+            Please sign in or create an account to access the Cortexa AI Internship Portal, Campus Ambassador Network, Leaderboard, and Career Tools.
+          </p>
+        </div>
+
+        <div className="pt-2 relative z-10">
+          <button
+            onClick={() => setIsAuthOpen(true)}
+            className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-sm tracking-wide shadow-lg hover:shadow-emerald-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+          >
+            <UserCheck className="w-4 h-4" />
+            <span>Sign In / Create Account</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex bg-[#f5f9f7] text-slate-900 font-sans">
       
@@ -111,7 +147,14 @@ export default function Home() {
 
         {/* Dynamic Portal View Container */}
         <div className="p-4 sm:p-8 max-w-7xl w-full mx-auto flex-1">
-          <div
+          {!isLoaded ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : !user ? (
+            <RenderLockScreen />
+          ) : (
+            <div
               key={activeTab}
               className="animate-[fadeSlideIn_0.18s_ease-out]"
             >
@@ -139,17 +182,20 @@ export default function Home() {
 
               {activeTab === 'freetier' && <ProductMarketplaceView />}
 
-              {activeTab === 'chapters' && <ChaptersAmbassadorsView />}
+              {activeTab === 'chapters' && (
+                <ChaptersAmbassadorsView userName={userName} userEmail={userEmail} />
+              )}
 
               {['announcements', 'support'].includes(activeTab) && (
                 <InternshipCommunityView type={activeTab as any} />
               )}
             </div>
+          )}
         </div>
       </div>
 
       {/* Auth Modal */}
-      {isAuthOpen && <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />}
+      {isAuthOpen && <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} allowClose={!!user} />}
     </div>
   );
 }
