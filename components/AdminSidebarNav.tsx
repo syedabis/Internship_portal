@@ -14,7 +14,7 @@ const navItems = [
   { href: '/admin/support', label: 'Support Inbox', icon: HelpCircle },
 ];
 
-export function AdminSidebarNav() {
+export function AdminSidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
 
   return (
@@ -30,6 +30,7 @@ export function AdminSidebarNav() {
           <Link
             key={href}
             href={href}
+            onClick={() => onNavigate?.()}
             className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all cursor-pointer font-medium ${
               isActive
                 ? 'bg-[#1b3d37] text-white font-bold shadow-xs border border-[#26554d]'

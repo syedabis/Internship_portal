@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { LogOut, Loader2 } from 'lucide-react';
+import { LogOut, Loader2, Menu, X } from 'lucide-react';
 import { AdminSidebarNav } from '@/components/AdminSidebarNav';
 import { supabase } from '@/lib/supabase';
 
@@ -15,8 +15,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const isLoginPage = pathname === '/admin/login';
+
+  // Automatically close mobile menu when navigating to a new route
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (isLoginPage) {
@@ -132,12 +138,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main Content Workspace */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
         
-        {/* Top Mobile Bar */}
+        {/* Top Mobile Bar with Hamburger Button */}
         <div className="md:hidden flex items-center justify-between p-3.5 bg-[#091715] text-white border-b border-[#163a34] sticky top-0 z-40">
-          <div className="font-black text-base tracking-tight flex items-center gap-1.5">
-            <span>Cortexa</span>
-            <span className="text-emerald-400 text-xs font-mono">Admin</span>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="p-1.5 rounded-xl bg-[#132d28] border border-[#23534b] text-emerald-400 hover:text-white transition-colors cursor-pointer"
+              aria-label="Toggle Navigation Menu"
+            >
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            <div className="font-black text-base tracking-tight flex items-center gap-1.5">
+              <span>Cortexa</span>
+              <span className="text-emerald-400 text-xs font-mono">Admin</span>
+            </div>
           </div>
+
           <Link
             href="/"
             className="px-3 py-1.5 rounded-full bg-[#163a34] border border-[#23534b] text-emerald-300 text-xs font-bold flex items-center gap-1.5"
@@ -145,6 +162,74 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span>Exit Admin</span>
           </Link>
         </div>
+
+        {/* Mobile Slide-Over Sidebar Drawer & Overlay */}
+        {mobileOpen && (
+          <div className="fixed inset-0 z-50 md:hidden flex">
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+              onClick={() => setMobileOpen(false)}
+            />
+
+            {/* Slide-out Drawer */}
+            <aside className="relative w-72 max-w-[80vw] bg-[#091715] border-r border-[#15342e] flex flex-col h-full justify-between p-4 text-[#a8b8b5] z-10 shadow-2xl animate-in slide-in-from-left duration-200">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="font-black text-xl text-white tracking-tight flex items-center gap-1.5">
+                    <span>Cortexa</span>
+                    <span className="text-emerald-400 text-xs font-bold font-mono">AI</span>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wide ml-1">
+                      Admin
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setMobileOpen(false)}
+                    className="p-1.5 rounded-xl text-slate-400 hover:text-white cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <AdminSidebarNav onNavigate={() => setMobileOpen(false)} />
+              </div>
+
+              <div className="space-y-2 pt-4 border-t border-[#183631]">
+                <Link
+                  href="/"
+                  onClick={() => setMobileOpen(false)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#9cb0ab] hover:text-white hover:bg-[#132d28] transition-colors"
+                >
+                  <LogOut className="w-4 h-4 text-[#758e89]" />
+                  <span>Back to Portal</span>
+                </Link>
+
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#0d221f] border border-[#1b433c]">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={userAvatar}
+                      alt={userName}
+                      className="w-8 h-8 rounded-full object-cover shrink-0 border border-emerald-500/40"
+                    />
+                    <div className="truncate min-w-0">
+                      <div className="font-bold text-xs text-white truncate flex items-center gap-1.5">
+                        <span className="truncate">{userName}</span>
+                        <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-[9px] text-emerald-300 shrink-0 font-bold">
+                          Admin
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-[#6c8681] truncate">
+                        {userEmail}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        )}
 
         {/* Dynamic Admin View Container */}
         <div className="p-4 sm:p-8 max-w-7xl w-full mx-auto flex-1">
