@@ -254,7 +254,7 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
            (a.chapter_id === selectedChapter.id || a.chapter_name.toLowerCase() === selectedChapter.name.toLowerCase())
     );
 
-    const currentCount = selectedChapter.members_count || 0;
+    const currentCount = getChapterMemberCount(selectedChapter.id, selectedChapter.name);
     if (!alreadyRegistered && currentCount >= MAX_GROUP_CAPACITY) {
       alert('This WhatsApp group has reached its maximum capacity of 3 interns.');
       setSubmitting(false);
