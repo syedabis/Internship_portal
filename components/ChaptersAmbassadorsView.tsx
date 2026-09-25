@@ -76,9 +76,46 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Phone Validation Regex (E.164 compliant: + followed by 10-15 digits, or standard local number)
+  const getLocalAmbassadors = (): Ambassador[] => {
+    try {
+      const saved = localStorage.getItem('cortexa_ambassadors_list');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const saveLocalAmbassadors = (list: Ambassador[]) => {
+    try {
+      localStorage.setItem('cortexa_ambassadors_list', JSON.stringify(list));
+      window.dispatchEvent(new Event('cortexa_ambassadors_updated'));
+    } catch (err) {
+      console.warn('LocalStorage save warning:', err);
+    }
+  };
+
+  // Phone Validation Regex
+  // 1. Pakistani local format: 11 digits starting with 03 (e.g. 03001234567)
+  // 2. Pakistani intl format: 12 digits starting with +923 or 923 (e.g. +923001234567)
+  // 3. E.164 International: + followed by 10-15 digits
   const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
-  const isPhoneValid = /^\+?[1-9]\d{9,14}$/.test(cleanPhone);
+  const isPakistaniLocal = /^03\d{9}$/.test(cleanPhone);
+  const isPakistaniIntl = /^\+?923\d{9}$/.test(cleanPhone);
+  const isIntlValid = /^\+[1-9]\d{9,14}$/.test(cleanPhone);
+  const isPhoneValid = isPakistaniLocal || isPakistaniIntl || isIntlValid;
+
+  const formattedPhone = cleanPhone.startsWith('03')
+    ? `+92${cleanPhone.slice(1)}`
+    : cleanPhone.startsWith('923')
+    ? `+${cleanPhone}`
+    : cleanPhone.startsWith('+')
+    ? cleanPhone
+    : `+92${cleanPhone}`;
+
+  const isPhoneDuplicateInChapter = selectedChapter ? getLocalAmbassadors().some(
+    a => (a.phone === formattedPhone || cleanPhone === a.phone.replace(/[\s\-\(\)]/g, '')) &&
+         (a.chapter_id === selectedChapter.id || a.chapter_name.toLowerCase() === selectedChapter.name.toLowerCase())
+  ) : false;
 
   const getLocalChapters = (): Chapter[] => {
     try {
@@ -106,24 +143,6 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
     try {
       localStorage.setItem('cortexa_chapters_list', JSON.stringify(list));
       window.dispatchEvent(new Event('cortexa_chapters_updated'));
-    } catch (err) {
-      console.warn('LocalStorage save warning:', err);
-    }
-  };
-
-  const getLocalAmbassadors = (): Ambassador[] => {
-    try {
-      const saved = localStorage.getItem('cortexa_ambassadors_list');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  };
-
-  const saveLocalAmbassadors = (list: Ambassador[]) => {
-    try {
-      localStorage.setItem('cortexa_ambassadors_list', JSON.stringify(list));
-      window.dispatchEvent(new Event('cortexa_ambassadors_updated'));
     } catch (err) {
       console.warn('LocalStorage save warning:', err);
     }
@@ -203,13 +222,12 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
   };
 
   const handleRegisterAndJoin = async () => {
-    if (!selectedChapter || !isPhoneValid) return;
+    if (!selectedChapter || !isPhoneValid || isPhoneDuplicateInChapter) return;
     setSubmitting(true);
 
     const ambName = resolvedName || 'Intern Ambassador';
     const ambEmail = resolvedEmail || 'intern@cortexa.ai';
     const ambUni = selectedChapter.name;
-    const formattedPhone = cleanPhone.startsWith('+') ? cleanPhone : `+92${cleanPhone.replace(/^0/, '')}`;
 
     const existingAmbassadors = getLocalAmbassadors();
     
@@ -575,21 +593,50 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                       WhatsApp Phone Number *
                     </label>
-                    <input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="e.g. +92 300 1234567"
-                      className={`w-full p-3 bg-slate-50 border rounded-xl text-xs font-medium text-slate-800 focus:outline-none transition-all ${
-                        phone.trim() && !isPhoneValid
-                          ? 'border-rose-400 focus:border-rose-500 bg-rose-50/30'
-                          : 'border-slate-200 focus:border-emerald-500'
-                      }`}
-                      autoFocus
-                    />
-                    {phone.trim() !== '' && !isPhoneValid && (
-                      <span className="text-[11px] font-semibold text-rose-500 mt-1.5 block">
-                        Please enter a valid phone number (e.g. +92 300 1234567)
+                    <div className="relative">
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="e.g. 0300 1234567 or +92 300 1234567"
+                        className={`w-full p-3 pr-10 bg-slate-50 border rounded-xl text-xs font-medium text-slate-800 focus:outline-none transition-all ${
+                          phone.trim() === ''
+                            ? 'border-slate-200 focus:border-emerald-500'
+                            : isPhoneDuplicateInChapter || !isPhoneValid
+                            ? 'border-rose-400 focus:border-rose-500 bg-rose-50/30'
+                            : 'border-emerald-500 bg-emerald-50/30 focus:border-emerald-600'
+                        }`}
+                        autoFocus
+                      />
+                      {phone.trim() !== '' && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
+                          {isPhoneValid && !isPhoneDuplicateInChapter ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          ) : (
+                            <X className="w-4 h-4 text-rose-500" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {phone.trim() === '' ? (
+                      <span className="text-[11px] font-medium text-slate-400 mt-1.5 flex items-center gap-1">
+                        💡 Must be 11 digits starting with 03... (e.g. 0300 1234567) or 12 digits (+923...)
+                      </span>
+                    ) : isPhoneDuplicateInChapter ? (
+                      <span className="text-[11px] font-semibold text-rose-600 mt-1.5 flex items-center gap-1">
+                        <X className="w-3.5 h-3.5 shrink-0" />
+                        This phone number is already registered in this chapter.
+                      </span>
+                    ) : !isPhoneValid ? (
+                      <span className="text-[11px] font-semibold text-rose-500 mt-1.5 flex items-center gap-1">
+                        <X className="w-3.5 h-3.5 shrink-0" />
+                        Invalid format. Enter 11 digits (0300 1234567) or 12 digits (+92300 1234567).
+                      </span>
+                    ) : (
+                      <span className="text-[11px] font-extrabold text-emerald-600 mt-1.5 flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                        Valid WhatsApp number ({formattedPhone})
                       </span>
                     )}
                   </div>
@@ -599,14 +646,14 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
                   <button
                     type="button"
                     onClick={() => setSelectedChapter(null)}
-                    className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl"
+                    className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     onClick={handleRegisterAndJoin}
-                    disabled={submitting || !phone.trim() || !isPhoneValid}
+                    disabled={submitting || !phone.trim() || !isPhoneValid || isPhoneDuplicateInChapter}
                     className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-extrabold rounded-xl flex items-center gap-2 shadow-md cursor-pointer transition-all"
                   >
                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
