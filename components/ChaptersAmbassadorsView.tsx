@@ -76,6 +76,8 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const [ambassadors, setAmbassadors] = useState<Ambassador[]>([]);
+
   const getLocalAmbassadors = (): Ambassador[] => {
     try {
       const saved = localStorage.getItem('cortexa_ambassadors_list');
@@ -112,7 +114,7 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
     ? cleanPhone
     : `+92${cleanPhone}`;
 
-  const isPhoneDuplicateInChapter = selectedChapter ? getLocalAmbassadors().some(
+  const isPhoneDuplicateInChapter = selectedChapter ? (ambassadors.length > 0 ? ambassadors : getLocalAmbassadors()).some(
     a => (a.phone === formattedPhone || cleanPhone === a.phone.replace(/[\s\-\(\)]/g, '')) &&
          (a.chapter_id === selectedChapter.id || a.chapter_name.toLowerCase() === selectedChapter.name.toLowerCase())
   ) : false;
@@ -122,19 +124,19 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
       const saved = localStorage.getItem('cortexa_chapters_list');
       if (saved) {
         const parsed: Chapter[] = JSON.parse(saved);
-        return parsed.map((c, idx) => ({
+        return parsed.map(c => ({
           ...c,
-          members_count: typeof c.members_count === 'number' && c.members_count > 3 ? (idx % 3) : (c.members_count || 0)
+          members_count: typeof c.members_count === 'number' && c.members_count > 3 ? 0 : (c.members_count || 0)
         }));
       }
-      return INITIAL_CHAPTERS.map((c, idx) => ({
+      return INITIAL_CHAPTERS.map(c => ({
         ...c,
-        members_count: typeof c.members_count === 'number' && c.members_count > 3 ? (idx % 3) : (c.members_count || 0)
+        members_count: typeof c.members_count === 'number' && c.members_count > 3 ? 0 : (c.members_count || 0)
       }));
     } catch {
-      return INITIAL_CHAPTERS.map((c, idx) => ({
+      return INITIAL_CHAPTERS.map(c => ({
         ...c,
-        members_count: typeof c.members_count === 'number' && c.members_count > 3 ? (idx % 3) : (c.members_count || 0)
+        members_count: typeof c.members_count === 'number' && c.members_count > 3 ? 0 : (c.members_count || 0)
       }));
     }
   };
@@ -170,36 +172,51 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
     resolveUser();
   }, [userName, userEmail]);
 
-  const loadChapters = async () => {
-    const local = getLocalChapters();
+  const loadData = async () => {
+    const localC = getLocalChapters();
+    const localA = getLocalAmbassadors();
+    setAmbassadors(localA);
+
     try {
-      const { data } = await supabase.from('chapters').select('*').order('created_at', { ascending: false });
-      if (data && data.length > 0) {
-        const normalized = (data as Chapter[]).map((c, idx) => ({
-          ...c,
-          members_count: typeof c.members_count === 'number' && c.members_count > 3 ? (idx % 3) : (c.members_count || 0)
-        }));
-        setChapters(normalized);
+      const { data: cData } = await supabase.from('chapters').select('*').order('created_at', { ascending: false });
+      if (cData && cData.length > 0) {
+        setChapters(cData as Chapter[]);
       } else {
-        setChapters(local);
+        setChapters(localC);
+      }
+
+      const { data: aData } = await supabase.from('ambassadors').select('*').order('created_at', { ascending: false });
+      if (aData && aData.length > 0) {
+        setAmbassadors(aData as Ambassador[]);
       }
     } catch {
-      setChapters(local);
+      setChapters(localC);
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    loadChapters();
-    const handleUpdate = () => loadChapters();
+    loadData();
+    const handleUpdate = () => loadData();
     window.addEventListener('cortexa_chapters_updated', handleUpdate);
-    return () => window.removeEventListener('cortexa_chapters_updated', handleUpdate);
+    window.addEventListener('cortexa_ambassadors_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('cortexa_chapters_updated', handleUpdate);
+      window.removeEventListener('cortexa_ambassadors_updated', handleUpdate);
+    };
   }, []);
 
   const MAX_GROUP_CAPACITY = 3;
 
+  const getChapterMemberCount = (chapterId: string, chapterName: string): number => {
+    const list = ambassadors.length > 0 ? ambassadors : getLocalAmbassadors();
+    return list.filter(
+      a => a.chapter_id === chapterId || a.chapter_name.toLowerCase() === chapterName.toLowerCase()
+    ).length;
+  };
+
   const isUserRegisteredInChapter = (chapterId: string, chapterName: string): boolean => {
-    const existingAmbassadors = getLocalAmbassadors();
+    const existingAmbassadors = ambassadors.length > 0 ? ambassadors : getLocalAmbassadors();
     const ambEmail = (resolvedEmail || userEmail || '').toLowerCase();
     if (!ambEmail) return false;
     return existingAmbassadors.some(
@@ -376,7 +393,7 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredChapters.map((chapter) => {
-            const count = chapter.members_count || 0;
+            const count = getChapterMemberCount(chapter.id, chapter.name);
             const isFull = count >= MAX_GROUP_CAPACITY;
             const isMember = isUserRegisteredInChapter(chapter.id, chapter.name);
 
