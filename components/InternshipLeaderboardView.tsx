@@ -381,128 +381,339 @@ export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps>
         </div>
       </div>
 
-      {/* Points Breakdown Card */}
+      {/* ── SECTION 1: Curriculum Masteries & Module Capacities ── */}
       <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs space-y-6">
         
-        {/* Header Header & Tier Badge */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                Personal Progress
-              </span>
-              <span className="inline-flex items-center gap-1 text-[11px] font-extrabold text-amber-800 bg-amber-50 border border-amber-200/80 px-2.5 py-1 rounded-full">
-                <span>{currentTier.icon}</span>
-                <span>{currentTier.name} Tier</span>
-              </span>
-            </div>
-            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-baseline gap-2 pt-1">
-              <span>{totalPoints.toLocaleString()} points</span>
-              <span className="text-xs font-semibold text-slate-400">/ {scoringCap.toLocaleString()} max</span>
+        {/* Section Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+          <div>
+            <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">
+              Curriculum Masteries &amp; Module Capacities
             </h3>
-            <p className="text-xs text-slate-500 font-medium">
-              You have completed <strong className="text-emerald-700 font-bold">{overallProgress}%</strong> of your internship scoring capacity.
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              Individual milestone tracking across learning tracks, practical code reviews, and presence
+            </p>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold shrink-0 self-start sm:self-auto">
+            7 Active Workstreams
+          </span>
+        </div>
+
+        {/* 3x2 Grid of Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+          {/* Card 1: Profile Completion */}
+          <div className="bg-slate-50/70 border border-slate-200/90 hover:border-emerald-300 rounded-3xl p-5 flex flex-col justify-between transition-all space-y-4">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-100/70 text-emerald-700 flex items-center justify-center font-bold">
+                  <UserCheck className="w-5 h-5 text-emerald-600" />
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200/80 text-[10px] font-extrabold uppercase">
+                  100% Certified
+                </span>
+              </div>
+              <h4 className="text-base font-extrabold text-slate-900 mt-3.5 tracking-tight">
+                Profile Completion
+              </h4>
+              <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                Personal bio, technical stack, resume submission, and career trajectory goals confirmed.
+              </p>
+            </div>
+
+            <div className="space-y-1.5 pt-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-[11px] font-bold text-slate-500">Full Points Earned</span>
+                <span className="font-mono font-extrabold text-slate-900">60 <span className="text-slate-400 font-normal">/ 60 pts</span></span>
+              </div>
+              <div className="w-full h-2 bg-slate-200/60 rounded-full overflow-hidden">
+                <div className="h-full bg-emerald-500 rounded-full w-full" />
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: Onboarding & Setup */}
+          <div className="bg-slate-50/70 border border-slate-200/90 hover:border-emerald-300 rounded-3xl p-5 flex flex-col justify-between transition-all space-y-4">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-100/70 text-emerald-700 flex items-center justify-center font-bold">
+                  <Zap className="w-5 h-5 text-emerald-600" />
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200/80 text-[10px] font-extrabold uppercase">
+                  100% Certified
+                </span>
+              </div>
+              <h4 className="text-base font-extrabold text-slate-900 mt-3.5 tracking-tight">
+                Onboarding &amp; Setup
+              </h4>
+              <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                Orientation webinar attended, fellowship conduct handbook signed, dev environment verified.
+              </p>
+            </div>
+
+            <div className="space-y-1.5 pt-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-[11px] font-bold text-slate-500">Full Points Earned</span>
+                <span className="font-mono font-extrabold text-slate-900">40 <span className="text-slate-400 font-normal">/ 40 pts</span></span>
+              </div>
+              <div className="w-full h-2 bg-slate-200/60 rounded-full overflow-hidden">
+                <div className="h-full bg-emerald-500 rounded-full w-full" />
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3: Learning Tracks */}
+          <div className="bg-purple-50/40 border border-purple-200/70 hover:border-purple-300 rounded-3xl p-5 flex flex-col justify-between transition-all space-y-4">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
+                  <BookOpen className="w-5 h-5 text-purple-600" />
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 border border-purple-200/80 text-[10px] font-extrabold">
+                  48% In Progress
+                </span>
+              </div>
+              <h4 className="text-base font-extrabold text-slate-900 mt-3.5 tracking-tight">
+                Learning Tracks
+              </h4>
+              <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                Core curriculum tracks. Next up: <strong className="text-purple-900 font-bold">Data Analysis Foundations &amp; Pipeline Design.</strong>
+              </p>
+            </div>
+
+            <div className="space-y-1.5 pt-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-[11px] font-bold text-slate-500">Points Allocated</span>
+                <span className="font-mono font-extrabold text-slate-900">240 <span className="text-slate-400 font-normal">/ 500 pts</span></span>
+              </div>
+              <div className="w-full h-2 bg-slate-200/60 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-purple-600 via-violet-500 to-indigo-500 rounded-full" style={{ width: '48%' }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Card 4: Work Submissions */}
+          <div className="bg-slate-50/70 border border-slate-200/90 hover:border-rose-300 rounded-3xl p-5 flex flex-col justify-between transition-all space-y-4">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-2xl bg-amber-100/70 text-amber-800 flex items-center justify-center font-bold">
+                  <FileText className="w-5 h-5 text-amber-700" />
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200/80 text-[10px] font-extrabold">
+                  8% Started
+                </span>
+              </div>
+              <h4 className="text-base font-extrabold text-slate-900 mt-3.5 tracking-tight">
+                Work Submissions
+              </h4>
+              <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                Practical deliverables &amp; sprints. 3 tasks submitted, 1 under mentor code evaluation.
+              </p>
+            </div>
+
+            <div className="space-y-1.5 pt-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-[11px] font-bold text-slate-500">Points Allocated</span>
+                <span className="font-mono font-extrabold text-slate-900">80 <span className="text-slate-400 font-normal">/ 1,000 pts</span></span>
+              </div>
+              <div className="w-full h-2 bg-slate-200/60 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-rose-500 to-amber-500 rounded-full" style={{ width: '8%' }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Card 5: Participation & Standups */}
+          <div className="bg-amber-50/30 border border-amber-200/70 hover:border-amber-300 rounded-3xl p-5 flex flex-col justify-between transition-all space-y-4">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-2xl bg-amber-100/80 text-amber-800 flex items-center justify-center font-bold">
+                  <MessageSquare className="w-5 h-5 text-amber-600" />
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200/80 text-[10px] font-extrabold">
+                  80% High Streak
+                </span>
+              </div>
+              <h4 className="text-base font-extrabold text-slate-900 mt-3.5 tracking-tight">
+                Participation &amp; Standups
+              </h4>
+              <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                Town halls, async discussions, and peer retrospectives. Streak: <strong className="text-amber-900 font-bold">12 consecutive days.</strong>
+              </p>
+            </div>
+
+            <div className="space-y-1.5 pt-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-[11px] font-bold text-slate-500">Points Allocated</span>
+                <span className="font-mono font-extrabold text-slate-900">480 <span className="text-slate-400 font-normal">/ 600 pts</span></span>
+              </div>
+              <div className="w-full h-2 bg-slate-200/60 rounded-full overflow-hidden">
+                <div className="h-full bg-amber-500 rounded-full" style={{ width: '80%' }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Card 6: Career Audits (CV & LinkedIn) */}
+          <div className="bg-sky-50/40 border border-sky-200/80 hover:border-sky-300 rounded-3xl p-5 flex flex-col justify-between transition-all space-y-4">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold">
+                  <ShieldCheck className="w-5 h-5 text-sky-600" />
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-sky-100 text-sky-800 border border-sky-200/80 text-[10px] font-extrabold">
+                  Audits: 48.5% Avg
+                </span>
+              </div>
+              <h4 className="text-base font-extrabold text-slate-900 mt-3.5 tracking-tight">
+                Career Audits (CV &amp; LinkedIn)
+              </h4>
+              <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+                Automated ATS benchmarking and coach feedback. Combined score: <strong className="text-slate-900 font-bold">97 / 200 pts</strong> across profile platforms.
+              </p>
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <div className="space-y-1">
+                <div className="flex justify-between items-center text-[11px] font-bold text-slate-600">
+                  <span>CV Audit (51 / 100)</span>
+                  <span className="font-mono text-teal-700">51%</span>
+                </div>
+                <div className="w-full h-1.5 bg-slate-200/60 rounded-full overflow-hidden">
+                  <div className="h-full bg-teal-500 rounded-full" style={{ width: '51%' }} />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex justify-between items-center text-[11px] font-bold text-slate-600">
+                  <span>LinkedIn Audit (46 / 100)</span>
+                  <span className="font-mono text-indigo-700">46%</span>
+                </div>
+                <div className="w-full h-1.5 bg-slate-200/60 rounded-full overflow-hidden">
+                  <div className="h-full bg-indigo-500 rounded-full" style={{ width: '46%' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ── SECTION 2: Constructive Feedback from Career Mentors ── */}
+      <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
+        
+        {/* Section Header with Action Buttons */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+          <div>
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold text-amber-800 uppercase tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+              MENTOR DIAGNOSTIC
+            </span>
+            <h3 className="text-xl font-extrabold text-slate-900 tracking-tight mt-0.5">
+              Constructive Feedback from Career Mentors
+            </h3>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              Actionable recommendations to bridge the gap toward the 1,500 point Gold Tier
             </p>
           </div>
 
-          <div className="flex items-center gap-4 bg-slate-50 border border-slate-200/80 p-3 rounded-2xl shrink-0">
-            {/* Radial / Arc Stat Summary */}
-            <div className="text-right">
-              <div className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Scoring Cap</div>
-              <div className="text-sm font-extrabold text-slate-800 font-mono">{overallProgress}% Done</div>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center font-extrabold shadow-md shrink-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/Icons/Chart.png" alt="Point Breakdown" className="w-8 h-8 object-contain" />
-            </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => onNavigateToTab?.('cvaudit')}
+              className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5 border border-slate-200 transition-all cursor-pointer"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+              <span>Full CV Audit</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigateToTab?.('linkedinaudit')}
+              className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5 border border-slate-200 transition-all cursor-pointer"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+              <span>Full LinkedIn Audit</span>
+            </button>
           </div>
         </div>
 
-        {/* Overall progress bar */}
-        <div className="space-y-1.5">
-          <div className="flex justify-between items-center text-xs font-bold text-slate-600">
-            <span>Overall Completion Status</span>
-            <span className="font-mono text-emerald-700 font-extrabold">{overallProgress}%</span>
-          </div>
-          <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200/60">
-            <div
-              className="h-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 rounded-full transition-all duration-500 shadow-xs"
-              style={{ width: `${overallProgress}%` }}
-            />
-          </div>
-        </div>
+        {/* Action Items Cards Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-        {/* Categories List */}
-        <div className="space-y-4 pt-2">
-          {pointCategories.map((cat) => {
-            const pct = Math.round((cat.earned / cat.max) * 100);
-            const isCompleted = cat.earned === cat.max;
-
-            return (
-              <div
-                key={cat.label}
-                className="bg-slate-50/60 border border-slate-200/70 hover:border-slate-300 rounded-2xl p-4 transition-all duration-200 space-y-2.5 group"
-              >
-                <div className="flex justify-between items-center text-xs">
-                  <div className="flex items-center gap-2.5">
-                    <div className="p-2 bg-white rounded-xl border border-slate-200/80 shadow-2xs group-hover:scale-105 transition-transform">
-                      {cat.icon}
-                    </div>
-                    <span className="font-bold text-slate-800 flex items-center gap-1.5">
-                      {cat.label}
-                      <span className="text-[10px] text-slate-400 font-normal hover:text-slate-600 cursor-help" title={`Earn up to ${cat.max} points in this category`}>
-                        <HelpCircle className="w-3 h-3 text-slate-400" />
-                      </span>
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2.5">
-                    {isCompleted ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100/80 border border-emerald-300/60 text-emerald-800 text-[10px] font-extrabold uppercase">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        <span>Completed</span>
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 bg-slate-200/70 text-slate-700 font-mono text-[10px] font-extrabold rounded-md">
-                        {pct}%
-                      </span>
-                    )}
-
-                    <span className="font-mono text-slate-900 font-extrabold text-xs">
-                      {cat.earned} <span className="text-slate-400 font-normal">/ {cat.max}</span>
-                    </span>
-
-                    {cat.linkTab && (
-                      <button
-                        onClick={() => onNavigateToTab?.(cat.linkTab!)}
-                        className="px-2.5 py-1 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-800 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all shadow-2xs cursor-pointer ml-1"
-                      >
-                        <span>{cat.linkLabel}</span>
-                        <ExternalLink className="w-3 h-3 text-slate-400" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                <div className="w-full h-2.5 bg-slate-200/60 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full bg-gradient-to-r ${cat.gradient || 'from-emerald-500 to-teal-500'} rounded-full transition-all duration-500 shadow-2xs`}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
+          {/* Left: CV Audit Action Items */}
+          <div className="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 space-y-3.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-cyan-600" />
+                <span className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                  CV AUDIT ACTION ITEMS (+49 PTS POTENTIAL)
+                </span>
               </div>
-            );
-          })}
-        </div>
+              <span className="text-xs font-bold text-slate-500 font-mono">Score: 51/100</span>
+            </div>
 
-        {/* Footer info tip */}
-        <div className="pt-2">
-          <div className="bg-slate-50 border border-slate-200/80 p-3.5 rounded-2xl flex items-start gap-2.5 text-xs text-slate-600 font-medium">
-            <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-            <span className="leading-relaxed">
-              Points reflect your personal internship activity across categories. There is no competition — focus on completing as many learning areas as you can at your own pace.
-            </span>
+            <div className="space-y-2.5 text-xs text-slate-700 font-medium">
+              <div className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-900 font-bold text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+                  1
+                </span>
+                <p className="leading-relaxed">
+                  <strong className="text-slate-900 font-bold">Quantify impact:</strong> Replace qualitative phrases with concrete metrics (e.g. latency drop %, users served, test coverage).
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-900 font-bold text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+                  2
+                </span>
+                <p className="leading-relaxed">
+                  <strong className="text-slate-900 font-bold">Tailor technical keyword density:</strong> Align framework competencies with target cloud engineering roles.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-slate-200/60 flex items-center gap-2 text-xs text-slate-600 font-medium">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Verified contact links &amp; typography formatting approved by coach.</span>
+            </div>
           </div>
+
+          {/* Right: LinkedIn Action Items */}
+          <div className="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 space-y-3.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-indigo-600" />
+                <span className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                  LINKEDIN PROFILE ACTION ITEMS (+54 PTS POTENTIAL)
+                </span>
+              </div>
+              <span className="text-xs font-bold text-slate-500 font-mono">Score: 46/100</span>
+            </div>
+
+            <div className="space-y-2.5 text-xs text-slate-700 font-medium">
+              <div className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-900 font-bold text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+                  1
+                </span>
+                <p className="leading-relaxed">
+                  <strong className="text-slate-900 font-bold">Showcase deliverables in Featured section:</strong> Embed GitHub demo links from Module 2 &amp; sprint repo.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-900 font-bold text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+                  2
+                </span>
+                <p className="leading-relaxed">
+                  <strong className="text-slate-900 font-bold">Expand personal statement:</strong> Highlight your specialization in data pipelines and system reliability.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-slate-200/60 flex items-center gap-2 text-xs text-slate-600 font-medium">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Professional headshot &amp; headline badge verified.</span>
+            </div>
+          </div>
+
         </div>
       </div>
       {/* Photo Cropper Modal */}
