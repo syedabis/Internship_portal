@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { supabase } from '../lib/supabase';
-import { Menu, UserCheck, Sparkles } from 'lucide-react';
+import { Menu, UserCheck, Sparkles, X } from 'lucide-react';
 import { InternshipSidebar, InternshipTab } from '../components/InternshipSidebar';
 import { isFeatureAllowedForUser } from '../lib/accessConfig';
 
@@ -32,6 +32,7 @@ export default function Home() {
     return 'documents';
   });
 
+  const [betaModalFeature, setBetaModalFeature] = useState<string | null>(null);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
@@ -68,7 +69,13 @@ export default function Home() {
     }
   }, [isLoaded, user]);
 
-
+  const handleTabSelect = (tab: InternshipTab) => {
+    if (isLoaded && user && !isFeatureAllowedForUser(userEmail, tab)) {
+      setBetaModalFeature(tab);
+    } else {
+      setActiveTab(tab);
+    }
+  };
 
   // ── Unauthenticated Lock Screen Component ──
   const RenderLockScreen = () => (
@@ -106,36 +113,13 @@ export default function Home() {
     </div>
   );
 
-  // ── Private Beta Locked Screen Component ──
-  const RenderPrivateBetaCard = ({ featureName }: { featureName: string }) => (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] py-12 px-4 text-center font-sans">
-      <div className="relative max-w-md w-full bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-5 overflow-hidden">
-        <div className="w-14 h-14 rounded-2xl bg-amber-100 border border-amber-200 text-amber-700 flex items-center justify-center mx-auto shadow-sm">
-          <Sparkles className="w-7 h-7" />
-        </div>
-
-        <div className="space-y-2">
-          <span className="px-3 py-1 bg-amber-100 text-amber-800 text-[10px] font-extrabold uppercase tracking-wider rounded-full border border-amber-200">
-            Private Beta
-          </span>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-2 font-mono">
-            Feature Under Testing
-          </h2>
-          <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-sm mx-auto">
-            Access to this feature is currently in private beta and limited to authorized testing accounts ({userEmail}).
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen flex bg-[#f5f9f7] text-slate-900 font-sans">
       
       {/* Dark Sidebar Navigation */}
       <InternshipSidebar
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabSelect}
         onOpenAuth={() => setIsAuthOpen(true)}
         isMobileOpen={isMobileNavOpen}
         onCloseMobile={() => setIsMobileNavOpen(false)}
@@ -177,8 +161,6 @@ export default function Home() {
             </div>
           ) : !user ? (
             <RenderLockScreen />
-          ) : !isFeatureAllowedForUser(userEmail, activeTab) ? (
-            <RenderPrivateBetaCard featureName={activeTab} />
           ) : (
             <div
               key={activeTab}
@@ -188,7 +170,7 @@ export default function Home() {
                 <InternshipLeaderboardView
                   userName={userName}
                   userEmail={userEmail}
-                  onNavigateToTab={(tab) => setActiveTab(tab as InternshipTab)}
+                  onNavigateToTab={(tab) => handleTabSelect(tab as InternshipTab)}
                 />
               )}
 
@@ -219,6 +201,59 @@ export default function Home() {
           )}
         </div>
       </div>
+
+      {/* Private Beta Modal Popup with Blurred Backdrop */}
+      {betaModalFeature && (
+        <div
+          onClick={() => setBetaModalFeature(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200 select-none"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6 text-white text-center overflow-hidden"
+          >
+            {/* Ambient Glows */}
+            <div className="absolute -top-20 -right-20 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Close X button */}
+            <button
+              onClick={() => setBetaModalFeature(null)}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Icon Box */}
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto shadow-xl">
+              <Sparkles className="w-8 h-8" />
+            </div>
+
+            {/* Title & Description */}
+            <div className="space-y-2 relative z-10">
+              <span className="px-3 py-1 bg-amber-500/10 text-amber-400 text-[10px] font-extrabold uppercase tracking-widest rounded-full border border-amber-500/20">
+                Private Beta
+              </span>
+              <h2 className="text-2xl font-extrabold tracking-tight text-white mt-3 font-mono">
+                Feature Under Testing
+              </h2>
+              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xs mx-auto">
+                Access to this feature is currently in private beta and limited to authorized testing accounts.
+              </p>
+            </div>
+
+            {/* Action Button */}
+            <div className="pt-2 relative z-10">
+              <button
+                onClick={() => setBetaModalFeature(null)}
+                className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-xs tracking-wider uppercase shadow-lg hover:shadow-emerald-500/20 transition-all cursor-pointer"
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Auth Modal */}
       {isAuthOpen && <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} allowClose={!!user} />}
