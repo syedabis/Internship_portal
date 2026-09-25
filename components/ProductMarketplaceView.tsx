@@ -208,24 +208,29 @@ export const ProductMarketplaceView: React.FC = () => {
     const localMap = getLocalImageMap();
     const localOverride = getLocalProductsOverride();
 
-    let base: Product[] = [];
-    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-    
-    if (localOverride && localOverride.length > 0) {
-      base = localOverride;
-    } else if (data && data.length > 0) {
-      base = data as Product[];
-    } else {
-      base = STATIC_PRODUCTS;
-    }
+    const base: Product[] = localOverride && localOverride.length > 0 ? localOverride : STATIC_PRODUCTS;
 
-    const merged = base.map(p => ({
+    const initialMerged = base.map(p => ({
       ...p,
       image_url: localMap[p.id] || localMap[p.name] || p.image_url || null
     }));
 
-    setProducts(merged);
+    setProducts(initialMerged);
     setLoading(false);
+
+    // Non-blocking background fetch from Supabase
+    try {
+      const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+      if (data && data.length > 0 && !localOverride) {
+        const remoteMerged = (data as Product[]).map(p => ({
+          ...p,
+          image_url: localMap[p.id] || localMap[p.name] || p.image_url || null
+        }));
+        setProducts(remoteMerged);
+      }
+    } catch {
+      // Fallback silently if offline or missing table
+    }
   };
 
   useEffect(() => {
