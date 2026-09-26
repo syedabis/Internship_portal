@@ -202,6 +202,20 @@ export default function AdminChaptersPage() {
     }
   };
 
+  const handleUpdateAmbassadorNotes = async (id: string, notesText: string) => {
+    const newList = ambassadors.map((a) =>
+      a.id === id ? { ...a, notes: notesText } : a
+    );
+    setAmbassadors(newList);
+    saveLocalAmbassadors(newList);
+
+    try {
+      await supabase.from('ambassadors').update({ notes: notesText }).eq('id', id);
+    } catch (err) {
+      console.warn('Supabase notes update warning:', err);
+    }
+  };
+
   const handleEditChapter = (c: Chapter) => {
     setEditingChapterId(c.id);
     setName(c.name);
@@ -218,7 +232,7 @@ export default function AdminChaptersPage() {
       return;
     }
 
-    const headers = ['ID', 'Full Name', 'WhatsApp Phone', 'Email', 'University', 'Chapter Name', 'Status', 'Group Admin', 'Date Joined'];
+    const headers = ['ID', 'Full Name', 'WhatsApp Phone', 'Email', 'University', 'Chapter Name', 'Status', 'Group Admin', 'Notes', 'Date Joined'];
     const rows = ambassadors.map(a => [
       `"${a.id}"`,
       `"${a.name}"`,
@@ -228,6 +242,7 @@ export default function AdminChaptersPage() {
       `"${a.chapter_name}"`,
       `"${a.status}"`,
       `"${a.is_group_admin ? 'Yes' : 'No'}"`,
+      `"${a.notes || ''}"`,
       `"${a.created_at || ''}"`
     ]);
 
@@ -461,6 +476,7 @@ export default function AdminChaptersPage() {
                     <th className="p-4">Chapter</th>
                     <th className="p-4">Status</th>
                     <th className="p-4">Group Admin</th>
+                    <th className="p-4">Notes</th>
                     <th className="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -504,6 +520,20 @@ export default function AdminChaptersPage() {
                           <ShieldCheck className={`w-3.5 h-3.5 ${a.is_group_admin ? 'text-emerald-600' : 'text-slate-400'}`} />
                           <span>{a.is_group_admin ? 'Admin Assigned' : 'Grant Admin'}</span>
                         </button>
+                      </td>
+                      <td className="p-4 min-w-[170px]">
+                        <input
+                          type="text"
+                          value={a.notes || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const newList = ambassadors.map((item) => item.id === a.id ? { ...item, notes: val } : item);
+                            setAmbassadors(newList);
+                          }}
+                          onBlur={(e) => handleUpdateAmbassadorNotes(a.id, e.target.value)}
+                          placeholder="Add note..."
+                          className="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg px-2.5 py-1 text-xs text-slate-700 placeholder:text-slate-400 focus:bg-white focus:outline-none transition-all font-medium"
+                        />
                       </td>
                       <td className="p-4 text-right">
                         <button

@@ -43,6 +43,7 @@ export interface Ambassador {
   chapter_name: string;
   status: 'Active' | 'Pending' | 'Lead';
   is_group_admin?: boolean;
+  notes?: string;
   created_at?: string;
 }
 
