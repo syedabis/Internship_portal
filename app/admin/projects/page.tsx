@@ -33,6 +33,9 @@ export type Project = {
 };
 
 const DOMAINS = [
+  { id: 'ai', label: 'Artificial Intelligence (AI)' },
+  { id: 'swe', label: 'Software Engineering' },
+  { id: 'cybersecurity', label: 'Cybersecurity & InfoSec' },
   { id: 'hr', label: 'Human Resources (HR)' },
   { id: 'sales', label: 'Sales & Business Dev' },
   { id: 'marketing', label: 'Digital Marketing & Growth' },
@@ -41,7 +44,6 @@ const DOMAINS = [
   { id: 'customersuccess', label: 'Customer Success & Support' },
   { id: 'product', label: 'Product & Strategy' },
   { id: 'design', label: 'Graphic Design & Branding' },
-  { id: 'tech', label: 'Software & AI Engineering' },
 ];
 
 const INITIAL_PROJECTS: Project[] = [

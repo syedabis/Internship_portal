@@ -22,7 +22,6 @@ export const RESTRICTED_BETA_FEATURES = new Set([
   "resources",
   "inbox",
   "jobopportunities",
-  "projects",
   "leaderboard",
   "linkedinaudit",
   "cvaudit",

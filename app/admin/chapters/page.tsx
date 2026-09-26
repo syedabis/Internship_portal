@@ -17,7 +17,8 @@ import {
   MessageCircle,
   Phone,
   Mail,
-  GraduationCap
+  GraduationCap,
+  ShieldCheck
 } from 'lucide-react';
 import { Chapter, Ambassador } from '@/components/ChaptersAmbassadorsView';
 import { INITIAL_CHAPTERS, INITIAL_AMBASSADORS } from '@/lib/chaptersData';
@@ -182,6 +183,25 @@ export default function AdminChaptersPage() {
     }
   };
 
+  const handleToggleGroupAdmin = async (e: React.MouseEvent, ambassador: Ambassador) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const updatedAdminState = !ambassador.is_group_admin;
+    const newList = ambassadors.map((a) =>
+      a.id === ambassador.id ? { ...a, is_group_admin: updatedAdminState } : a
+    );
+
+    setAmbassadors(newList);
+    saveLocalAmbassadors(newList);
+
+    try {
+      await supabase.from('ambassadors').update({ is_group_admin: updatedAdminState }).eq('id', ambassador.id);
+    } catch (err) {
+      console.warn('Supabase update warning:', err);
+    }
+  };
+
   const handleEditChapter = (c: Chapter) => {
     setEditingChapterId(c.id);
     setName(c.name);
@@ -198,7 +218,7 @@ export default function AdminChaptersPage() {
       return;
     }
 
-    const headers = ['ID', 'Full Name', 'WhatsApp Phone', 'Email', 'University', 'Chapter Name', 'Status', 'Date Joined'];
+    const headers = ['ID', 'Full Name', 'WhatsApp Phone', 'Email', 'University', 'Chapter Name', 'Status', 'Group Admin', 'Date Joined'];
     const rows = ambassadors.map(a => [
       `"${a.id}"`,
       `"${a.name}"`,
@@ -207,6 +227,7 @@ export default function AdminChaptersPage() {
       `"${a.university}"`,
       `"${a.chapter_name}"`,
       `"${a.status}"`,
+      `"${a.is_group_admin ? 'Yes' : 'No'}"`,
       `"${a.created_at || ''}"`
     ]);
 
@@ -439,6 +460,7 @@ export default function AdminChaptersPage() {
                     <th className="p-4">University</th>
                     <th className="p-4">Chapter</th>
                     <th className="p-4">Status</th>
+                    <th className="p-4">Group Admin</th>
                     <th className="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -467,6 +489,21 @@ export default function AdminChaptersPage() {
                         <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold rounded-full">
                           {a.status}
                         </span>
+                      </td>
+                      <td className="p-4">
+                        <button
+                          type="button"
+                          onClick={(e) => handleToggleGroupAdmin(e, a)}
+                          className={`px-3 py-1 rounded-full text-[10px] font-extrabold flex items-center gap-1.5 transition-all border cursor-pointer ${
+                            a.is_group_admin
+                              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/20'
+                              : 'bg-slate-100 border-slate-200 text-slate-500 hover:bg-slate-200/80 hover:text-slate-800'
+                          }`}
+                          title={a.is_group_admin ? 'Group Admin assigned (click to revoke)' : 'Click to mark as Group Admin'}
+                        >
+                          <ShieldCheck className={`w-3.5 h-3.5 ${a.is_group_admin ? 'text-emerald-600' : 'text-slate-400'}`} />
+                          <span>{a.is_group_admin ? 'Admin Assigned' : 'Grant Admin'}</span>
+                        </button>
                       </td>
                       <td className="p-4 text-right">
                         <button

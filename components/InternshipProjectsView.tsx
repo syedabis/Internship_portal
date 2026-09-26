@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 import {
   Search,
   Sparkles,
@@ -30,6 +31,15 @@ import {
   Megaphone,
   UserCheck,
   FileText,
+  Send,
+  ExternalLink,
+  FileCheck,
+  AlertCircle,
+  Loader2,
+  X,
+  Cpu,
+  Code,
+  ShieldCheck,
 } from 'lucide-react';
 
 // ── Domain definitions (Corporate & Business Functions) ───────────────────
@@ -44,6 +54,9 @@ interface Domain {
 
 const DOMAINS: Domain[] = [
   { id: 'all', label: 'All Domains', icon: Layers, color: 'text-slate-700', bgColor: 'bg-slate-100', borderColor: 'border-slate-200' },
+  { id: 'ai', label: 'Artificial Intelligence (AI)', icon: Cpu, color: 'text-violet-700', bgColor: 'bg-violet-50', borderColor: 'border-violet-200' },
+  { id: 'swe', label: 'Software Engineering', icon: Code, color: 'text-cyan-700', bgColor: 'bg-cyan-50', borderColor: 'border-cyan-200' },
+  { id: 'cybersecurity', label: 'Cybersecurity & InfoSec', icon: ShieldCheck, color: 'text-emerald-700', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200' },
   { id: 'hr', label: 'Human Resources (HR)', icon: Users, color: 'text-purple-700', bgColor: 'bg-purple-50', borderColor: 'border-purple-200' },
   { id: 'sales', label: 'Sales & Business Dev', icon: TrendingUp, color: 'text-emerald-700', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200' },
   { id: 'marketing', label: 'Digital Marketing & Growth', icon: Target, color: 'text-rose-700', bgColor: 'bg-rose-50', borderColor: 'border-rose-200' },
@@ -70,6 +83,84 @@ interface Project {
 }
 
 const PROJECTS: Project[] = [
+  {
+    id: 'p_ai1',
+    title: 'Enterprise AI RAG Knowledge Agent & Vector Pipeline',
+    description: 'Build an end-to-end Retrieval-Augmented Generation (RAG) assistant using LangChain/LlamaIndex, vector embeddings, and OpenAI APIs to query technical documentation.',
+    domain: 'ai',
+    difficulty: 'Advanced',
+    duration: '5 weeks',
+    teamSize: '1–2',
+    techStack: ['Python', 'LangChain', 'OpenAI API', 'Pinecone / Qdrant', 'Streamlit'],
+    learningOutcomes: ['RAG architecture design', 'Vector database indexing', 'Prompt optimization', 'LLM latency benchmarking'],
+    points: 500,
+    popularity: 98,
+  },
+  {
+    id: 'p_ai2',
+    title: 'LLM Prompt Engineering & Fine-Tuning Evaluation',
+    description: 'Construct automated evaluation pipelines, design domain-specific prompt strategies, and format JSONL datasets for fine-tuning open-source language models.',
+    domain: 'ai',
+    difficulty: 'Intermediate',
+    duration: '4 weeks',
+    teamSize: '1',
+    techStack: ['OpenAI Evals', 'Python / Pandas', 'HuggingFace', 'PromptLayer', 'JSONL Datasets'],
+    learningOutcomes: ['LLM evaluation metrics', 'Dataset curation & cleaning', 'Few-shot prompt design', 'Model alignment auditing'],
+    points: 400,
+    popularity: 95,
+  },
+  {
+    id: 'p_swe1',
+    title: 'Full-Stack Microservices Architecture & API Gateway',
+    description: 'Architect a scalable REST / GraphQL backend with JWT authentication, Redis rate limiting, Docker containerization, and GitHub Actions CI/CD workflows.',
+    domain: 'swe',
+    difficulty: 'Advanced',
+    duration: '5 weeks',
+    teamSize: '2–3',
+    techStack: ['Node.js / Express', 'TypeScript', 'PostgreSQL', 'Docker', 'GitHub Actions'],
+    learningOutcomes: ['Microservice decomposition', 'Database schema migration', 'CI/CD pipeline automation', 'API security & rate limiting'],
+    points: 480,
+    popularity: 96,
+  },
+  {
+    id: 'p_swe2',
+    title: 'Real-Time Analytics Dashboard & WebSockets Engine',
+    description: 'Develop a high-performance frontend application using Next.js, WebSockets, and state management to render real-time streaming telemetry and interactive charts.',
+    domain: 'swe',
+    difficulty: 'Intermediate',
+    duration: '4 weeks',
+    teamSize: '1–2',
+    techStack: ['React / Next.js', 'TailwindCSS', 'WebSockets', 'Recharts', 'Zustand'],
+    learningOutcomes: ['WebSockets connection lifecycle', 'State management optimization', 'Real-time UI updates', 'Responsive dashboard design'],
+    points: 390,
+    popularity: 92,
+  },
+  {
+    id: 'p_sec1',
+    title: 'Web Application Penetration Testing & Vulnerability Audit',
+    description: 'Perform OWASP Top 10 security testing, execute automated vulnerability scans, identify injection flaws, and compile executive remediation reports.',
+    domain: 'cybersecurity',
+    difficulty: 'Advanced',
+    duration: '5 weeks',
+    teamSize: '1–2',
+    techStack: ['Burp Suite', 'OWASP ZAP', 'Nmap', 'Threat Modeling', 'Security Remediation'],
+    learningOutcomes: ['OWASP Top 10 exploitation', 'Vulnerability assessment', 'CVSS scoring framework', 'Security patch recommendations'],
+    points: 500,
+    popularity: 97,
+  },
+  {
+    id: 'p_sec2',
+    title: 'SOC SIEM Log Analysis & Threat Detection Playbooks',
+    description: 'Configure SIEM log ingestion rules, detect unauthorized access attempts, analyze network pcap captures, and write automated incident response playbooks.',
+    domain: 'cybersecurity',
+    difficulty: 'Intermediate',
+    duration: '4 weeks',
+    teamSize: '1',
+    techStack: ['Splunk / Elastic SIEM', 'Wireshark', 'Log Parser', 'Mitre ATT&CK', 'Incident Playbooks'],
+    learningOutcomes: ['SIEM query syntax (SPL/KQL)', 'Network protocol analysis', 'MITRE ATT&CK mapping', 'Automated containment steps'],
+    points: 420,
+    popularity: 91,
+  },
   {
     id: 'p1',
     title: 'HR Talent Acquisition & Onboarding Workflow',
@@ -228,7 +319,13 @@ const PROJECTS: Project[] = [
   },
 ];
 
-// ── Generated Plan type ────────────────────────────────────────────────────
+interface ExampleCaseStudy {
+  company: string;
+  scenario: string;
+  targetProblem: string;
+  sampleBenchmark: string;
+}
+
 interface WeekPlan {
   week: number;
   title: string;
@@ -239,10 +336,84 @@ interface WeekPlan {
 
 interface GeneratedPlan {
   overview: string;
+  exampleCaseStudy: ExampleCaseStudy;
   weeklyPlan: WeekPlan[];
   techStackBreakdown: { name: string; role: string }[];
   finalDeliverable: string;
   evaluationCriteria: string[];
+}
+
+function getExampleCaseStudy(project: Project): ExampleCaseStudy {
+  if (project.domain === 'ai') {
+    return {
+      company: 'Acme Cloud Intelligence (SaaS Startup)',
+      scenario: 'The company has 500+ internal Notion & Slack docs. Employees waste 12+ hours/week searching for documentation.',
+      targetProblem: 'No central AI system to answer technical questions with verified source citations.',
+      sampleBenchmark: 'A Streamlit / Next.js RAG application connected to a Pinecone vector database that ingests markdown files, processes queries in < 2 seconds, and provides clickable source links.',
+    };
+  }
+  if (project.domain === 'swe') {
+    return {
+      company: 'PayPulse Fintech',
+      scenario: 'Monolithic API service crashes during high-traffic payment processing bursts due to database locking.',
+      targetProblem: 'Lack of containerized microservices, rate limiting, and automated deployment pipelines.',
+      sampleBenchmark: 'A TypeScript microservice built with Node.js/Express, JWT authentication, Redis rate limiting, Docker containerization, and a GitHub Actions CI/CD script.',
+    };
+  }
+  if (project.domain === 'cybersecurity') {
+    return {
+      company: 'HealthTech Connect (HIPAA Compliance)',
+      scenario: 'Preparing for a SOC-2 security audit, but lacks vulnerability scanning logs and SIEM incident playbooks.',
+      targetProblem: 'Unidentified OWASP Top 10 vulnerabilities and manual threat detection processes.',
+      sampleBenchmark: 'A detailed OWASP PenTest audit report generated via Burp Suite/OWASP ZAP, complete with CVSS risk scores, proof-of-concept steps, and code remediation snippets.',
+    };
+  }
+  if (project.domain === 'hr') {
+    return {
+      company: 'Nova Workflows (50-Person Remote Team)',
+      scenario: 'New remote hires report feeling lost during their first month because onboarding documents are scattered.',
+      targetProblem: 'High 90-day employee churn rate (24%) due to unstructured onboarding.',
+      sampleBenchmark: 'A Notion 30-60-90 Day Onboarding Portal with automated check-in milestones, mentor assignment rubrics, and a 1-page HR manager SOP.',
+    };
+  }
+  if (project.domain === 'sales') {
+    return {
+      company: 'Apex B2B Solutions',
+      scenario: 'Sales reps spend 65% of their day reviewing unqualified inbound leads with no systematic lead scoring algorithm.',
+      targetProblem: 'Low sales pipeline velocity and missed quarterly revenue targets.',
+      sampleBenchmark: 'An interactive Excel/HubSpot Quantitative Lead Scoring Model with lead tier routing (Hot/Warm/Cold) and a 5-step outbound email drip sequence.',
+    };
+  }
+  if (project.domain === 'marketing') {
+    return {
+      company: 'Lumina Consumer Brand',
+      scenario: 'Paid ad spend is increasing, but CAC (Customer Acquisition Cost) has risen 35% without clear UTM attribution.',
+      targetProblem: 'Inability to track which channels (Search vs Social) drive profitable long-term LTV.',
+      sampleBenchmark: 'An omnichannel marketing strategy report with a live Looker Studio dashboard, UTM tracking framework, and 3 high-converting ad copy templates.',
+    };
+  }
+  if (project.domain === 'finance') {
+    return {
+      company: 'Vanguard Logistics',
+      scenario: 'Leadership lacks real-time visibility into monthly cash burn and budget variance across operational departments.',
+      targetProblem: 'Inaccurate runway forecasting leading to delayed investment decisions.',
+      sampleBenchmark: 'A 3-statement financial model in Excel/Sheets with monthly cash flow projections, sensitivity analysis tables, and executive summary charts.',
+    };
+  }
+  if (project.domain === 'product') {
+    return {
+      company: 'SaaSFlow Platform',
+      scenario: 'Product team wants to launch a new automated workflow feature but lacks user research validation and prioritization.',
+      targetProblem: 'Risk of building unused features without clear GTM positioning.',
+      sampleBenchmark: 'A GTM Strategy deck in Figma/Miro with RICE feature prioritization matrix, competitive analysis matrix, and 5 user interview synthesis notes.',
+    };
+  }
+  return {
+    company: 'Enterprise Organization Example',
+    scenario: `The company needs a structured execution plan for ${project.title} to improve operational efficiency.`,
+    targetProblem: `Lack of standardized frameworks and SOP documentation for ${project.domain.toUpperCase()} operations.`,
+    sampleBenchmark: `A comprehensive portfolio project featuring live operational templates, standardized SOP documentation, and an executive presentation video.`,
+  };
 }
 
 function generatePlan(project: Project): GeneratedPlan {
@@ -341,6 +512,7 @@ function generatePlan(project: Project): GeneratedPlan {
 
   return {
     overview: `This ${project.duration} project will guide you through the execution of "${project.title}" — from strategy and process design to live deployment and reporting. You will leverage tools like ${project.techStack.join(', ')} to deliver a industry-standard portfolio project worth ${project.points} leaderboard points.`,
+    exampleCaseStudy: getExampleCaseStudy(project),
     weeklyPlan: weeklyPlans,
     techStackBreakdown: project.techStack.map((tech) => ({
       name: tech,
@@ -450,20 +622,127 @@ export const InternshipProjectsView: React.FC = () => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [expandedWeek, setExpandedWeek] = useState<number | null>(1);
 
-  const loadProjects = () => {
+  // ── Weekly Submissions State ────────────────────────────────────────────
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [submissions, setSubmissions] = useState<Record<number, any>>({});
+  const [submittingWeek, setSubmittingWeek] = useState<number | null>(null);
+  const [deliverableUrl, setDeliverableUrl] = useState('');
+  const [submissionNotes, setSubmissionNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => setCurrentUser(user));
+  }, []);
+
+  const loadSubmissionsForProject = async (projectId: string, userEmail?: string) => {
+    if (!userEmail) return;
+    try {
+      const { data } = await supabase
+        .from('project_submissions')
+        .select('*')
+        .eq('project_id', projectId)
+        .eq('user_email', userEmail.toLowerCase().trim());
+
+      if (data && data.length > 0) {
+        const subMap: Record<number, any> = {};
+        data.forEach((sub: any) => {
+          subMap[sub.week_number] = sub;
+        });
+        setSubmissions(subMap);
+      } else {
+        setSubmissions({});
+      }
+    } catch (err) {
+      console.warn('Submissions load error:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedProject && currentUser?.email) {
+      loadSubmissionsForProject(selectedProject.id, currentUser.email);
+    }
+  }, [selectedProject, currentUser]);
+
+  const handleSubmitDeliverable = async () => {
+    if (!selectedProject || submittingWeek === null || !deliverableUrl.trim()) return;
+    setIsSubmitting(true);
+    const email = currentUser?.email || 'intern@datacrumbs.org';
+
+    const payload = {
+      user_email: email.toLowerCase().trim(),
+      user_name: currentUser?.user_metadata?.full_name || email.split('@')[0],
+      project_id: selectedProject.id,
+      project_title: selectedProject.title,
+      week_number: submittingWeek,
+      deliverable_url: deliverableUrl.trim(),
+      notes: submissionNotes.trim(),
+      status: 'pending',
+      updated_at: new Date().toISOString(),
+    };
+
+    try {
+      const { data, error } = await supabase
+        .from('project_submissions')
+        .upsert([payload], { onConflict: 'user_email,project_id,week_number' })
+        .select();
+
+      const newSub = data && data[0] ? data[0] : payload;
+      setSubmissions((prev) => ({ ...prev, [submittingWeek]: newSub }));
+    } catch (err) {
+      console.error('Submission error:', err);
+      setSubmissions((prev) => ({ ...prev, [submittingWeek]: payload }));
+    }
+
+    setIsSubmitting(false);
+    setSubmittingWeek(null);
+    setDeliverableUrl('');
+    setSubmissionNotes('');
+  };
+
+  const getLocalProjects = (): Project[] => {
     try {
       const saved = localStorage.getItem('cortexa_projects_list');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setProjectsList(parsed);
-          return;
+          return parsed;
         }
       }
     } catch (err) {
       console.warn('Error reading local projects:', err);
     }
-    setProjectsList(PROJECTS);
+    return PROJECTS;
+  };
+
+  const loadProjects = async () => {
+    const local = getLocalProjects();
+    try {
+      const { data } = await supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (data && data.length > 0) {
+        const mapped: Project[] = data.map((p: any) => ({
+          id: p.id,
+          title: p.title,
+          description: p.description,
+          domain: p.domain,
+          difficulty: p.difficulty || 'Intermediate',
+          duration: p.duration || '4 weeks',
+          teamSize: p.team_size || p.teamSize || '1-2',
+          techStack: p.tech_stack || p.techStack || [],
+          learningOutcomes: p.learning_outcomes || p.learningOutcomes || [],
+          points: p.points || 350,
+          popularity: p.popularity || 90,
+        }));
+        setProjectsList(mapped);
+      } else {
+        setProjectsList(local);
+      }
+    } catch {
+      setProjectsList(local);
+    }
   };
 
   useEffect(() => {
@@ -484,15 +763,12 @@ export const InternshipProjectsView: React.FC = () => {
     return matchesDomain && matchesDifficulty && matchesSearch;
   });
 
-  // ── Generate plan handler ──────────────────────────────────────────────
+  // ── View plan handler ──────────────────────────────────────────────
   const handleGeneratePlan = (project: Project) => {
     setSelectedProject(project);
-    setIsGenerating(true);
     setExpandedWeek(1);
-    setTimeout(() => {
-      setGeneratedPlan(generatePlan(project));
-      setIsGenerating(false);
-    }, 600);
+    setGeneratedPlan(generatePlan(project));
+    setIsGenerating(false);
   };
 
   const handleCopy = (text: string, field: string) => {
@@ -524,45 +800,62 @@ export const InternshipProjectsView: React.FC = () => {
           <span>Back to Projects</span>
         </button>
 
-        {/* Project Header Banner */}
-        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 text-white shadow-lg border border-slate-700/50 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl" />
-          <div className="relative">
-            <div className="flex items-start justify-between gap-4 flex-wrap">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${domain?.bgColor} ${domain?.color} border ${domain?.borderColor}`}>
-                    {domain?.label}
-                  </span>
-                  <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-bold border ${getDifficultyStyles(selectedProject.difficulty)}`}>
-                    {selectedProject.difficulty}
-                  </span>
-                </div>
-                <h1 className="text-2xl font-black tracking-tight">{selectedProject.title}</h1>
-                <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">{selectedProject.description}</p>
+        {/* Project Header Banner with Dark Abstract Textured Background */}
+        <div className="relative rounded-2xl p-6 sm:p-7 shadow-xl border border-slate-800/80 overflow-hidden text-white">
+          {/* Horizontally inverted background image */}
+          <div
+            className="absolute inset-0 -scale-x-100 bg-cover bg-center pointer-events-none"
+            style={{
+              backgroundImage: `url('/dark-abstract-textured-background-with-green-and-t-2026-08-20-19-21-18-utc.JPG (1).jpeg')`,
+            }}
+          />
+
+          <div className="relative z-10 space-y-4">
+            {/* Top Badges & Points/Duration */}
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-purple-900/60 text-purple-200 border border-purple-500/40">
+                  {domain?.label || selectedProject.domain}
+                </span>
+                <span className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${
+                  selectedProject.difficulty === 'Beginner'
+                    ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40'
+                    : selectedProject.difficulty === 'Intermediate'
+                    ? 'bg-amber-950/80 text-amber-300 border-amber-500/40'
+                    : 'bg-rose-950/80 text-rose-300 border-rose-500/40'
+                }`}>
+                  {selectedProject.difficulty}
+                </span>
               </div>
-              <div className="flex items-center gap-6 text-xs text-slate-400 shrink-0">
-                <div className="text-center">
-                  <div className="text-xl font-black text-emerald-400">{selectedProject.points}</div>
-                  <div className="mt-0.5 font-semibold">Points</div>
+
+              <div className="flex items-center gap-6 text-right">
+                <div>
+                  <div className="text-xl sm:text-2xl font-black text-emerald-400 leading-none">{selectedProject.points}</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Points</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-xl font-black text-white">{selectedProject.duration}</div>
-                  <div className="mt-0.5 font-semibold">Duration</div>
+                <div>
+                  <div className="text-xl sm:text-2xl font-black text-white leading-none">{selectedProject.duration}</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Duration</div>
                 </div>
               </div>
             </div>
 
-            {/* Meta pills row */}
-            <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-white/10">
-              <span className="px-3 py-1 rounded-lg bg-white/10 text-white/80 text-xs font-semibold flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" /> {selectedProject.duration}
+            {/* Title & Description */}
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{selectedProject.title}</h1>
+              <p className="text-xs sm:text-sm text-slate-300 max-w-4xl leading-relaxed mt-2">{selectedProject.description}</p>
+            </div>
+
+            {/* Divider & Horizontal Meta Pills */}
+            <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-slate-700/50">
+              <span className="px-3 py-1.5 rounded-xl bg-slate-900/70 border border-slate-700/60 text-slate-300 text-xs font-semibold flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-emerald-400" /> {selectedProject.duration}
               </span>
-              <span className="px-3 py-1 rounded-lg bg-white/10 text-white/80 text-xs font-semibold flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5" /> {selectedProject.teamSize} members
+              <span className="px-3 py-1.5 rounded-xl bg-slate-900/70 border border-slate-700/60 text-slate-300 text-xs font-semibold flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5 text-emerald-400" /> {selectedProject.teamSize} members
               </span>
               {selectedProject.techStack.map((tech) => (
-                <span key={tech} className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white/70 text-[11px] font-medium">
+                <span key={tech} className="px-3 py-1.5 rounded-xl bg-slate-900/60 border border-slate-700/50 text-slate-300 text-xs font-medium">
                   {tech}
                 </span>
               ))}
@@ -591,6 +884,47 @@ export const InternshipProjectsView: React.FC = () => {
                 <h2 className="text-base font-extrabold text-slate-900">Project Overview</h2>
               </div>
               <p className="text-sm text-slate-600 leading-relaxed">{generatedPlan.overview}</p>
+            </div>
+
+            {/* Real-World Example Case Study & Benchmark Card */}
+            <div className="bg-black text-white rounded-2xl p-6 border border-slate-800 shadow-md space-y-4">
+              <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-extrabold text-white">Real-World Case Study & Benchmark Example</h2>
+                    <p className="text-xs text-neutral-400">What to build and how top submissions look</p>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+                  Sample Guidance
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-neutral-950 rounded-xl p-4 border border-neutral-800 space-y-2">
+                  <div className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Briefcase className="w-3.5 h-3.5" /> Example Scenario: {generatedPlan.exampleCaseStudy.company}
+                  </div>
+                  <p className="text-xs text-neutral-300 leading-relaxed">
+                    <strong className="text-white">Context:</strong> {generatedPlan.exampleCaseStudy.scenario}
+                  </p>
+                  <p className="text-xs text-neutral-300 leading-relaxed">
+                    <strong className="text-white">Core Problem:</strong> {generatedPlan.exampleCaseStudy.targetProblem}
+                  </p>
+                </div>
+
+                <div className="bg-neutral-950 rounded-xl p-4 border border-neutral-800 space-y-2">
+                  <div className="text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> Top Submission Benchmark Output
+                  </div>
+                  <p className="text-xs text-neutral-300 leading-relaxed">
+                    {generatedPlan.exampleCaseStudy.sampleBenchmark}
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Weekly Plan Accordion */}
@@ -655,6 +989,56 @@ export const InternshipProjectsView: React.FC = () => {
                                   </li>
                                 ))}
                               </ul>
+                            </div>
+                            {/* Weekly Submission Action Bar */}
+                            <div className="mt-4 p-4 rounded-xl bg-white border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-lg bg-emerald-50 text-emerald-700">
+                                  <FileCheck className="w-4 h-4" />
+                                </div>
+                                <div>
+                                  <div className="text-xs font-bold text-slate-900">
+                                    Week {week.week} Submission Status
+                                  </div>
+                                  <div className="text-[11px] text-slate-500 mt-0.5">
+                                    {submissions[week.week] ? (
+                                      <span className="flex items-center gap-1.5 font-semibold text-amber-600">
+                                        <Clock className="w-3 h-3" /> Submitted (Pending Review)
+                                      </span>
+                                    ) : (
+                                      'Not submitted yet. Complete deliverables and submit link.'
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {submissions[week.week] ? (
+                                <div className="flex items-center gap-2">
+                                  <a
+                                    href={submissions[week.week].deliverable_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                                  >
+                                    <span>View Submitted Link</span>
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                  <button
+                                    onClick={() => setSubmittingWeek(week.week)}
+                                    className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition-colors"
+                                  >
+                                    Update
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => setSubmittingWeek(week.week)}
+                                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                                >
+                                  <Send className="w-3.5 h-3.5" />
+                                  <span>Submit Week {week.week} Deliverable</span>
+                                </button>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -918,27 +1302,31 @@ export const InternshipProjectsView: React.FC = () => {
                   </span>
                 </div>
 
-                {/* Tech / Tools Badges */}
+                {/* Skills & Experience Badges */}
                 <div className="flex flex-wrap gap-1.5 pt-2">
-                  {project.techStack.map((tech) => (
+                  {(project.learningOutcomes && project.learningOutcomes.length > 0
+                    ? project.learningOutcomes
+                    : project.techStack
+                  ).map((skill) => (
                     <span
-                      key={tech}
-                      className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200/80 text-slate-700 text-[10px] font-medium"
+                      key={skill}
+                      className="px-2.5 py-1 rounded-lg bg-emerald-50/80 border border-emerald-200/70 text-emerald-800 text-[10px] font-semibold flex items-center gap-1"
                     >
-                      {tech}
+                      <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600 shrink-0" />
+                      {skill}
                     </span>
                   ))}
                 </div>
               </div>
 
-              {/* Generate Plan Button */}
+              {/* View Plan Button */}
               <div className="pt-3 border-t border-slate-100">
                 <button
                   onClick={() => handleGeneratePlan(project)}
-                  className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-xs flex items-center justify-center gap-2 transition-all"
+                  className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Generate Project Plan</span>
+                  <FileText className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>View Project Plan</span>
                   <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
                 </button>
               </div>
@@ -967,6 +1355,81 @@ export const InternshipProjectsView: React.FC = () => {
           >
             Clear Filters
           </button>
+        </div>
+      )}
+
+      {/* ── Submission Modal ── */}
+      {submittingWeek !== null && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-[fadeIn_0.15s_ease-out]">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 border border-slate-100">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-700 flex items-center justify-center font-bold">
+                  <Send className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900">
+                    Submit Week {submittingWeek} Deliverable
+                  </h3>
+                  <p className="text-xs text-slate-500 truncate max-w-xs font-medium">{(selectedProject as any)?.title}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSubmittingWeek(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                  Deliverable URL <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="url"
+                  value={deliverableUrl}
+                  onChange={(e) => setDeliverableUrl(e.target.value)}
+                  placeholder="https://notion.so/... or https://drive.google.com/..."
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500"
+                />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Provide a public link to your Notion document, Google Drive file, Loom video, or GitHub repository.
+                </p>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                  Notes & Reflection (Optional)
+                </label>
+                <textarea
+                  rows={3}
+                  value={submissionNotes}
+                  onChange={(e) => setSubmissionNotes(e.target.value)}
+                  placeholder="Summarize key findings, tools used, or challenges overcome..."
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                onClick={() => setSubmittingWeek(null)}
+                className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitDeliverable}
+                disabled={isSubmitting || !deliverableUrl.trim()}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all cursor-pointer"
+              >
+                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                <span>{isSubmitting ? 'Submitting...' : `Submit Week ${submittingWeek}`}</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

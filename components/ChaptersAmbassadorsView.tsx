@@ -42,6 +42,7 @@ export interface Ambassador {
   chapter_id: string;
   chapter_name: string;
   status: 'Active' | 'Pending' | 'Lead';
+  is_group_admin?: boolean;
   created_at?: string;
 }
 
