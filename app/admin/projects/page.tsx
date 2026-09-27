@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { INITIAL_PROJECTS, Project } from '@/lib/projectsData';
+import { INITIAL_PROJECTS, Project, CaseStudyData, WeekPlanData } from '@/lib/projectsData';
 import {
   Plus,
   Trash2,
@@ -16,7 +16,14 @@ import {
   Filter,
   Layers,
   Award,
-  RefreshCw
+  RefreshCw,
+  ChevronDown,
+  ChevronUp,
+  BookOpen,
+  Target,
+  Star,
+  Zap,
+  Calendar
 } from 'lucide-react';
 
 export type { Project };
@@ -45,7 +52,7 @@ export default function AdminProjectsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [domainFilter, setDomainFilter] = useState('all');
 
-  // Form state
+  // Basic Form state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [domain, setDomain] = useState('sales');
@@ -56,6 +63,16 @@ export default function AdminProjectsPage() {
   const [outcomesText, setOutcomesText] = useState('');
   const [points, setPoints] = useState('350');
   const [popularity, setPopularity] = useState('90');
+
+  // Advanced Execution Plan Form state (Option 1)
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [caseStudyCompany, setCaseStudyCompany] = useState('');
+  const [caseStudyScenario, setCaseStudyScenario] = useState('');
+  const [caseStudyProblem, setCaseStudyProblem] = useState('');
+  const [caseStudyBenchmark, setCaseStudyBenchmark] = useState('');
+  const [finalDeliverableText, setFinalDeliverableText] = useState('');
+  const [evaluationCriteriaText, setEvaluationCriteriaText] = useState('');
+  const [weeklyPlanText, setWeeklyPlanText] = useState('');
 
   const getLocalProjects = (): Project[] => {
     try {
@@ -94,7 +111,6 @@ export default function AdminProjectsPage() {
         setProjects(data as Project[]);
       } else {
         setProjects(localProjects);
-        // Attempt background seed if Supabase has 0 records
         if (!error) {
           seedSupabaseProjects(INITIAL_PROJECTS);
         }
@@ -111,6 +127,9 @@ export default function AdminProjectsPage() {
     setTitle(''); setDescription(''); setDomain('sales'); setDifficulty('Intermediate');
     setDuration('4 weeks'); setTeamSize('1-2'); setTechStackText(''); setOutcomesText('');
     setPoints('350'); setPopularity('90'); setEditingId(null); setShowForm(false);
+    setShowAdvanced(false);
+    setCaseStudyCompany(''); setCaseStudyScenario(''); setCaseStudyProblem(''); setCaseStudyBenchmark('');
+    setFinalDeliverableText(''); setEvaluationCriteriaText(''); setWeeklyPlanText('');
   };
 
   const handleSave = async () => {
@@ -120,6 +139,32 @@ export default function AdminProjectsPage() {
     const techStack = techStackText.split('\n').map(t => t.trim()).filter(Boolean);
     const learningOutcomes = outcomesText.split('\n').map(o => o.trim()).filter(Boolean);
     const targetId = editingId || 'proj_' + Date.now();
+
+    // Parse Case Study
+    let caseStudyData: CaseStudyData | undefined = undefined;
+    if (caseStudyCompany.trim() || caseStudyScenario.trim() || caseStudyProblem.trim() || caseStudyBenchmark.trim()) {
+      caseStudyData = {
+        company: caseStudyCompany.trim(),
+        scenario: caseStudyScenario.trim(),
+        targetProblem: caseStudyProblem.trim(),
+        sampleBenchmark: caseStudyBenchmark.trim(),
+      };
+    }
+
+    // Parse Weekly Plan
+    let parsedWeeklyPlan: WeekPlanData[] | undefined = undefined;
+    if (weeklyPlanText.trim()) {
+      try {
+        const parsed = JSON.parse(weeklyPlanText.trim());
+        if (Array.isArray(parsed)) {
+          parsedWeeklyPlan = parsed;
+        }
+      } catch {
+        console.warn('Weekly plan JSON parse failed, using raw string formatting');
+      }
+    }
+
+    const evaluationCriteria = evaluationCriteriaText.split('\n').map(c => c.trim()).filter(Boolean);
 
     const updatedProject: Project = {
       id: targetId,
@@ -133,6 +178,10 @@ export default function AdminProjectsPage() {
       learningOutcomes,
       points: parseInt(points) || 350,
       popularity: parseInt(popularity) || 90,
+      caseStudy: caseStudyData,
+      weeklyPlan: parsedWeeklyPlan,
+      finalDeliverable: finalDeliverableText.trim() || undefined,
+      evaluationCriteria: evaluationCriteria.length > 0 ? evaluationCriteria : undefined,
       created_at: new Date().toISOString()
     };
 
@@ -158,7 +207,11 @@ export default function AdminProjectsPage() {
         tech_stack: techStack,
         learning_outcomes: learningOutcomes,
         points: parseInt(points) || 350,
-        popularity: parseInt(popularity) || 90
+        popularity: parseInt(popularity) || 90,
+        case_study: caseStudyData || null,
+        weekly_plan: parsedWeeklyPlan || null,
+        final_deliverable: finalDeliverableText.trim() || null,
+        evaluation_criteria: evaluationCriteria.length > 0 ? evaluationCriteria : null,
       };
 
       if (editingId && !editingId.startsWith('proj_') && !editingId.startsWith('p')) {
@@ -204,6 +257,27 @@ export default function AdminProjectsPage() {
     setOutcomesText(Array.isArray(p.learningOutcomes) ? p.learningOutcomes.join('\n') : '');
     setPoints(String(p.points || 350));
     setPopularity(String(p.popularity || 90));
+
+    // Populate Advanced Fields
+    setCaseStudyCompany(p.caseStudy?.company || '');
+    setCaseStudyScenario(p.caseStudy?.scenario || '');
+    setCaseStudyProblem(p.caseStudy?.targetProblem || '');
+    setCaseStudyBenchmark(p.caseStudy?.sampleBenchmark || '');
+    setFinalDeliverableText(p.finalDeliverable || '');
+    setEvaluationCriteriaText(Array.isArray(p.evaluationCriteria) ? p.evaluationCriteria.join('\n') : '');
+
+    if (p.weeklyPlan && Array.isArray(p.weeklyPlan)) {
+      setWeeklyPlanText(JSON.stringify(p.weeklyPlan, null, 2));
+    } else {
+      setWeeklyPlanText('');
+    }
+
+    if (p.caseStudy || p.weeklyPlan || p.finalDeliverable || p.evaluationCriteria) {
+      setShowAdvanced(true);
+    } else {
+      setShowAdvanced(false);
+    }
+
     setShowForm(true);
   };
 
@@ -374,6 +448,143 @@ export default function AdminProjectsPage() {
                 className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-800 focus:outline-none focus:border-emerald-500"
               />
             </div>
+          </div>
+
+          {/* Option 1: Expandable Advanced Execution Plan Settings */}
+          <div className="pt-2 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="w-full py-2.5 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold flex items-center justify-between transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Advanced Candidate Execution Plan Settings (Case Study, Weekly Breakdown & Rubric)</span>
+              </div>
+              {showAdvanced ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
+            </button>
+
+            {showAdvanced && (
+              <div className="mt-3 p-4 bg-slate-900 text-white rounded-2xl space-y-4 border border-slate-800 animate-[fadeSlideIn_0.2s_ease-out]">
+                {/* 1. Real-World Case Study */}
+                <div className="space-y-2 border-b border-slate-800 pb-3">
+                  <div className="text-xs font-extrabold text-emerald-400 flex items-center gap-1.5 uppercase tracking-wider">
+                    <BookOpen className="w-3.5 h-3.5" /> Real-World Case Study & Benchmark Example
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input
+                      value={caseStudyCompany}
+                      onChange={(e) => setCaseStudyCompany(e.target.value)}
+                      placeholder="Example Company Name (e.g. Acme Tech Solutions)"
+                      className="p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                    />
+                    <input
+                      value={caseStudyScenario}
+                      onChange={(e) => setCaseStudyScenario(e.target.value)}
+                      placeholder="Scenario Context (e.g. Scaling B2B outbound campaign)"
+                      className="p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                  <textarea
+                    value={caseStudyProblem}
+                    onChange={(e) => setCaseStudyProblem(e.target.value)}
+                    placeholder="Core Problem to Solve (e.g. High customer acquisition cost and unoptimized funnel)"
+                    rows={2}
+                    className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                  />
+                  <textarea
+                    value={caseStudyBenchmark}
+                    onChange={(e) => setCaseStudyBenchmark(e.target.value)}
+                    placeholder="Top Submission Benchmark Output (What high scoring submissions look like)"
+                    rows={2}
+                    className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                {/* 2. Weekly Execution Plan */}
+                <div className="space-y-2 border-b border-slate-800 pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs font-extrabold text-amber-400 flex items-center gap-1.5 uppercase tracking-wider">
+                      <Calendar className="w-3.5 h-3.5" /> Weekly Execution Plan & Deliverables (JSON Array)
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const samplePlan = [
+                          {
+                            week: 1,
+                            title: "Architecture & Requirements Audit",
+                            keyMetrics: "Completion of initial strategy blueprint",
+                            objectives: ["Audit existing workflow", "Define KPIs and targets"],
+                            deliverables: ["Strategy Architecture Document"]
+                          },
+                          {
+                            week: 2,
+                            title: "Implementation & Core Workflow Setup",
+                            keyMetrics: "Functional setup and baseline testing",
+                            objectives: ["Configure core tools", "Execute phase 1 testing"],
+                            deliverables: ["Workflow Prototype & Config File"]
+                          },
+                          {
+                            week: 3,
+                            title: "Optimization & Quality Assurance",
+                            keyMetrics: "Zero critical bugs and performance pass",
+                            objectives: ["Conduct QA testing", "Optimize response times"],
+                            deliverables: ["Test Report & Final SOP Guide"]
+                          },
+                          {
+                            week: 4,
+                            title: "Final Presentation & Video Walkthrough",
+                            keyMetrics: "100% project completion",
+                            objectives: ["Record video walkthrough", "Publish repository"],
+                            deliverables: ["Final Executive Deck & Video Link"]
+                          }
+                        ];
+                        setWeeklyPlanText(JSON.stringify(samplePlan, null, 2));
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 text-[10px] font-bold transition-colors"
+                    >
+                      + Pre-fill Sample 4-Week Template
+                    </button>
+                  </div>
+                  <textarea
+                    value={weeklyPlanText}
+                    onChange={(e) => setWeeklyPlanText(e.target.value)}
+                    placeholder='JSON Array format: [{"week": 1, "title": "Setup", "keyMetrics": "SOP complete", "objectives": ["Goal 1"], "deliverables": ["Deliv 1"]}]'
+                    rows={5}
+                    className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs font-mono text-emerald-300 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                {/* 3. Final Deliverable & Evaluation Rubric */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">
+                      Custom Final Deliverable Description
+                    </label>
+                    <textarea
+                      value={finalDeliverableText}
+                      onChange={(e) => setFinalDeliverableText(e.target.value)}
+                      placeholder="Comprehensive executive case study complete with live template..."
+                      rows={3}
+                      className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">
+                      Custom Evaluation Criteria (one per line)
+                    </label>
+                    <textarea
+                      value={evaluationCriteriaText}
+                      onChange={(e) => setEvaluationCriteriaText(e.target.value)}
+                      placeholder="Strategic depth & problem solving (25%)&#10;Execution completeness (25%)&#10;Data accuracy (20%)"
+                      rows={3}
+                      className="w-full p-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end border-t border-slate-100 pt-3">

@@ -1,5 +1,20 @@
 // Central dataset for all 18 Internship Projects across 11 domains
 
+export type CaseStudyData = {
+  company: string;
+  scenario: string;
+  targetProblem: string;
+  sampleBenchmark: string;
+};
+
+export type WeekPlanData = {
+  week: number;
+  title: string;
+  objectives: string[];
+  deliverables: string[];
+  keyMetrics: string;
+};
+
 export type Project = {
   id: string;
   title: string;
@@ -12,6 +27,10 @@ export type Project = {
   learningOutcomes: string[];
   points: number;
   popularity: number;
+  caseStudy?: CaseStudyData;
+  weeklyPlan?: WeekPlanData[];
+  finalDeliverable?: string;
+  evaluationCriteria?: string[];
   created_at?: string;
 };
 
