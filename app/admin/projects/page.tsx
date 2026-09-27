@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { INITIAL_PROJECTS, Project } from '@/lib/projectsData';
 import {
   Plus,
   Trash2,
@@ -14,23 +15,11 @@ import {
   Search,
   Filter,
   Layers,
-  Award
+  Award,
+  RefreshCw
 } from 'lucide-react';
 
-export type Project = {
-  id: string;
-  title: string;
-  description: string;
-  domain: string;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-  duration: string;
-  teamSize: string;
-  techStack: string[];
-  learningOutcomes: string[];
-  points: number;
-  popularity: number;
-  created_at?: string;
-};
+export type { Project };
 
 const DOMAINS = [
   { id: 'ai', label: 'Artificial Intelligence (AI)' },
@@ -46,64 +35,10 @@ const DOMAINS = [
   { id: 'design', label: 'Graphic Design & Branding' },
 ];
 
-const INITIAL_PROJECTS: Project[] = [
-  {
-    id: 'p1',
-    title: 'HR Talent Acquisition & Onboarding Workflow',
-    description: 'Design and implement a structured talent pipeline, 30-60-90 day employee onboarding journey, automated check-ins, and performance feedback frameworks for a remote workforce.',
-    domain: 'hr',
-    difficulty: 'Intermediate',
-    duration: '4 weeks',
-    teamSize: '1–2',
-    techStack: ['HRIS Frameworks', 'Notion', 'Excel / Sheets', 'LMS Tools', 'Process Mapping'],
-    learningOutcomes: ['End-to-end recruitment funnel', 'Onboarding SLA design', 'Employee retention strategies', 'HR metrics & analytics'],
-    points: 350,
-    popularity: 94,
-  },
-  {
-    id: 'p2',
-    title: 'B2B Sales Pipeline & Lead Scoring Engine',
-    description: 'Build an outbound sales pipeline strategy, define ideal customer profiles (ICPs), create a quantitative lead scoring model, and design automated email follow-up workflows.',
-    domain: 'sales',
-    difficulty: 'Intermediate',
-    duration: '4 weeks',
-    teamSize: '1–2',
-    techStack: ['HubSpot CRM', 'Salesforce Logic', 'LinkedIn Sales Navigator', 'Excel Financials', 'Email Automation'],
-    learningOutcomes: ['B2B prospecting methodology', 'CRM pipeline optimization', 'Lead scoring algorithms', 'Sales conversion tracking'],
-    points: 380,
-    popularity: 91,
-  },
-  {
-    id: 'p3',
-    title: 'Multi-Channel Growth Marketing Campaign',
-    description: 'Create an integrated growth marketing campaign targeting B2B SaaS users. Set up SEO keyword trees, ad creative copy, A/B landing page tests, and ROI attribution models.',
-    domain: 'marketing',
-    difficulty: 'Beginner',
-    duration: '3 weeks',
-    teamSize: '1–3',
-    techStack: ['Google Analytics 4', 'Meta Ads Manager', 'SEO Tools', 'Canva', 'Copywriting'],
-    learningOutcomes: ['Customer acquisition cost (CAC) analysis', 'Ad conversion optimization', 'Content calendar planning', 'Campaign ROI tracking'],
-    points: 300,
-    popularity: 96,
-  },
-  {
-    id: 'p4',
-    title: 'Financial Valuation & Unit Economics Model',
-    description: 'Develop a dynamic 3-statement financial model for an early-stage startup. Calculate DCF valuation, customer lifetime value (LTV), burn rate, and runway projections under 3 growth scenarios.',
-    domain: 'finance',
-    difficulty: 'Advanced',
-    duration: '5 weeks',
-    teamSize: '1–2',
-    techStack: ['Advanced Excel', 'Financial Modeling', 'DCF Analysis', 'Power BI', 'Cap Table Logic'],
-    learningOutcomes: ['3-Statement financial forecasting', 'DCF & WACC calculations', 'LTV:CAC ratio modeling', 'Investor pitch deck financials'],
-    points: 450,
-    popularity: 88,
-  }
-];
-
 export default function AdminProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [syncingSupabase, setSyncingSupabase] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -140,15 +75,29 @@ export default function AdminProjectsPage() {
     }
   };
 
+  const seedSupabaseProjects = async (projectsToSeed: Project[]) => {
+    setSyncingSupabase(true);
+    try {
+      await supabase.from('projects').upsert(projectsToSeed);
+    } catch (err) {
+      console.warn('Supabase bulk seed notice:', err);
+    }
+    setSyncingSupabase(false);
+  };
+
   const fetchProjects = async () => {
     const localProjects = getLocalProjects();
 
     try {
-      const { data } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
+      const { data, error } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
       if (data && data.length > 0) {
         setProjects(data as Project[]);
       } else {
         setProjects(localProjects);
+        // Attempt background seed if Supabase has 0 records
+        if (!error) {
+          seedSupabaseProjects(INITIAL_PROJECTS);
+        }
       }
     } catch {
       setProjects(localProjects);
