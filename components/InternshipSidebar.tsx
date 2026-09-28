@@ -81,9 +81,9 @@ export const InternshipSidebar: React.FC<InternshipSidebarProps> = ({
   const isLoggedIn = !!user;
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
-  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Nmesoma Anita';
-  const userEmail = user?.email || 'nmesoanita@gmail.com';
-  const userAvatar = user?.user_metadata?.avatar_url || (typeof window !== 'undefined' && localStorage.getItem('user_avatar_url')) || '/profile_image.png';
+  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || (user?.email ? user.email.split('@')[0] : (isLoggedIn ? 'Intern' : 'Guest Intern'));
+  const userEmail = user?.email || (isLoggedIn ? '' : 'Sign in to access');
+  const userAvatar = user?.user_metadata?.avatar_url || (typeof window !== 'undefined' && localStorage.getItem('user_avatar_url')) || null;
 
   const navSections: NavSection[] = [
     {
@@ -220,12 +220,18 @@ export const InternshipSidebar: React.FC<InternshipSidebarProps> = ({
           className="flex items-center justify-between p-2 rounded-xl bg-[#0d221f] hover:bg-[#132d28] border border-[#1b433c] cursor-pointer transition-colors"
         >
           <div className="flex items-center gap-2.5 min-w-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={userAvatar}
-              alt={userName}
-              className="w-8 h-8 rounded-full object-cover shrink-0 border border-emerald-500/30"
-            />
+            {userAvatar ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={userAvatar}
+                alt={userName}
+                className="w-8 h-8 rounded-full object-cover shrink-0 border border-emerald-500/30"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs flex items-center justify-center shrink-0">
+                {userName && userName.length > 0 ? userName.charAt(0).toUpperCase() : 'U'}
+              </div>
+            )}
             <div className="truncate min-w-0">
               <div className="font-bold text-xs text-white truncate flex items-center gap-1.5">
                 <span className="truncate">{userName}</span>

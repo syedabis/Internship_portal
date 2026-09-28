@@ -1,7 +1,6 @@
 {
   "chapters": [
     {
-      "id": "c_1",
       "name": "GIK Institute of Technology",
       "city": "Swabi / Topi",
       "lead_name": "Campus Team",
@@ -10,7 +9,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_2",
       "name": "Government Postgraduate college Haripur Chapter",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -19,16 +17,14 @@
       "badge": "Growing"
     },
     {
-      "id": "c_3",
       "name": "University of Sargodha – Sargodha",
       "city": "Sargodha",
       "lead_name": "Campus Team",
       "whatsapp_link": "https://chat.whatsapp.com/HjoEGCKSRGp9IEF949Op6b?s=cl&p=a&mlu=4&ilr=4",
-      "members_count": 53,
+      "members_count": 94,
       "badge": "Official"
     },
     {
-      "id": "c_4",
       "name": "Benazir Bhutto Shaheed University Lyari Karachi.",
       "city": "Karachi",
       "lead_name": "Campus Team",
@@ -37,7 +33,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_5",
       "name": "Iqra University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -46,7 +41,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_6",
       "name": "IMNSU Multan",
       "city": "Multan",
       "lead_name": "Campus Team",
@@ -55,7 +49,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_7",
       "name": "FJWU Chapter 5",
       "city": "Rawalpindi",
       "lead_name": "Campus Team",
@@ -64,7 +57,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_8",
       "name": "NED Chapter-6",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -73,7 +65,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_9",
       "name": "Dha Suffa Chapter",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -82,7 +73,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_10",
       "name": "(PAF-IAST) Chapter",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -91,25 +81,14 @@
       "badge": "Growing"
     },
     {
-      "id": "c_11",
-      "name": "(Dawood University ) Chapter",
+      "name": "Dawood University Chapter 01",
       "city": "Pakistan",
       "lead_name": "syed wasif",
       "whatsapp_link": "https://chat.whatsapp.com/HtVfPxaatE9CqbdcTPEwHA?s=cl&p=a&ilr=1",
-      "members_count": 29,
+      "members_count": 47,
       "badge": "Official"
     },
     {
-      "id": "c_12",
-      "name": "GIK Institute of Technology",
-      "city": "Swabi / Topi",
-      "lead_name": "Campus Team",
-      "whatsapp_link": "https://chat.whatsapp.com/Bu6sGlCKukAJ65561Vsuil?s=cl&p=a&ilr=1",
-      "members_count": 36,
-      "badge": "Growing"
-    },
-    {
-      "id": "c_13",
       "name": "NUML Chap",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -118,7 +97,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_14",
       "name": "FJWU Chapter 1",
       "city": "Rawalpindi",
       "lead_name": "Khadija Malik",
@@ -127,7 +105,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_15",
       "name": "IBA University PUNJAB",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -136,7 +113,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_16",
       "name": "Dow University of Health Sciences",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -145,7 +121,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_17",
       "name": "IBA Sukkur Chapter 02",
       "city": "Sukkur",
       "lead_name": "Hafsa Noor",
@@ -154,7 +129,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_18",
       "name": "Abdul Wali khan university Mardan Chap",
       "city": "KPK / Mardan",
       "lead_name": "Campus Team",
@@ -163,7 +137,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_19",
       "name": "Virtual University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -172,7 +145,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_20",
       "name": "Begum Nusrat Bhutto women university sukkur",
       "city": "Sukkur",
       "lead_name": "Campus Team",
@@ -181,7 +153,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_21",
       "name": "Comsats University Chapter 04",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -190,7 +161,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_22",
       "name": "FJWU Chapter 6",
       "city": "Rawalpindi",
       "lead_name": "Campus Team",
@@ -199,7 +169,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_23",
       "name": "Federal Urdu University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -208,7 +177,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_24",
       "name": "AROR University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -217,7 +185,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_25",
       "name": "PMAS Arid Agriculture University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -226,7 +193,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_26",
       "name": "SZABIST Karachi Chapter 01",
       "city": "Karachi",
       "lead_name": "Sanjana Lokwani",
@@ -235,7 +201,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_27",
       "name": "NED Chapter 04",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -244,7 +209,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_28",
       "name": "SZABIST Karachi Chapter 02",
       "city": "Karachi",
       "lead_name": "Campus Team",
@@ -253,7 +217,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_29",
       "name": "Mehran University Chapter",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -262,7 +225,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_30",
       "name": "IBA DADU Chapter",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -271,7 +233,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_31",
       "name": "IBA Sukkur Chapter 01",
       "city": "Sukkur",
       "lead_name": "Campus Team",
@@ -280,7 +241,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_32",
       "name": "FJWU Chapter 4",
       "city": "Rawalpindi",
       "lead_name": "Aiman Iqbal",
@@ -289,7 +249,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_33",
       "name": "FJWU Chapter 2",
       "city": "Rawalpindi",
       "lead_name": "Campus Team",
@@ -298,7 +257,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_34",
       "name": "UET Chap 1",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -307,7 +265,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_35",
       "name": "Career Hub",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -316,7 +273,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_36",
       "name": "FAST NUCES",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -325,7 +281,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_37",
       "name": "University of the Punjab Chapter",
       "city": "Pakistan",
       "lead_name": "Rabya Samman",
@@ -334,7 +289,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_38",
       "name": "FJWU Chapter 3",
       "city": "Rawalpindi",
       "lead_name": "Campus Team",
@@ -343,7 +297,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_39",
       "name": "SAUIT Chapter",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -352,7 +305,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_40",
       "name": "ChangeMakers (FAST-NUCES)",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -361,7 +313,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_41",
       "name": "Quaid-e-Azam University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -370,7 +321,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_42",
       "name": "Dawood University Chapter 02",
       "city": "Pakistan",
       "lead_name": "Abdul Waris",
@@ -379,7 +329,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_43",
       "name": "University of Mianwali Chap 2",
       "city": "Pakistan",
       "lead_name": "Manahil Rehman",
@@ -388,7 +337,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_44",
       "name": "NED Chapter-2",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -397,7 +345,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_45",
       "name": "UET Mardan| CV • LinkedIn • Jobs",
       "city": "KPK / Mardan",
       "lead_name": "Campus Team",
@@ -406,7 +353,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_46",
       "name": "University of Mianwali",
       "city": "Pakistan",
       "lead_name": "Manahil Rehman",
@@ -415,7 +361,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_47",
       "name": "Namal University Chapter",
       "city": "Pakistan",
       "lead_name": "Tanzila Younas",
@@ -424,7 +369,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_48",
       "name": "Air University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -433,7 +377,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_49",
       "name": "COMSATS University Chapter 02",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -442,7 +385,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_50",
       "name": "Bahria University Chapter 02",
       "city": "Pakistan",
       "lead_name": "Taha fayyaz",
@@ -451,7 +393,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_51",
       "name": "Superior Chap",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -460,7 +401,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_52",
       "name": "Government College University Hyderabad Chap",
       "city": "Sindh / Jamshoro",
       "lead_name": "Campus Team",
@@ -469,7 +409,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_53",
       "name": "Bahria Chapter",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -478,7 +417,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_54",
       "name": "Sindh Agriculture University Chapter",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -487,7 +425,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_55",
       "name": "ChangeMakers (Central Punjab University - Chapter)",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -496,7 +433,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_56",
       "name": "IBA Karachi Chapter",
       "city": "Karachi",
       "lead_name": "Campus Team",
@@ -505,7 +441,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_57",
       "name": "University of Management and Technology",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -514,7 +449,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_58",
       "name": "University of Karachi - 3",
       "city": "Karachi",
       "lead_name": "Campus Team",
@@ -523,7 +457,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_59",
       "name": "IOBM Chapter",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -532,7 +465,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_60",
       "name": "Al-Ghazali University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -541,7 +473,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_61",
       "name": "(Government College University)",
       "city": "Pakistan",
       "lead_name": "Tanzila Anwar",
@@ -550,7 +481,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_62",
       "name": "University of Karachi (Chapter-1)",
       "city": "Karachi",
       "lead_name": "Campus Team",
@@ -559,7 +489,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_63",
       "name": "Indus University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -568,7 +497,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_64",
       "name": "Pakistan Institute of Engineering & Applied Sciences (PIEAS) - Chapter",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -577,7 +505,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_65",
       "name": "NED Chapter-1",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -586,16 +513,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_66",
-      "name": "University of Sargodha – Sargodha",
-      "city": "Sargodha",
-      "lead_name": "Campus Team",
-      "whatsapp_link": "https://chat.whatsapp.com/HjoEGCKSRGp9IEF949Op6b",
-      "members_count": 94,
-      "badge": "Growing"
-    },
-    {
-      "id": "c_67",
       "name": "Sindh Agriculture University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -604,7 +521,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_68",
       "name": "SMIU",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -613,7 +529,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_69",
       "name": "Mehran University Chapter 2",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -622,7 +537,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_70",
       "name": "MAJU Chapter",
       "city": "Pakistan",
       "lead_name": "Agha Hassan Mavia",
@@ -631,7 +545,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_71",
       "name": "University of Wah Cantt",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -640,7 +553,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_72",
       "name": "University of Sindh Jamshoro",
       "city": "Sindh / Jamshoro",
       "lead_name": "Campus Team",
@@ -649,7 +561,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_73",
       "name": "NED Chapter-7",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -658,25 +569,22 @@
       "badge": "Official"
     },
     {
-      "id": "c_74",
-      "name": "Govt islamia law college",
-      "city": "Pakistan",
+      "name": "Govt islamia law college Karachi",
+      "city": "Karachi",
       "lead_name": "Campus Team",
       "whatsapp_link": "https://chat.whatsapp.com/KMYq2Bo3tjs6dcuaaff7XF",
-      "members_count": 70,
+      "members_count": 72,
       "badge": "Top Active"
     },
     {
-      "id": "c_75",
       "name": "Punjab University College of Information Technology",
       "city": "Pakistan",
       "lead_name": "Campus Team",
       "whatsapp_link": "https://chat.whatsapp.com/EXODcEQkkiMIi3tt4tC0Mh",
       "members_count": 77,
-      "badge": "Official"
+      "badge": "Top Active"
     },
     {
-      "id": "c_76",
       "name": "International Islamic University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -685,7 +593,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_77",
       "name": "PAF KIET",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -694,7 +601,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_78",
       "name": "University of Sahiwal",
       "city": "Sahiwal",
       "lead_name": "Campus Team",
@@ -703,7 +609,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_79",
       "name": "Gomal University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -712,7 +617,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_80",
       "name": "Sindh  University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -721,7 +625,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_81",
       "name": "Preston University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -730,7 +633,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_82",
       "name": "Jinnah University for Women – Karachi",
       "city": "Karachi",
       "lead_name": "Campus Team",
@@ -739,7 +641,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_83",
       "name": "The Islamia University of Bahawalpur",
       "city": "Bahawalpur",
       "lead_name": "Timsal Hassan",
@@ -748,7 +649,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_84",
       "name": "Quaid-e-Awam University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -757,7 +657,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_85",
       "name": "Comsats University Chapter 03",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -766,7 +665,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_86",
       "name": "NED Chapter-3",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -775,7 +673,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_87",
       "name": "University of Karachi (Chapter-2)",
       "city": "Karachi",
       "lead_name": "Campus Team",
@@ -784,7 +681,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_88",
       "name": "Bahauddin Zakariya University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -793,7 +689,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_89",
       "name": "University of the people",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -802,7 +697,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_90",
       "name": "UIT Chapter",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -811,7 +705,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_91",
       "name": "IQ School of Finance, Karachi for CA",
       "city": "Karachi",
       "lead_name": "Campus Team",
@@ -820,16 +713,14 @@
       "badge": "Official"
     },
     {
-      "id": "c_92",
-      "name": "GUTECH",
+      "name": "GUTECH Chapter",
       "city": "Pakistan",
       "lead_name": "Campus Team",
       "whatsapp_link": "https://chat.whatsapp.com/H7BGVLdV6gaHlu9KHdofln",
-      "members_count": 36,
-      "badge": "Growing"
+      "members_count": 37,
+      "badge": "Official"
     },
     {
-      "id": "c_93",
       "name": "Muhammad Nawaz Shareef University of Agriculture",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -838,7 +729,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_94",
       "name": "UMT Lahore",
       "city": "Lahore",
       "lead_name": "Campus Team",
@@ -847,7 +737,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_95",
       "name": "UET Chap 2",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -856,7 +745,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_96",
       "name": "NED Chapter-5",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -865,7 +753,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_97",
       "name": "Govt. College University – Faisalabad",
       "city": "Faisalabad",
       "lead_name": "Campus Team",
@@ -874,7 +761,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_98",
       "name": "University of Sufism and Modern Sciences",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -883,7 +769,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_99",
       "name": "(NUST) – Islamabad Chapter",
       "city": "Islamabad",
       "lead_name": "Campus Team",
@@ -892,7 +777,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_100",
       "name": "UMT Sialkot",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -901,7 +785,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_101",
       "name": "COMSATS University Chapter 01",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -910,25 +793,22 @@
       "badge": "Official"
     },
     {
-      "id": "c_102",
       "name": "Comsat Lahore Chap",
       "city": "Lahore",
       "lead_name": "Campus Team",
       "whatsapp_link": "https://chat.whatsapp.com/CwmqjdTFKoYK2aB9zA6ar3",
-      "members_count": 26,
-      "badge": "Growing"
+      "members_count": 103,
+      "badge": "Official"
     },
     {
-      "id": "c_103",
       "name": "Government Graduate College for Women ,Bahawalpur Chap",
       "city": "Bahawalpur",
       "lead_name": "Campus Team",
       "whatsapp_link": "https://chat.whatsapp.com/C1im36NFF5fApRUH4BiwOH",
       "members_count": 33,
-      "badge": "Official"
+      "badge": "Top Active"
     },
     {
-      "id": "c_104",
       "name": "College for Women University Lahore",
       "city": "Lahore",
       "lead_name": "Campus Team",
@@ -937,25 +817,14 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_105",
-      "name": "Dawood University Chapter 01",
-      "city": "Pakistan",
-      "lead_name": "Campus Team",
-      "whatsapp_link": "https://chat.whatsapp.com/HtVfPxaatE9CqbdcTPEwHA?s=cl&p=a&mlu=4&ilr=4",
-      "members_count": 47,
-      "badge": "Official"
-    },
-    {
-      "id": "c_106",
       "name": "JMDC Chapter",
       "city": "Pakistan",
       "lead_name": "Campus Team",
       "whatsapp_link": "https://chat.whatsapp.com/BtybFVKO7Xw9lqCA1ExO19",
-      "members_count": 54,
+      "members_count": 96,
       "badge": "Growing"
     },
     {
-      "id": "c_107",
       "name": "Dawood University Chapter 03",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -964,17 +833,15 @@
       "badge": "Official"
     },
     {
-      "id": "c_108",
       "name": "Allama Iqbal Open University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
       "whatsapp_link": "https://chat.whatsapp.com/C4UjwaOrhdw8mPgLi0AZKL",
       "members_count": 68,
-      "badge": "Growing"
+      "badge": "Official"
     },
     {
-      "id": "c_109",
-      "name": "FJWU Chapter 1",
+      "name": "FJWU Chapter 7",
       "city": "Rawalpindi",
       "lead_name": "Campus Team",
       "whatsapp_link": "https://chat.whatsapp.com/CsbERpraxHeEpFsLq2zGLJ?s=cl&p=a&mlu=4&ilr=4",
@@ -982,7 +849,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_110",
       "name": "Green international university lahore",
       "city": "Lahore",
       "lead_name": "Campus Team",
@@ -991,7 +857,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_111",
       "name": "Dawood University Chapter 04",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1000,43 +865,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_112",
-      "name": "JMDC Chapter",
-      "city": "Pakistan",
-      "lead_name": "Campus Team",
-      "whatsapp_link": "https://chat.whatsapp.com/BtybFVKO7Xw9lqCA1ExO19?s=cl&p=a&mlu=4&ilr=4",
-      "members_count": 96,
-      "badge": "Growing"
-    },
-    {
-      "id": "c_113",
-      "name": "Comsat Lahore Chap",
-      "city": "Lahore",
-      "lead_name": "Campus Team",
-      "whatsapp_link": "https://chat.whatsapp.com/CwmqjdTFKoYK2aB9zA6ar3?s=cl&p=a&mlu=4&ilr=4",
-      "members_count": 103,
-      "badge": "Official"
-    },
-    {
-      "id": "c_114",
-      "name": "Government Graduate College for Women ,Bahawalpur Chap",
-      "city": "Bahawalpur",
-      "lead_name": "Campus Team",
-      "whatsapp_link": "https://chat.whatsapp.com/C1im36NFF5fApRUH4BiwOH?s=cl&p=a&mlu=4&ilr=4",
-      "members_count": 30,
-      "badge": "Top Active"
-    },
-    {
-      "id": "c_115",
-      "name": "GUTECH Chapter",
-      "city": "Pakistan",
-      "lead_name": "Campus Team",
-      "whatsapp_link": "https://chat.whatsapp.com/H7BGVLdV6gaHlu9KHdofln?s=cl&p=a&mlu=4&ilr=4",
-      "members_count": 37,
-      "badge": "Official"
-    },
-    {
-      "id": "c_116",
       "name": "Ziauddin University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1045,7 +873,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_117",
       "name": "SZABIST  Hyderabad",
       "city": "Sindh / Jamshoro",
       "lead_name": "Campus Team",
@@ -1054,7 +881,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_118",
       "name": "University of Swabi",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1063,7 +889,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_119",
       "name": "Bahria University Chapter 03",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1072,16 +897,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_120",
-      "name": "Govt islamia law college Karachi",
-      "city": "Karachi",
-      "lead_name": "Campus Team",
-      "whatsapp_link": "https://chat.whatsapp.com/KMYq2Bo3tjs6dcuaaff7XF?s=cl&p=a&mlu=4&ilr=4",
-      "members_count": 72,
-      "badge": "Growing"
-    },
-    {
-      "id": "c_121",
       "name": "Pakistan Institute of Engineering & Applied Sciences (PIEAS) - Chapter 2",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1090,7 +905,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_122",
       "name": "Shaheed Benazir Bhutto University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1099,7 +913,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_123",
       "name": "DHA suffa Chapter 02",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1108,7 +921,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_124",
       "name": "National University of Pakistan",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1117,52 +929,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_125",
-      "name": "Allama Iqbal Open University",
-      "city": "Pakistan",
-      "lead_name": "Campus Team",
-      "whatsapp_link": "https://chat.whatsapp.com/C4UjwaOrhdw8mPgLi0AZKL?s=cl&p=a&mlu=4&ilr=4",
-      "members_count": 27,
-      "badge": "Official"
-    },
-    {
-      "id": "c_126",
-      "name": "NED Chapter-7",
-      "city": "Pakistan",
-      "lead_name": "Campus Team",
-      "whatsapp_link": "https://chat.whatsapp.com/HsuEBniMOCFB3YEmnRCX8M?s=cl&p=a&mlu=4&ilr=4",
-      "members_count": 34,
-      "badge": "Growing"
-    },
-    {
-      "id": "c_127",
-      "name": "University of the people",
-      "city": "Pakistan",
-      "lead_name": "Campus Team",
-      "whatsapp_link": "https://chat.whatsapp.com/KzlMCIzw6mxDHJhw9PI1dA?s=cl&p=a&mlu=4&ilr=4",
-      "members_count": 41,
-      "badge": "Official"
-    },
-    {
-      "id": "c_128",
-      "name": "Quaid-e-Awam University",
-      "city": "Pakistan",
-      "lead_name": "Campus Team",
-      "whatsapp_link": "https://chat.whatsapp.com/INpXL56gWjVDF3C64MvKPX?s=cl&p=a&mlu=4&ilr=4",
-      "members_count": 48,
-      "badge": "Growing"
-    },
-    {
-      "id": "c_129",
-      "name": "Punjab University College of Information Technology",
-      "city": "Pakistan",
-      "lead_name": "Campus Team",
-      "whatsapp_link": "https://chat.whatsapp.com/EXODcEQkkiMIi3tt4tC0Mh?s=cl&p=a&mlu=4&ilr=4",
-      "members_count": 55,
-      "badge": "Top Active"
-    },
-    {
-      "id": "c_130",
       "name": "Himayat e islam degree College for women",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1171,7 +937,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_131",
       "name": "SZABIST LARKANA",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1180,7 +945,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_132",
       "name": "CV • Linkedin – Information Technology University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1189,7 +953,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_133",
       "name": "CV • Linkedin – National University of Pakistan",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1198,7 +961,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_134",
       "name": "Lasbela University of Agriculture, Water and Marine Sciences",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1207,7 +969,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_135",
       "name": "Qarshi University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1216,7 +977,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_136",
       "name": "University of Agriculture (UAF) (Faisalabad)",
       "city": "Faisalabad",
       "lead_name": "Campus Team",
@@ -1225,7 +985,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_137",
       "name": "The Women University (Multan)",
       "city": "Multan",
       "lead_name": "Masooma Fatima",
@@ -1234,7 +993,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_138",
       "name": "University of Okara",
       "city": "Pakistan",
       "lead_name": "saiba Fatima",
@@ -1243,7 +1001,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_139",
       "name": "Sir Syed University of Engineering and Technology (SSUET)",
       "city": "Pakistan",
       "lead_name": "Aafia Uzair",
@@ -1252,7 +1009,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_140",
       "name": "Kohat University of Science and Technology (KUST)",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1261,7 +1017,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_141",
       "name": "Riphah International University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1270,7 +1025,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_142",
       "name": "Salim Habib University (SHU)",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1279,7 +1033,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_143",
       "name": "Baltistan University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1288,7 +1041,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_144",
       "name": "Hamdard University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1297,7 +1049,6 @@
       "badge": "Top Active"
     },
     {
-      "id": "c_145",
       "name": "University of Gujrat",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1306,7 +1057,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_146",
       "name": "CV • Linkedin – Khwaja Fareed University of Engineering & Information Technology",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1315,7 +1065,6 @@
       "badge": "Growing"
     },
     {
-      "id": "c_147",
       "name": "CV • Linkedin — Karakoram International University",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1324,7 +1073,6 @@
       "badge": "Official"
     },
     {
-      "id": "c_148",
       "name": "CV • Linkedin — Al kahf institute",
       "city": "Pakistan",
       "lead_name": "Campus Team",
@@ -1335,292 +1083,234 @@
   ],
   "ambassadors": [
     {
-      "id": "amb_1",
       "name": "syed wasif",
       "email": "syedwasif@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "(Dawood University ) Chapter",
-      "chapter_id": "c_11",
       "chapter_name": "(Dawood University ) Chapter",
       "status": "Active"
     },
     {
-      "id": "amb_2",
       "name": "Khadija Malik",
       "email": "khadijamalik@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "FJWU Chapter 1",
-      "chapter_id": "c_14",
       "chapter_name": "FJWU Chapter 1",
       "status": "Active"
     },
     {
-      "id": "amb_3",
       "name": "Bushra Ashraf Bhatti",
       "email": "bushraashrafbhatti@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "FJWU Chapter 1",
-      "chapter_id": "c_14",
       "chapter_name": "FJWU Chapter 1",
       "status": "Active"
     },
     {
-      "id": "amb_4",
       "name": "Hafsa Noor",
       "email": "hafsanoor@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "IBA Sukkur Chapter 02",
-      "chapter_id": "c_17",
       "chapter_name": "IBA Sukkur Chapter 02",
       "status": "Active"
     },
     {
-      "id": "amb_5",
       "name": "Sanjana Lokwani",
       "email": "sanjanalokwani@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "SZABIST Karachi Chapter 01",
-      "chapter_id": "c_26",
       "chapter_name": "SZABIST Karachi Chapter 01",
       "status": "Active"
     },
     {
-      "id": "amb_6",
       "name": "Aiman Iqbal",
       "email": "aimaniqbal@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "FJWU Chapter 4",
-      "chapter_id": "c_32",
       "chapter_name": "FJWU Chapter 4",
       "status": "Active"
     },
     {
-      "id": "amb_7",
       "name": "Rabya Samman",
       "email": "rabyasamman@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "University of the Punjab Chapter",
-      "chapter_id": "c_37",
       "chapter_name": "University of the Punjab Chapter",
       "status": "Active"
     },
     {
-      "id": "amb_8",
       "name": "Abdul Waris",
       "email": "abdulwaris@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "Dawood University Chapter 02",
-      "chapter_id": "c_42",
       "chapter_name": "Dawood University Chapter 02",
       "status": "Active"
     },
     {
-      "id": "amb_9",
       "name": "Daniyal Ismail",
       "email": "daniyalismail@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "Dawood University Chapter 02",
-      "chapter_id": "c_42",
       "chapter_name": "Dawood University Chapter 02",
       "status": "Active"
     },
     {
-      "id": "amb_10",
       "name": "Manahil Rehman",
       "email": "manahilrehman@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "University of Mianwali Chap 2",
-      "chapter_id": "c_43",
       "chapter_name": "University of Mianwali Chap 2",
       "status": "Active"
     },
     {
-      "id": "amb_11",
       "name": "Manahil Rehman",
-      "email": "manahilrehman@cortexa.ai",
+      "email": "manahilrehman+1@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "University of Mianwali",
-      "chapter_id": "c_46",
       "chapter_name": "University of Mianwali",
       "status": "Active"
     },
     {
-      "id": "amb_12",
       "name": "Shazia Bibi",
       "email": "shaziabibi@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "University of Mianwali",
-      "chapter_id": "c_46",
       "chapter_name": "University of Mianwali",
       "status": "Active"
     },
     {
-      "id": "amb_13",
       "name": "Tanzila Younas",
       "email": "tanzilayounas@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "Namal University Chapter",
-      "chapter_id": "c_47",
       "chapter_name": "Namal University Chapter",
       "status": "Active"
     },
     {
-      "id": "amb_14",
       "name": "Taha fayyaz",
       "email": "tahafayyaz@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "Bahria University Chapter 02",
-      "chapter_id": "c_50",
       "chapter_name": "Bahria University Chapter 02",
       "status": "Active"
     },
     {
-      "id": "amb_15",
       "name": "Tanzila Anwar",
       "email": "tanzilaanwar@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "(Government College University)",
-      "chapter_id": "c_61",
       "chapter_name": "(Government College University)",
       "status": "Active"
     },
     {
-      "id": "amb_16",
       "name": "Agha Hassan Mavia",
       "email": "aghahassanmavia@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "MAJU Chapter",
-      "chapter_id": "c_70",
       "chapter_name": "MAJU Chapter",
       "status": "Active"
     },
     {
-      "id": "amb_17",
       "name": "Timsal Hassan",
       "email": "timsalhassan@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "The Islamia University of Bahawalpur",
-      "chapter_id": "c_83",
       "chapter_name": "The Islamia University of Bahawalpur",
       "status": "Active"
     },
     {
-      "id": "amb_18",
       "name": "Masooma Fatima",
       "email": "masoomafatima@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "The Women University (Multan)",
-      "chapter_id": "c_137",
       "chapter_name": "The Women University (Multan)",
       "status": "Active"
     },
     {
-      "id": "amb_19",
       "name": "Saiba Fatima",
       "email": "saibafatima@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "The Women University (Multan)",
-      "chapter_id": "c_137",
       "chapter_name": "The Women University (Multan)",
       "status": "Active"
     },
     {
-      "id": "amb_20",
       "name": "saiba Fatima",
-      "email": "saibafatima@cortexa.ai",
+      "email": "saibafatima+1@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "University of Okara",
-      "chapter_id": "c_138",
       "chapter_name": "University of Okara",
       "status": "Active"
     },
     {
-      "id": "amb_21",
       "name": "Masooma Fatima",
-      "email": "masoomafatima@cortexa.ai",
+      "email": "masoomafatima+1@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "University of Okara",
-      "chapter_id": "c_138",
       "chapter_name": "University of Okara",
       "status": "Active"
     },
     {
-      "id": "amb_22",
       "name": "Aafia Uzair",
       "email": "aafiauzair@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "Sir Syed University of Engineering and Technology (SSUET)",
-      "chapter_id": "c_139",
       "chapter_name": "Sir Syed University of Engineering and Technology (SSUET)",
       "status": "Active"
     },
     {
-      "id": "amb_23",
       "name": "M.Hassan Asif",
       "email": "mhassanasif@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "Sir Syed University of Engineering and Technology (SSUET)",
-      "chapter_id": "c_139",
       "chapter_name": "Sir Syed University of Engineering and Technology (SSUET)",
       "status": "Active"
     },
     {
-      "id": "amb_24",
       "name": "Maliha Siddique Khan",
       "email": "malihasiddiquekhan@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "Sir Syed University of Engineering and Technology (SSUET)",
-      "chapter_id": "c_139",
       "chapter_name": "Sir Syed University of Engineering and Technology (SSUET)",
       "status": "Active"
     },
     {
-      "id": "amb_25",
       "name": "Muhammad Arsalan Zahid",
       "email": "muhammadarsalanzahid@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "Sir Syed University of Engineering and Technology (SSUET)",
-      "chapter_id": "c_139",
       "chapter_name": "Sir Syed University of Engineering and Technology (SSUET)",
       "status": "Active"
     },
     {
-      "id": "amb_26",
       "name": "Zaid Khan",
       "email": "zaidkhan@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "Sir Syed University of Engineering and Technology (SSUET)",
-      "chapter_id": "c_139",
       "chapter_name": "Sir Syed University of Engineering and Technology (SSUET)",
       "status": "Active"
     },
     {
-      "id": "amb_27",
       "name": "Sabih Ahmed",
       "email": "sabihahmed@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "Sir Syed University of Engineering and Technology (SSUET)",
-      "chapter_id": "c_139",
       "chapter_name": "Sir Syed University of Engineering and Technology (SSUET)",
       "status": "Active"
     },
     {
-      "id": "amb_28",
       "name": "Huzaifa Bin Sabeeh khadija kubra",
       "email": "huzaifabinsabeehkhadijakubra@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "Sir Syed University of Engineering and Technology (SSUET)",
-      "chapter_id": "c_139",
       "chapter_name": "Sir Syed University of Engineering and Technology (SSUET)",
       "status": "Active"
     },
     {
-      "id": "amb_29",
       "name": "zoya zia",
       "email": "zoyazia@cortexa.ai",
       "phone": "+92 300 0000000",
       "university": "Sir Syed University of Engineering and Technology (SSUET)",
-      "chapter_id": "c_139",
       "chapter_name": "Sir Syed University of Engineering and Technology (SSUET)",
       "status": "Active"
     }

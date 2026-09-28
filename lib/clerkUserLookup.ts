@@ -15,21 +15,30 @@ export async function lookupClerkUsers(userIds: string[]): Promise<Map<string, U
     const client = await clerkClient();
     await Promise.all(
       uniqueIds.map(async (uid) => {
-        try {
-          const u = await client.users.getUser(uid);
-          const email =
-            u.primaryEmailAddress?.emailAddress ||
-            u.emailAddresses?.[0]?.emailAddress ||
-            'No Email';
-          const name = `${u.firstName || ''} ${u.lastName || ''}`.trim() || email;
-          map.set(uid, { id: uid, name, email });
-        } catch {
-          map.set(uid, { id: uid, name: 'Unknown User', email: '(Not found in Clerk)' });
+        if (uid.startsWith('user_')) {
+          try {
+            const u = await client.users.getUser(uid);
+            const email =
+              u.primaryEmailAddress?.emailAddress ||
+              u.emailAddresses?.[0]?.emailAddress ||
+              'No Email';
+            const name = `${u.firstName || ''} ${u.lastName || ''}`.trim() || email;
+            map.set(uid, { id: uid, name, email });
+            return;
+          } catch {
+            // Clerk user fetch failed
+          }
         }
+        map.set(uid, { id: uid, name: `User ${uid.slice(0, 8)}`, email: uid });
       })
     );
   } catch (e) {
     console.error('[lookupClerkUsers] Failed to fetch users from Clerk:', e);
+    uniqueIds.forEach((uid) => {
+      if (!map.has(uid)) {
+        map.set(uid, { id: uid, name: `User ${uid.slice(0, 8)}`, email: uid });
+      }
+    });
   }
 
   return map;

@@ -1,7 +1,8 @@
 import OpenAI from 'openai';
 import type { LinkedinProfileData } from '../../../types';
 import { db } from '@/lib/db';
-import { currentUser } from '@clerk/nextjs/server';
+import { getCurrentUser } from '@/lib/serverAuth';
+import { isAdminEmail } from '@/lib/adminAuth';
 import { isFeatureAllowedForUser } from '../../../lib/accessConfig';
 
 export const runtime = 'nodejs';
@@ -39,10 +40,18 @@ interface ChatMessage {
 }
 
 export async function POST(request: Request) {
-  const user = await currentUser();
-  const userEmail = user?.emailAddresses?.[0]?.emailAddress;
+  const authUser = await getCurrentUser(request);
+  if (!authUser || !authUser.userId) {
+    return Response.json(
+      { error: 'Authentication required. Please sign in to use the AI assistant.' },
+      { status: 401 }
+    );
+  }
 
-  if (!userEmail || !isFeatureAllowedForUser(userEmail, 'linkedinaudit')) {
+  const userEmail = authUser.email || '';
+  const isAdmin = isAdminEmail(userEmail);
+
+  if (!isAdmin && !isFeatureAllowedForUser(userEmail, 'linkedinaudit')) {
     return Response.json(
       { error: 'Forbidden — LinkedIn Studio is currently in Private Beta for authorized testers only.' },
       { status: 403 }
@@ -57,6 +66,25 @@ export async function POST(request: Request) {
   }
 
   try {
+    const userId = authUser.userId;
+    if (!isAdmin) {
+      const unlock = await db.paymentUnlock.findUnique({ where: { userId } });
+      if (!unlock) {
+        const usage = await db.profileBuilderAiUsage.findUnique({ where: { userId } });
+        const used = usage?.usedCount || 0;
+        if (used >= 5) {
+          return Response.json({
+            reply: '🔒 **AI Limit Reached.** You have used your 5 free AI messages. Upgrade to Pro to unlock unlimited AI editing and exports!',
+          });
+        }
+        await db.profileBuilderAiUsage.upsert({
+          where: { userId },
+          update: { usedCount: { increment: 1 } },
+          create: { userId, usedCount: 1 },
+        });
+      }
+    }
+
     const body = (await request.json()) as { messages?: ChatMessage[]; linkedin?: LinkedinProfileData; sessionId?: string; builderType?: string };
     const messages = Array.isArray(body.messages) ? body.messages : [];
     const linkedin = body.linkedin ?? {};
@@ -80,13 +108,12 @@ export async function POST(request: Request) {
     const parsed = JSON.parse(raw);
     const reply = typeof parsed.reply === 'string' ? parsed.reply : 'Done — updated your profile.';
 
-    const user = await currentUser();
     if (sessionId !== 'unknown') {
       await db.profileBuilderChatLog.create({
         data: {
           sessionId,
           builderType,
-          userId: user?.id,
+          userId: authUser.userId,
           userMessage,
           aiReply: reply,
           isAutoFit: false,

@@ -1,11 +1,12 @@
-import { currentUser } from '@clerk/nextjs/server';
+import { getCurrentUser } from '@/lib/serverAuth';
+import { isAdminEmail } from '@/lib/adminAuth';
 import { db } from '../../../../lib/db';
 import { PAYMENT_TESTING_MODE } from '../../../../lib/paymentConfig';
 import { BUILDER_ACCESS_EMAILS } from '../../../../lib/accessConfig';
 
-export async function GET() {
-  const user = await currentUser();
-  const userId = user?.id;
+export async function GET(req: Request) {
+  const authUser = await getCurrentUser(req);
+  const userId = authUser?.userId;
   if (!userId) return Response.json({ unlocked: false, aiMessagesUsed: 0 });
 
   let aiMessagesUsed = 0;
@@ -17,8 +18,8 @@ export async function GET() {
   // Admin override: Team emails permanently get Pro access.
   // We explicitly write a PaymentUnlock row so that other server endpoints 
   // (like AI chat limiters) natively see this user as fully unlocked.
-  const primaryEmail = user.primaryEmailAddress?.emailAddress;
-  if (primaryEmail && BUILDER_ACCESS_EMAILS.has(primaryEmail)) {
+  const primaryEmail = authUser.email;
+  if (primaryEmail && (BUILDER_ACCESS_EMAILS.has(primaryEmail) || isAdminEmail(primaryEmail))) {
     let unlock = await db.paymentUnlock.findUnique({ where: { userId } });
     if (!unlock) {
       unlock = await db.paymentUnlock.create({ data: { userId } });

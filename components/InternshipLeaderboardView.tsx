@@ -105,8 +105,8 @@ interface InternshipLeaderboardViewProps {
 }
 
 export const InternshipLeaderboardView: React.FC<InternshipLeaderboardViewProps> = ({
-  userName = 'Nmesoma Anita',
-  userEmail = 'nmesoanita@gmail.com',
+  userName = 'Intern',
+  userEmail = '',
   userAvatar,
   onNavigateToTab,
   onUpdateAvatar,

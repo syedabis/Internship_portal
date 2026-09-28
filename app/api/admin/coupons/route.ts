@@ -3,8 +3,8 @@ import { db } from '@/lib/db';
 import { getAdminCoupons } from '@/lib/adminData';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
-  const auth = await requireAdmin();
+export async function GET(req: NextRequest) {
+  const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 
   const coupons = await getAdminCoupons();
@@ -12,7 +12,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const auth = await requireAdmin();
+  const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 
   const body = await req.json();

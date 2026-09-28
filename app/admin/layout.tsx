@@ -6,8 +6,7 @@ import Link from 'next/link';
 import { LogOut, Loader2, Menu, X } from 'lucide-react';
 import { AdminSidebarNav } from '@/components/AdminSidebarNav';
 import { supabase } from '@/lib/supabase';
-
-const ADMIN_EMAILS = ['abis@datacrumbs.org'];
+import { isAdminEmail } from '@/lib/adminEmails';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -34,9 +33,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
       const email = user?.email ?? null;
-      if (!email || !ADMIN_EMAILS.includes(email.toLowerCase())) {
+      if (!isAdminEmail(email)) {
+        if (typeof document !== 'undefined') {
+          document.cookie = 'sb-access-token=; path=/; max-age=0; SameSite=Lax';
+        }
         router.replace('/admin/login');
         return;
+      }
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token && typeof document !== 'undefined') {
+        document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=604800; SameSite=Lax`;
       }
       setIsAuthorized(true);
       setLoading(false);
@@ -47,9 +53,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       if (isLoginPage) return;
       setUser(session?.user ?? null);
       const email = session?.user?.email ?? null;
-      if (!email || !ADMIN_EMAILS.includes(email.toLowerCase())) {
+      if (!isAdminEmail(email)) {
+        if (typeof document !== 'undefined') {
+          document.cookie = 'sb-access-token=; path=/; max-age=0; SameSite=Lax';
+        }
         router.replace('/admin/login');
         return;
+      }
+      if (session?.access_token && typeof document !== 'undefined') {
+        document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=604800; SameSite=Lax`;
       }
       setIsAuthorized(true);
       setLoading(false);
@@ -77,7 +89,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!isAuthorized) return null;
 
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Admin';
-  const userEmail = user?.email || 'abis@datacrumbs.org';
+  const userEmail = user?.email || 'admin@datacrumbs.org';
   const userAvatar = user?.user_metadata?.avatar_url || '/profile_image.png';
 
   return (

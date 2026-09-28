@@ -3,7 +3,7 @@ import { getAdminPayments } from '@/lib/adminData';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
-  const auth = await requireAdmin();
+  const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 
   const { searchParams } = new URL(req.url);

@@ -2,8 +2,8 @@ import { requireAdmin } from '@/lib/adminAuth';
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
-  const auth = await requireAdmin();
+export async function GET(req: Request) {
+  const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 
   const [

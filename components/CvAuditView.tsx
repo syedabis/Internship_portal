@@ -6,8 +6,8 @@ import { FileSearch, Sparkles, CheckCircle2, AlertTriangle, ArrowUpRight, Upload
 export const CvAuditView: React.FC = () => {
   const [atsScore, setAtsScore] = useState(78);
   const [isAuditing, setIsAuditing] = useState(false);
-  const [cvText, setCvText] = useState(`Nmesoma Anita - Machine Learning Intern
-Email: nmesoanita@gmail.com | Location: Nigeria
+  const [cvText, setCvText] = useState(`Alex Chen - AI & Machine Learning Intern
+Email: alex.chen@cortexa.ai | Location: Remote
 
 SUMMARY:
 Passionate Machine Learning student researcher with hands-on experience building computer vision and NLP models in PyTorch. 

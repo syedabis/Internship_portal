@@ -1,4 +1,4 @@
-import { isAdminEmail } from './adminAuth';
+import { isAdminEmail } from './adminEmails';
 
 /**
  * Selective email list of authorized beta testers.

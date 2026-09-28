@@ -1,9 +1,11 @@
 import { requireAdmin } from '@/lib/adminAuth';
-import { isAdmin } from '@/lib/adminAuth';
-import { getCurrentUserId } from '@/lib/serverAuth';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
-  const userId = await getCurrentUserId();
-  return NextResponse.json({ isAdmin: isAdmin(userId) });
+export async function GET(req: Request) {
+  const auth = await requireAdmin(req);
+  if (auth instanceof NextResponse) {
+    return NextResponse.json({ isAdmin: false, error: 'Not authorized' }, { status: 403 });
+  }
+  return NextResponse.json({ isAdmin: true, email: auth.email, userId: auth.userId });
 }
+

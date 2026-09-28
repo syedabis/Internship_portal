@@ -53,8 +53,8 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const userEmail = user?.email || 'nmesoanita@gmail.com';
-  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Nmesoma Anita';
+  const userEmail = user?.email || '';
+  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || (user?.email ? user.email.split('@')[0] : (isLoaded ? 'Guest Intern' : 'Loading...'));
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -186,7 +186,7 @@ export default function Home() {
 
               {activeTab === 'resources' && <InternshipResourcesView />}
 
-              {activeTab === 'inbox' && <InternshipInboxView />}
+              {activeTab === 'inbox' && <InternshipInboxView userName={userName} userEmail={userEmail} />}
 
               {activeTab === 'freetier' && <ProductMarketplaceView />}
 

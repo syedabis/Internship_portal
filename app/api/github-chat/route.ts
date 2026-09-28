@@ -1,7 +1,8 @@
 import OpenAI from 'openai';
 import type { GithubProfileData } from '../../../types';
 import { db } from '@/lib/db';
-import { currentUser } from '@clerk/nextjs/server';
+import { getCurrentUser } from '@/lib/serverAuth';
+import { isAdminEmail } from '@/lib/adminAuth';
 
 export const runtime = 'nodejs';
 
@@ -88,9 +89,19 @@ export async function POST(request: Request) {
   }
 
   try {
-    const user = await currentUser();
-    const userId = user?.id;
-    if (userId) {
+    const authUser = await getCurrentUser(request);
+    if (!authUser || !authUser.userId) {
+      return Response.json(
+        { error: 'Authentication required. Please sign in to use the AI assistant.' },
+        { status: 401 }
+      );
+    }
+
+    const userId = authUser.userId;
+    const userEmail = authUser.email;
+    const isAdmin = userEmail ? isAdminEmail(userEmail) : false;
+
+    if (!isAdmin) {
       const unlock = await db.paymentUnlock.findUnique({ where: { userId } });
       if (!unlock) {
         const usage = await db.profileBuilderAiUsage.findUnique({ where: { userId } });
@@ -135,7 +146,7 @@ export async function POST(request: Request) {
         data: {
           sessionId,
           builderType,
-          userId: user?.id,
+          userId: authUser.userId,
           userMessage,
           aiReply: reply,
           isAutoFit: false,

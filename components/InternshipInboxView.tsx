@@ -38,7 +38,7 @@ const SAMPLE_EMAILS: EmailMessage[] = [
     category: 'Task Evaluation',
     pointsAwarded: 240,
     content: `
-<p>Hi Nmesoma,</p>
+<p>Hi there,</p>
 <p>Congratulations! Your project task submission for <strong>Task #4: Multi-Agent QLoRA Fine-Tuning Pipeline</strong> has been reviewed and officially approved by the Cortexa evaluation committee.</p>
 <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:16px; margin:16px 0;">
   <h4 style="margin:0 0 8px 0; color:#14532d; font-size:13px; font-weight:700;">Task Benchmark Scorecard</h4>
@@ -71,7 +71,7 @@ const SAMPLE_EMAILS: EmailMessage[] = [
     isStarred: true,
     category: 'Offer Letter',
     content: `
-<p>Hello Nmesoma,</p>
+<p>Hello,</p>
 <p>Based on your outstanding performance in the <strong>Cortexa AI Internship Program</strong> and your current rank of <strong>#4 overall</strong> in the Machine Learning track, our recruitment team would love to invite you to an introductory interview for the <em>Backend AI Systems Intern</em> position.</p>
 <p>This role offers mentorship from senior systems engineers, real-world LLM deployment projects, and a monthly stipend of <strong>$1,800/mo</strong>.</p>
 <p>Please click the link below to select a 30-minute interview slot that suits your schedule:</p>
@@ -94,7 +94,7 @@ const SAMPLE_EMAILS: EmailMessage[] = [
     isStarred: false,
     category: 'System Alert',
     content: `
-<p>Hi Nmesoma,</p>
+<p>Hi there,</p>
 <p>Your latest ATS Resume Audit report has been generated successfully.</p>
 <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin:16px 0;">
   <div style="font-size:24px; font-weight:800; color:#0f172a;">ATS Match Score: 92 / 100</div>
@@ -117,7 +117,7 @@ const SAMPLE_EMAILS: EmailMessage[] = [
     isStarred: false,
     category: 'Mentor Review',
     content: `
-<p>Hey Nmesoma,</p>
+<p>Hey there,</p>
 <p>I reviewed your architectural proposal for vector caching in Redis. Your choice of HNSW indexing strategy was solid.</p>
 <p>To reduce latency under high concurrent load, consider implementing connection pooling with HSET pipelining. Feel free to ping me if you have any questions before submitted Task #5.</p>
 <p>Cheers,<br/><strong>Marcus Vance</strong></p>
@@ -137,15 +137,28 @@ const SAMPLE_EMAILS: EmailMessage[] = [
     isStarred: false,
     category: 'System Alert',
     content: `
-<p>Hello Nmesoma,</p>
+<p>Hello,</p>
 <p>The weekly leaderboard rankings for <strong>Cohort #4</strong> have been updated. You have moved up 2 positions to <strong>Rank #4</strong> out of 1,240 active participants.</p>
 <p>Keep up the great work on task submissions to maintain your top standings!</p>
     `,
   },
 ];
 
-export const InternshipInboxView: React.FC = () => {
-  const [emails, setEmails] = useState<EmailMessage[]>(SAMPLE_EMAILS);
+interface InternshipInboxViewProps {
+  userName?: string;
+  userEmail?: string;
+}
+
+export const InternshipInboxView: React.FC<InternshipInboxViewProps> = ({
+  userName = 'Intern',
+  userEmail = 'intern@cortexa.ai',
+}) => {
+  const firstName = (userName && userName !== 'Guest Intern' && userName !== 'Loading...') ? userName.split(' ')[0] : 'Intern';
+  const personalizedEmails = SAMPLE_EMAILS.map(e => ({
+    ...e,
+    content: e.content.replace(/Nmesoma/g, firstName)
+  }));
+  const [emails, setEmails] = useState<EmailMessage[]>(personalizedEmails);
   const [selectedEmailId, setSelectedEmailId] = useState<string>(SAMPLE_EMAILS[0].id);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedFilter, setSelectedFilter] = useState<'All' | 'Unread' | 'Starred' | 'Task Evaluation' | 'Offer Letter'>('All');
@@ -417,7 +430,7 @@ export const InternshipInboxView: React.FC = () => {
                   </div>
 
                   <div className="text-right text-[11px] text-slate-400">
-                    To: <span className="font-semibold text-slate-700">Nmesoma Anita &lt;nmesoanita@gmail.com&gt;</span>
+                    To: <span className="font-semibold text-slate-700">{userName} &lt;{userEmail || 'intern@cortexa.ai'}&gt;</span>
                   </div>
                 </div>
 

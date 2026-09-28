@@ -4,17 +4,22 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, Lock, Mail, Eye, EyeOff, Sparkles, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-
-const ADMIN_EMAILS = ['abis@datacrumbs.org'];
+import { isAdminEmail } from '@/lib/adminEmails';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('abis@datacrumbs.org');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  const setAdminCookie = (token?: string) => {
+    if (token && typeof document !== 'undefined') {
+      document.cookie = `sb-access-token=${token}; path=/; max-age=604800; SameSite=Lax`;
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +31,7 @@ export default function AdminLoginPage() {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    if (!ADMIN_EMAILS.includes(cleanEmail)) {
+    if (!isAdminEmail(cleanEmail)) {
       setErrorMsg(`Access Denied: "${cleanEmail}" is not authorized as an administrator.`);
       return;
     }
@@ -48,10 +53,11 @@ export default function AdminLoginPage() {
         setErrorMsg(error.message);
         setLoading(false);
       } else if (data.session) {
+        setAdminCookie(data.session.access_token);
         router.replace('/admin');
       } else {
         // Fallback login if user exists
-        const { error: signInError } = await supabase.auth.signInWithPassword({
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
           email: cleanEmail,
           password: password,
         });
@@ -59,11 +65,12 @@ export default function AdminLoginPage() {
           setErrorMsg(signInError.message);
           setLoading(false);
         } else {
+          setAdminCookie(signInData.session?.access_token);
           router.replace('/admin');
         }
       }
     } else {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
         password: password,
       });
@@ -76,6 +83,7 @@ export default function AdminLoginPage() {
         }
         setLoading(false);
       } else {
+        setAdminCookie(data.session?.access_token);
         router.replace('/admin');
       }
     }
@@ -137,7 +145,7 @@ export default function AdminLoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="abis@datacrumbs.org"
+                placeholder="admin@datacrumbs.org"
                 className="w-full pl-10 pr-4 py-3 bg-[#091715] border border-[#1b433c] rounded-xl text-xs text-white placeholder-[#5c7973] focus:outline-none focus:border-emerald-500 transition-all font-medium"
               />
             </div>

@@ -3,7 +3,7 @@ import { requireAdmin } from '@/lib/adminAuth';
 import { db } from '@/lib/db';
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await requireAdmin();
+  const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 
   const { id } = await params;

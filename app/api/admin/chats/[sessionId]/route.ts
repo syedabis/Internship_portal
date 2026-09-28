@@ -6,7 +6,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
-  const auth = await requireAdmin();
+  const auth = await requireAdmin(req);
   if (auth instanceof NextResponse) return auth;
 
   const { sessionId } = await params;

@@ -1,18 +1,14 @@
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs/server';
+import { requireAdmin } from '@/lib/adminAuth';
 import { db } from '../../../../lib/db';
 import { getAdminNameRequests } from '@/lib/adminData';
 
 export const runtime = 'nodejs';
 
 /** GET /api/admin/name-requests — list all PENDING resume name-change requests */
-export async function GET(): Promise<NextResponse> {
-  const clerk = await currentUser();
-  if (!clerk) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-  // Admin check via Clerk public metadata
-  const role = (clerk.publicMetadata as any)?.role;
-  if (role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+export async function GET(request: Request): Promise<NextResponse> {
+  const auth = await requireAdmin(request);
+  if (auth instanceof NextResponse) return auth;
 
   const enriched = await getAdminNameRequests();
 
@@ -21,11 +17,8 @@ export async function GET(): Promise<NextResponse> {
 
 /** POST /api/admin/name-requests — approve or reject a request */
 export async function POST(request: Request): Promise<NextResponse> {
-  const clerk = await currentUser();
-  if (!clerk) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-
-  const role = (clerk.publicMetadata as any)?.role;
-  if (role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  const auth = await requireAdmin(request);
+  if (auth instanceof NextResponse) return auth;
 
   const body = await request.json().catch(() => null);
   const { requestId, action } = body ?? {};

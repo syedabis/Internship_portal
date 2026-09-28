@@ -2,13 +2,47 @@ const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 const path = require('path');
 
-const supabaseUrl = 'https://tlckqydcxdmduogjilqc.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsY2txeWRjeGRtZHVvZ2ppbHFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwODc5MTUsImV4cCI6MjA5NDY2MzkxNX0.tL5gfMIsVm-mS7x93h42JFf_Ex9BwMW3y-Z67JAenK0';
+// Helper to parse .env.local if process.env is not already populated
+function loadEnv() {
+  const envPath = path.join(__dirname, '..', '.env.local');
+  if (fs.existsSync(envPath)) {
+    const lines = fs.readFileSync(envPath, 'utf8').split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const eqIdx = trimmed.indexOf('=');
+      if (eqIdx !== -1) {
+        const key = trimmed.slice(0, eqIdx).trim();
+        let val = trimmed.slice(eqIdx + 1).trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
+        }
+        if (!process.env[key]) {
+          process.env[key] = val;
+        }
+      }
+    }
+  }
+}
+
+loadEnv();
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Error: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY must be set in .env.local');
+  process.exit(1);
+}
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function pushData() {
   const dataPath = path.join(__dirname, '..', 'parsed_data.json');
+  if (!fs.existsSync(dataPath)) {
+    console.error(`Error: Data file not found at ${dataPath}`);
+    process.exit(1);
+  }
   const { chapters, ambassadors } = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
   console.log(`Pushing ${chapters.length} chapters to Supabase...`);
@@ -34,7 +68,7 @@ async function pushData() {
     }
   }
 
-  if (ambassadors.length > 0) {
+  if (ambassadors && ambassadors.length > 0) {
     console.log(`Pushing ${ambassadors.length} ambassadors to Supabase...`);
     const ambassadorsPayload = ambassadors.map(a => ({
       name: a.name,

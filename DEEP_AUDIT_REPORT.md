@@ -219,7 +219,7 @@ This catalog tracks the remaining open issues across architecture, authenticatio
 - **File:** [`components/InternshipLeaderboardView.tsx`](file:///c:/Users/Administrator/.gemini/antigravity/scratch/29%20-%20Internship%20Portal/components/InternshipLeaderboardView.tsx#L141-L156)
 - **Description:**
   - When a user uploads a custom avatar, the full Base64 data URL string is saved directly into `supabase.auth.updateUser({ data: { avatar_url: croppedDataUrl } })`.
-  - **Consequence:** Storing massive Base64 strings in user metadata bloats auth JWT tokens, often exceeding cookie and header size limits (causing 431 Request Header Fields Too Large HTTP errors).
+- **Consequence:** Storing massive Base64 strings in user metadata bloats auth JWT tokens, often exceeding cookie and header size limits (causing 431 Request Header Fields Too Large HTTP errors).
 
 ---
 
