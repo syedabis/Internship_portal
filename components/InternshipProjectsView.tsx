@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { INITIAL_PROJECTS, Project } from '@/lib/projectsData';
+import toast from '@/lib/toast';
 import {
   Search,
   Sparkles,
@@ -161,6 +162,30 @@ function getExampleCaseStudy(project: Project): ExampleCaseStudy {
       sampleBenchmark: 'A GTM Strategy deck in Figma/Miro with RICE feature prioritization matrix, competitive analysis matrix, and 5 user interview synthesis notes.',
     };
   }
+  if (project.domain === 'operations') {
+    return {
+      company: 'Nexus Global Supply Chain',
+      scenario: 'Supplier fulfillment delays average 18 days with 12% stockout rates across core distribution warehouses.',
+      targetProblem: 'Lack of supplier SLA scoring, automated inventory reorder thresholds, and bottleneck mapping.',
+      sampleBenchmark: 'An interactive Supply Chain Dashboard with vendor SLA scorecards, dynamic safety stock formulas, and end-to-end operational bottleneck audit.',
+    };
+  }
+  if (project.domain === 'customersuccess') {
+    return {
+      company: 'CloudPulse Enterprise Software',
+      scenario: 'Customer churn rate increased to 9.2% annually, with support ticket response times exceeding SLA targets.',
+      targetProblem: 'No proactive health scoring system to flag at-risk accounts before contract renewal periods.',
+      sampleBenchmark: 'A Customer Success Health Scoring model in Google Sheets/Notion with automated CSAT/NPS survey workflows, churn risk tiers, and customer onboarding journey maps.',
+    };
+  }
+  if (project.domain === 'design') {
+    return {
+      company: 'Aura Fintech & Payments',
+      scenario: 'Inconsistent typography, component sizing, and brand colors across web, mobile, and marketing channels.',
+      targetProblem: 'Absence of unified brand style guidelines and scalable reusable component tokens.',
+      sampleBenchmark: 'A comprehensive Brand Design System in Figma complete with typography hierarchy, WCAG-compliant color palettes, design tokens, and social marketing templates.',
+    };
+  }
   return {
     company: 'Enterprise Organization Example',
     scenario: `The company needs a structured execution plan for ${project.title} to improve operational efficiency.`,
@@ -263,22 +288,47 @@ function generatePlan(project: Project): GeneratedPlan {
   // Renumber
   weeklyPlans.forEach((w, i) => { w.week = i + 1; });
 
+  // Use admin custom case study if provided, otherwise domain fallback
+  const customCaseStudy = project.caseStudy && project.caseStudy.company ? {
+    company: project.caseStudy.company,
+    scenario: project.caseStudy.scenario || '',
+    targetProblem: project.caseStudy.targetProblem || '',
+    sampleBenchmark: project.caseStudy.sampleBenchmark || '',
+  } : getExampleCaseStudy(project);
+
+  // Use admin custom weekly plan if provided, otherwise structured weeklyPlans
+  const customWeeklyPlan = (project.weeklyPlan && Array.isArray(project.weeklyPlan) && project.weeklyPlan.length > 0)
+    ? project.weeklyPlan.map((w: any, idx: number) => ({
+        week: w.week || idx + 1,
+        title: w.title || `Week ${idx + 1} Plan`,
+        objectives: Array.isArray(w.objectives) ? w.objectives : [String(w.objectives || 'Complete week deliverables')],
+        deliverables: Array.isArray(w.deliverables) ? w.deliverables : [String(w.deliverables || 'Weekly deliverable link')],
+        keyMetrics: w.keyMetrics || 'Successful mentor sign-off',
+      }))
+    : weeklyPlans;
+
+  const customFinalDeliverable = project.finalDeliverable || `A comprehensive executive case study for "${project.title}", complete with live dashboards/templates, standardized SOP documentation, and a 3-5 minute video presentation.`;
+
+  const customEvaluationCriteria = (project.evaluationCriteria && Array.isArray(project.evaluationCriteria) && project.evaluationCriteria.length > 0)
+    ? project.evaluationCriteria
+    : [
+        'Strategic depth & problem-solving framework (25%)',
+        'Execution completeness & template quality (25%)',
+        'Data accuracy & analytical rigor (20%)',
+        'Documentation & presentation clarity (15%)',
+        'Tool mastery & automation efficiency (15%)',
+      ];
+
   return {
     overview: `This ${project.duration} project will guide you through the execution of "${project.title}" — from strategy and process design to live deployment and reporting. You will leverage tools like ${project.techStack.join(', ')} to deliver a industry-standard portfolio project worth ${project.points} leaderboard points.`,
-    exampleCaseStudy: getExampleCaseStudy(project),
-    weeklyPlan: weeklyPlans,
+    exampleCaseStudy: customCaseStudy,
+    weeklyPlan: customWeeklyPlan,
     techStackBreakdown: project.techStack.map((tech) => ({
       name: tech,
       role: getTechRole(tech),
     })),
-    finalDeliverable: `A comprehensive executive case study for "${project.title}", complete with live dashboards/templates, standardized SOP documentation, and a 3-5 minute video presentation.`,
-    evaluationCriteria: [
-      'Strategic depth & problem-solving framework (25%)',
-      'Execution completeness & template quality (25%)',
-      'Data accuracy & analytical rigor (20%)',
-      'Documentation & presentation clarity (15%)',
-      'Tool mastery & automation efficiency (15%)',
-    ],
+    finalDeliverable: customFinalDeliverable,
+    evaluationCriteria: customEvaluationCriteria,
   };
 }
 
@@ -418,13 +468,19 @@ export const InternshipProjectsView: React.FC = () => {
 
   const handleSubmitDeliverable = async () => {
     if (!selectedProject || submittingWeek === null || !deliverableUrl.trim()) return;
+
+    if (!currentUser?.email) {
+      toast.error('Please sign in to submit your project deliverable.');
+      return;
+    }
+
     setIsSubmitting(true);
-    const email = currentUser?.email || 'intern@datacrumbs.org';
+    const email = currentUser.email.toLowerCase().trim();
 
     const payload = {
-      user_email: email.toLowerCase().trim(),
-      user_name: currentUser?.user_metadata?.full_name || email.split('@')[0],
-      project_id: selectedProject.id,
+      user_email: email,
+      user_name: currentUser.user_metadata?.full_name || email.split('@')[0],
+      project_id: String(selectedProject.id),
       project_title: selectedProject.title,
       week_number: submittingWeek,
       deliverable_url: deliverableUrl.trim(),
@@ -439,17 +495,22 @@ export const InternshipProjectsView: React.FC = () => {
         .upsert([payload], { onConflict: 'user_email,project_id,week_number' })
         .select();
 
-      const newSub = data && data[0] ? data[0] : payload;
-      setSubmissions((prev) => ({ ...prev, [submittingWeek]: newSub }));
-    } catch (err) {
+      if (error) {
+        toast.error(`Submission error: ${error.message}`);
+      } else {
+        toast.success(`Week ${submittingWeek} deliverable submitted successfully!`);
+        const newSub = data && data[0] ? data[0] : payload;
+        setSubmissions((prev) => ({ ...prev, [submittingWeek]: newSub }));
+        setSubmittingWeek(null);
+        setDeliverableUrl('');
+        setSubmissionNotes('');
+      }
+    } catch (err: any) {
       console.error('Submission error:', err);
-      setSubmissions((prev) => ({ ...prev, [submittingWeek]: payload }));
+      toast.error(`Submission failed: ${err?.message || 'Please check connection.'}`);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
-    setSubmittingWeek(null);
-    setDeliverableUrl('');
-    setSubmissionNotes('');
   };
 
   const getLocalProjects = (): Project[] => {
@@ -488,6 +549,11 @@ export const InternshipProjectsView: React.FC = () => {
           learningOutcomes: p.learning_outcomes || p.learningOutcomes || [],
           points: p.points || 350,
           popularity: p.popularity || 90,
+          caseStudy: p.case_study || undefined,
+          weeklyPlan: p.weekly_plan || undefined,
+          finalDeliverable: p.final_deliverable || undefined,
+          evaluationCriteria: p.evaluation_criteria || undefined,
+          created_at: p.created_at,
         }));
         setProjectsList(mapped);
       } else {
@@ -890,8 +956,9 @@ export const InternshipProjectsView: React.FC = () => {
                     `\n## Final Deliverable\n${generatedPlan.finalDeliverable}`,
                   ].join('\n');
                   handleCopy(fullPlan, 'fullplan');
+                  toast.success('Project plan copied to clipboard as Markdown!');
                 }}
-                className="px-6 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-lg shadow-slate-900/20 flex items-center gap-2 transition-all"
+                className="px-6 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-lg shadow-slate-900/20 flex items-center gap-2 transition-all cursor-pointer"
               >
                 {copiedField === 'fullplan' ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                 <span>{copiedField === 'fullplan' ? 'Plan Copied to Clipboard!' : 'Copy Full Plan as Markdown'}</span>
@@ -922,9 +989,9 @@ export const InternshipProjectsView: React.FC = () => {
       {/* Stats Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Total Projects', value: PROJECTS.length.toString(), icon: '/Icons/4.png' },
+          { label: 'Total Projects', value: projectsList.length.toString(), icon: '/Icons/4.png' },
           { label: 'Domains', value: (DOMAINS.length - 1).toString(), icon: '/Icons/5.png' },
-          { label: 'Max Points', value: '500', icon: '/Icons/6.png' },
+          { label: 'Max Points', value: String(Math.max(...projectsList.map(p => p.points || 0), 500)), icon: '/Icons/6.png' },
           { label: 'Avg Duration', value: '4.2 wks', icon: '/Icons/7.png' },
         ].map((stat) => (
           <div key={stat.label} className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex items-center gap-3.5">

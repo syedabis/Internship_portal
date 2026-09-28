@@ -161,7 +161,7 @@ export default function AdminResourcesPage() {
             <input
               value={instructor}
               onChange={(e) => setInstructor(e.target.value)}
-              placeholder="Instructor Name (e.g. Dr. Aris Thorne)"
+              placeholder="Instructor Name (e.g. Syed Abis)"
               className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
             />
           </div>

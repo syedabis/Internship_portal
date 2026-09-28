@@ -25,9 +25,9 @@ export interface EmailMessage {
 const SAMPLE_EMAILS: EmailMessage[] = [
   {
     id: 'email-1',
-    senderName: 'Dr. Aris Thorne',
-    senderEmail: 'aris.thorne@cortexa.ai',
-    senderRole: 'Head of AI Research',
+    senderName: 'Syed Abis',
+    senderEmail: 'abis@datacrumbs.org',
+    senderRole: 'Lead Mentor & AI Director',
     senderAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     subject: 'Task #4 PyTorch Fine-Tuning Approved (+240 pts)',
     preview: 'Great work on your QLoRA submission! Automated benchmark scores passed with 98% accuracy...',
@@ -50,7 +50,7 @@ const SAMPLE_EMAILS: EmailMessage[] = [
   </ul>
 </div>
 <p><strong>Mentor Feedback:</strong> "Your implementation of memory-efficient gradient checkpointing in PyTorch was crisp. Keep up the high standard as we prepare for Cohort #4 final rankings!"</p>
-<p>Best regards,<br/><strong>Dr. Aris Thorne</strong><br/><em>Head of AI Research @ Cortexa</em></p>
+<p>Best regards,<br/><strong>Syed Abis</strong><br/><em>Lead Mentor & AI Director @ Cortexa</em></p>
     `,
     attachments: [
       { name: 'Evaluation_Benchmark_Report.pdf', size: '1.2 MB', type: 'PDF' },

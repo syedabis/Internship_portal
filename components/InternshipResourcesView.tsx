@@ -25,7 +25,7 @@ const MASTERCLASSES: Masterclass[] = [
   {
     id: 'mc-1',
     title: 'Building & Fine-Tuning Multi-Agent LLMs with QLoRA',
-    instructor: 'Dr. Aris Thorne',
+    instructor: 'Syed Abis',
     role: 'Head of AI Research @ Cortexa',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     thumbnail: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
@@ -97,7 +97,7 @@ const MASTERCLASSES: Masterclass[] = [
   {
     id: 'mc-5',
     title: 'Enterprise RAG: Vector DBs, Hybrid Search & Graph RAG',
-    instructor: 'Dr. Aris Thorne',
+    instructor: 'Syed Abis',
     role: 'Head of AI Research @ Cortexa',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     thumbnail: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=600&auto=format&fit=crop&q=80',
