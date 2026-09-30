@@ -4,7 +4,7 @@ This document contains the comprehensive, re-calibrated directory of all **20 in
 
 - **Standard Point Award:** **500 Points** across all capstone projects upon successful completion and review.
 - **Difficulty Curve:**
-  - **Beginner Projects (40% / 8 Projects):** 3-week guided foundational projects with clear constraints and starter templates (accessible to non-coders and beginners).
+  - **Beginner Projects (40% / 8 Projects):** 4-week guided foundational projects with clear constraints and starter templates (accessible to non-coders and beginners).
   - **Intermediate Projects (60% / 12 Projects):** 4-week end-to-end execution projects simulating real-world team deliverables.
   - **Custom Student Proposals:** Interns can propose their own projects via the portal for mentor review & 500-point assignment.
 
