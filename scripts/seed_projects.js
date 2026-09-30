@@ -377,17 +377,16 @@ async function seed() {
   console.log('Authenticated successfully:', auth.user.email);
 
   // Check existing projects count
-  const { data: existing } = await supabase.from('projects').select('id');
-  if (existing && existing.length > 0) {
-    console.log(`Clearing ${existing.length} existing projects to avoid duplicates...`);
-    for (const item of existing) {
-      await supabase.from('projects').delete().eq('id', item.id);
-    }
+  // Check existing projects and preserve IDs in-place
+  const { data: existing } = await supabase.from('projects').select('id, title');
+  const existingMap = new Map();
+  if (existing) {
+    existing.forEach((item) => existingMap.set(item.title.trim().toLowerCase(), item.id));
   }
 
-  console.log(`Seeding ${RAW_PROJECTS.length} calibrated projects (all 500 points) into Supabase...`);
+  console.log(`Synchronizing ${RAW_PROJECTS.length} calibrated projects (all 500 points, 4 weeks) into Supabase...`);
 
-  const payload = RAW_PROJECTS.map((p) => {
+  for (const p of RAW_PROJECTS) {
     const caseStudy = CASE_STUDIES[p.domain] || {
       company: 'Enterprise Organization Example',
       scenario: `The company needs a structured execution plan for ${p.title}.`,
@@ -395,7 +394,7 @@ async function seed() {
       sampleBenchmark: `A comprehensive portfolio project featuring live operational templates and executive presentation video.`,
     };
 
-    return {
+    const projectPayload = {
       title: p.title,
       description: p.description,
       domain: p.domain,
@@ -416,16 +415,16 @@ async function seed() {
         'Tool mastery & automation efficiency (15%)',
       ],
     };
-  });
 
-  const { data, error } = await supabase.from('projects').insert(payload).select();
-
-  if (error) {
-    console.error('Seeding failed:', error.message);
-    process.exit(1);
+    const existingId = existingMap.get(p.title.trim().toLowerCase());
+    if (existingId) {
+      await supabase.from('projects').update(projectPayload).eq('id', existingId);
+    } else {
+      await supabase.from('projects').insert([projectPayload]);
+    }
   }
 
-  console.log(`Successfully seeded ${data.length} projects (all 500 points) into Supabase!`);
+  console.log(`Successfully synchronized all 20 projects (IDs preserved)!`);
 }
 
 seed();

@@ -148,7 +148,7 @@ export default function AdminProjectsPage() {
     setEvaluatingSubmission(sub);
     const { mentorFeedback } = parseSubmissionNotes(sub.notes);
     setMentorComment(mentorFeedback || '');
-    setCustomPointsInput(sub.points_awarded > 0 ? String(sub.points_awarded) : '100');
+    setCustomPointsInput(sub.points_awarded > 0 ? String(sub.points_awarded) : '125');
   };
 
   const getLocalProjects = (): Project[] => {
@@ -1230,12 +1230,12 @@ export default function AdminProjectsPage() {
                           {sub.status !== 'approved' && (
                             <button
                               type="button"
-                              onClick={() => handleUpdateSubmissionStatus(sub.id, 'approved', 100)}
+                              onClick={() => handleUpdateSubmissionStatus(sub.id, 'approved', 125)}
                               className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow-2xs transition-colors cursor-pointer"
-                              title="Quick approve and award 100 points"
+                              title="Quick approve and award 125 points"
                             >
                               <Check className="w-3.5 h-3.5" />
-                              <span>Approve (+100 pts)</span>
+                              <span>Approve (+125 pts)</span>
                             </button>
                           )}
 

@@ -535,6 +535,20 @@ export const InternshipProjectsView: React.FC = () => {
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [projectToSwitchTo, setProjectToSwitchTo] = useState<Project | null>(null);
 
+  const isProjectActive = (project: Project | null | undefined): boolean => {
+    if (!project) return false;
+    if (activeProjectId && String(project.id) === String(activeProjectId)) return true;
+    if (activeProjectTitle) {
+      const pTitle = project.title.toLowerCase().trim();
+      const aTitle = activeProjectTitle.toLowerCase().trim();
+      if (pTitle === aTitle) return true;
+      if (aTitle.includes('enterprise ai rag') && pTitle.includes('ai document knowledge assistant')) return true;
+      if (aTitle.includes('rag knowledge agent') && pTitle.includes('ai document knowledge assistant')) return true;
+      if (aTitle.includes('ai document') && pTitle.includes('ai document')) return true;
+    }
+    return false;
+  };
+
   // ── Weekly Submissions State ────────────────────────────────────────────
   const [submissions, setSubmissions] = useState<Record<number, any>>({});
   const [submittingWeek, setSubmittingWeek] = useState<number | null>(null);
@@ -756,8 +770,9 @@ export const InternshipProjectsView: React.FC = () => {
       return;
     }
 
-    // Single active project rule: prompt confirmation if switching from a different project
-    if (activeProjectId && String(activeProjectId) !== String(project.id) && !skipConfirmation) {
+    // Single active project rule: prompt confirmation if switching from a different project that actually exists
+    const currentActiveExists = projectsList.some((p) => isProjectActive(p));
+    if (activeProjectId && !isProjectActive(project) && currentActiveExists && !skipConfirmation) {
       setProjectToSwitchTo(project);
       return;
     }
@@ -820,7 +835,7 @@ export const InternshipProjectsView: React.FC = () => {
     }
 
     // Safety check: only active project can submit
-    if (String(selectedProject.id) !== String(activeProjectId)) {
+    if (!isProjectActive(selectedProject)) {
       toast.error('You can only submit deliverables for your currently active enrolled project.');
       return;
     }
@@ -922,6 +937,43 @@ export const InternshipProjectsView: React.FC = () => {
     return () => window.removeEventListener('cortexa_projects_updated', handleUpdate);
   }, []);
 
+  // Auto-reconcile orphaned or renamed active project IDs/titles
+  useEffect(() => {
+    if (!projectsList || projectsList.length === 0) return;
+    if (!activeProjectId && !activeProjectTitle) return;
+
+    // Check if activeProjectId already matches directly
+    const exactMatch = projectsList.find((p) => String(p.id) === String(activeProjectId));
+    if (exactMatch) {
+      if (activeProjectTitle !== exactMatch.title) {
+        setActiveProjectTitle(exactMatch.title);
+      }
+      return;
+    }
+
+    // Try finding by title or alias
+    const matched = projectsList.find((p) => isProjectActive(p));
+    if (matched) {
+      setActiveProjectId(String(matched.id));
+      setActiveProjectTitle(matched.title);
+      if (currentUser?.email) {
+        const email = currentUser.email.toLowerCase().trim();
+        const nowIso = activeProjectStartedAt || new Date().toISOString();
+        localStorage.setItem(
+          `cortexa_active_project_${email}`,
+          JSON.stringify({ id: String(matched.id), title: matched.title, startedAt: nowIso })
+        );
+        supabase.auth.updateUser({
+          data: {
+            active_project_id: String(matched.id),
+            active_project_title: matched.title,
+            active_project_started_at: nowIso,
+          },
+        }).catch(() => {});
+      }
+    }
+  }, [projectsList, activeProjectId, activeProjectTitle]);
+
   // ── Filtering ──────────────────────────────────────────────────────────
   const filteredProjects = projectsList.filter((p) => {
     const matchesDomain = activeDomain === 'all' || p.domain === activeDomain;
@@ -955,7 +1007,7 @@ export const InternshipProjectsView: React.FC = () => {
   // ═════════════════════════════════════════════════════════════════════════
   // MAIN RENDER (Unified container)
   // ═════════════════════════════════════════════════════════════════════════
-  const isSelectedActive = selectedProject ? String(selectedProject.id) === String(activeProjectId) : false;
+  const isSelectedActive = isProjectActive(selectedProject);
 
   return (
     <div className="space-y-6 pb-12">
@@ -1713,7 +1765,7 @@ export const InternshipProjectsView: React.FC = () => {
 
           {/* ── Active Enrolled Project Card Banner (if user has active project) ── */}
           {activeProjectId && (() => {
-            const activeProj = projectsList.find((p) => String(p.id) === String(activeProjectId));
+            const activeProj = projectsList.find((p) => isProjectActive(p));
             if (!activeProj) return null;
             return (
               <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 border border-emerald-500/40 rounded-2xl p-5 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-[fadeIn_0.2s_ease-out]">
@@ -1962,7 +2014,7 @@ export const InternshipProjectsView: React.FC = () => {
             {filteredProjects.map((project) => {
               const domain = DOMAINS.find((d) => d.id === project.domain);
               const DomainIcon = domain?.icon || Layers;
-              const isActive = String(project.id) === String(activeProjectId);
+              const isActive = isProjectActive(project);
 
               return (
                 <div
