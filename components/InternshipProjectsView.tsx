@@ -811,6 +811,19 @@ export const InternshipProjectsView: React.FC = () => {
       setActiveProjectStartedAt(nowIso);
       setProjectToSwitchTo(null);
 
+      // Persist enrollment record in project_submissions for admin cohort visibility
+      supabase.from('project_submissions').upsert([{
+        user_email: email,
+        user_name: currentUser.user_metadata?.full_name || email.split('@')[0],
+        project_id: String(project.id),
+        project_title: project.title,
+        week_number: -1,
+        deliverable_url: 'https://datacrumbs.org/enrolled',
+        notes: JSON.stringify({ enrolledAt: nowIso, domain: project.domain || 'swe', type: 'enrollment' }),
+        status: 'approved',
+        points_awarded: 0,
+      }], { onConflict: 'user_email,project_id,week_number' }).then(() => {}, () => {});
+
       // Open project view if not already open
       if (!selectedProject || String(selectedProject.id) !== String(project.id)) {
         setSelectedProject(project);
@@ -970,6 +983,17 @@ export const InternshipProjectsView: React.FC = () => {
             active_project_started_at: nowIso,
           },
         }).catch(() => {});
+        supabase.from('project_submissions').upsert([{
+          user_email: email,
+          user_name: currentUser.user_metadata?.full_name || email.split('@')[0],
+          project_id: String(matched.id),
+          project_title: matched.title,
+          week_number: -1,
+          deliverable_url: 'https://datacrumbs.org/enrolled',
+          notes: JSON.stringify({ enrolledAt: nowIso, domain: matched.domain || 'swe', type: 'enrollment' }),
+          status: 'approved',
+          points_awarded: 0,
+        }], { onConflict: 'user_email,project_id,week_number' }).then(() => {}, () => {});
       }
     }
   }, [projectsList, activeProjectId, activeProjectTitle]);

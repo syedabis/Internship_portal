@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS project_submissions (
   user_email TEXT NOT NULL,
   user_name TEXT,
   project_id TEXT NOT NULL,
-  week_number INTEGER NOT NULL, -- 0 = Custom Project Proposal; 1..N = Weekly Deliverable Milestones
+  week_number INTEGER NOT NULL, -- -1 = Project Enrollment Record; 0 = Custom Project Proposal; 1..4 = Weekly Deliverable Milestones
   deliverable_url TEXT NOT NULL,
   notes TEXT,
   status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),

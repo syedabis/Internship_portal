@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { INITIAL_PROJECTS, Project, CaseStudyData, WeekPlanData } from '@/lib/projectsData';
 import toast from '@/lib/toast';
@@ -39,6 +39,11 @@ import {
   FileText,
   Link2,
   User,
+  Users,
+  GraduationCap,
+  TrendingUp,
+  Mail,
+  ArrowRight,
 } from 'lucide-react';
 
 export type { Project };
@@ -72,8 +77,38 @@ export interface ProjectSubmission {
   updated_at: string;
 }
 
+export interface EnrolledStudent {
+  user_email: string;
+  user_name: string;
+  project_id: string;
+  project_title: string;
+  domain: string;
+  enrolled_at: string;
+  weeks: {
+    [weekNum: number]: {
+      status: 'approved' | 'pending' | 'rejected' | 'not_submitted';
+      points_awarded: number;
+      deliverable_url?: string;
+      notes?: string;
+      updated_at?: string;
+      submission_id?: string;
+    };
+  };
+  completed_weeks_count: number;
+  submitted_weeks_count: number;
+  total_points: number;
+  overall_status: 'enrolled' | 'in_progress' | 'pending_review' | 'completed' | 'revision_requested';
+  last_activity_at: string;
+}
+
 export default function AdminProjectsPage() {
-  const [activeTab, setActiveTab] = useState<'projects' | 'submissions' | 'proposals'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'enrollments' | 'submissions' | 'proposals'>('projects');
+
+  // Enrolled Students Cohort State
+  const [enrollmentSearch, setEnrollmentSearch] = useState('');
+  const [enrollmentDomainFilter, setEnrollmentDomainFilter] = useState('all');
+  const [enrollmentStatusFilter, setEnrollmentStatusFilter] = useState<string>('all');
+  const [viewingStudent, setViewingStudent] = useState<EnrolledStudent | null>(null);
 
   // Projects State
   const [projects, setProjects] = useState<Project[]>([]);
@@ -464,6 +499,148 @@ export default function AdminProjectsPage() {
   const pendingSubmissionsCount = milestoneSubmissions.filter((s) => s.status === 'pending').length;
   const pendingProposalsCount = proposals.filter((s) => s.status === 'pending').length;
 
+  // Aggregated Enrolled Students Cohort
+  const enrolledStudents: EnrolledStudent[] = useMemo(() => {
+    const studentMap = new Map<string, EnrolledStudent>();
+
+    submissions.forEach((sub) => {
+      if (sub.week_number === 0 || sub.project_id?.startsWith('proposal_')) return;
+
+      const email = (sub.user_email || '').toLowerCase().trim();
+      if (!email) return;
+
+      const pTitle = (sub.project_title || 'Internship Project').trim();
+      const key = `${email}::${pTitle.toLowerCase()}`;
+
+      if (!studentMap.has(key)) {
+        let resolvedDomain = 'swe';
+        const matchedProj = projects.find(
+          (p) => p.title.toLowerCase().trim() === pTitle.toLowerCase().trim() || String(p.id) === String(sub.project_id)
+        );
+        if (matchedProj?.domain) {
+          resolvedDomain = matchedProj.domain;
+        } else if (sub.notes) {
+          try {
+            const parsed = JSON.parse(sub.notes);
+            if (parsed.domain) resolvedDomain = parsed.domain;
+          } catch {}
+        }
+
+        studentMap.set(key, {
+          user_email: email,
+          user_name: sub.user_name || email.split('@')[0],
+          project_id: sub.project_id || '',
+          project_title: matchedProj?.title || pTitle,
+          domain: resolvedDomain,
+          enrolled_at: sub.created_at,
+          weeks: {
+            1: { status: 'not_submitted', points_awarded: 0 },
+            2: { status: 'not_submitted', points_awarded: 0 },
+            3: { status: 'not_submitted', points_awarded: 0 },
+            4: { status: 'not_submitted', points_awarded: 0 },
+          },
+          completed_weeks_count: 0,
+          submitted_weeks_count: 0,
+          total_points: 0,
+          overall_status: 'enrolled',
+          last_activity_at: sub.updated_at || sub.created_at,
+        });
+      }
+
+      const record = studentMap.get(key)!;
+
+      if (sub.week_number === -1) {
+        record.enrolled_at = sub.created_at;
+      } else if (new Date(sub.created_at) < new Date(record.enrolled_at)) {
+        record.enrolled_at = sub.created_at;
+      }
+
+      if (new Date(sub.updated_at || sub.created_at) > new Date(record.last_activity_at)) {
+        record.last_activity_at = sub.updated_at || sub.created_at;
+      }
+
+      if (sub.user_name && record.user_name === email.split('@')[0]) {
+        record.user_name = sub.user_name;
+      }
+
+      if (sub.week_number >= 1 && sub.week_number <= 4) {
+        record.weeks[sub.week_number] = {
+          status: sub.status,
+          points_awarded: sub.points_awarded || 0,
+          deliverable_url: sub.deliverable_url,
+          notes: sub.notes,
+          updated_at: sub.updated_at || sub.created_at,
+          submission_id: sub.id,
+        };
+      }
+    });
+
+    const list = Array.from(studentMap.values()).map((student) => {
+      let completed = 0;
+      let submitted = 0;
+      let totalPts = 0;
+      let hasPending = false;
+      let hasRejected = false;
+
+      [1, 2, 3, 4].forEach((w) => {
+        const info = student.weeks[w];
+        if (info) {
+          if (info.status === 'approved') {
+            completed += 1;
+            submitted += 1;
+            totalPts += info.points_awarded;
+          } else if (info.status === 'pending') {
+            submitted += 1;
+            hasPending = true;
+          } else if (info.status === 'rejected') {
+            submitted += 1;
+            hasRejected = true;
+          }
+        }
+      });
+
+      let status: EnrolledStudent['overall_status'] = 'enrolled';
+      if (completed >= 4 || totalPts >= 500) {
+        status = 'completed';
+      } else if (hasPending) {
+        status = 'pending_review';
+      } else if (hasRejected) {
+        status = 'revision_requested';
+      } else if (submitted > 0) {
+        status = 'in_progress';
+      }
+
+      return {
+        ...student,
+        completed_weeks_count: completed,
+        submitted_weeks_count: submitted,
+        total_points: totalPts,
+        overall_status: status,
+      };
+    });
+
+    return list.sort((a, b) => {
+      if (a.overall_status === 'pending_review' && b.overall_status !== 'pending_review') return -1;
+      if (b.overall_status === 'pending_review' && a.overall_status !== 'pending_review') return 1;
+      return new Date(b.last_activity_at).getTime() - new Date(a.last_activity_at).getTime();
+    });
+  }, [submissions, projects]);
+
+  const filteredEnrolledStudents = enrolledStudents.filter((student) => {
+    const matchesSearch =
+      student.user_name.toLowerCase().includes(enrollmentSearch.toLowerCase()) ||
+      student.user_email.toLowerCase().includes(enrollmentSearch.toLowerCase()) ||
+      student.project_title.toLowerCase().includes(enrollmentSearch.toLowerCase());
+    const matchesDomain = enrollmentDomainFilter === 'all' || student.domain === enrollmentDomainFilter;
+    const matchesStatus =
+      enrollmentStatusFilter === 'all' || student.overall_status === enrollmentStatusFilter;
+    return matchesSearch && matchesDomain && matchesStatus;
+  });
+
+  const enrolledPendingReviewCount = enrolledStudents.filter((s) => s.overall_status === 'pending_review').length;
+  const enrolledCompletedCount = enrolledStudents.filter((s) => s.overall_status === 'completed').length;
+  const enrolledInProgressCount = enrolledStudents.filter((s) => s.overall_status === 'in_progress').length;
+
   const filteredProjects = projects.filter(p => {
     const matchesDomain = domainFilter === 'all' || p.domain === domainFilter;
     const matchesQuery = p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -665,6 +842,27 @@ export default function AdminProjectsPage() {
         >
           <Briefcase className="w-4 h-4" />
           <span>All Domain Projects ({projects.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab('enrollments');
+            fetchSubmissions();
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+            activeTab === 'enrollments'
+              ? 'bg-slate-900 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          <Users className="w-4 h-4 text-blue-400" />
+          <span>Enrolled Students ({enrolledStudents.length})</span>
+          {enrolledPendingReviewCount > 0 && (
+            <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black">
+              {enrolledPendingReviewCount} Review
+            </span>
+          )}
         </button>
 
         <button
@@ -1066,7 +1264,516 @@ export default function AdminProjectsPage() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════════ */}
-      {/* TAB 2: INTERN SUBMISSIONS & REVIEWS                                  */}
+      {/* TAB 2: ENROLLED STUDENTS COHORT ROSTER                                */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'enrollments' && (
+        <div className="space-y-5 animate-[fadeSlideIn_0.2s_ease-out]">
+          {/* Summary Metric Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center shrink-0">
+                <Users className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none">
+                  {enrolledStudents.length}
+                </div>
+                <div className="text-[11px] font-semibold text-slate-500 mt-1">Total Enrolled</div>
+              </div>
+            </div>
+
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 flex items-center justify-center shrink-0">
+                <TrendingUp className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none">
+                  {enrolledInProgressCount}
+                </div>
+                <div className="text-[11px] font-semibold text-slate-500 mt-1">Active Sprints</div>
+              </div>
+            </div>
+
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center shrink-0">
+                <Clock className="w-5 h-5 text-amber-600" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none">
+                  {enrolledPendingReviewCount}
+                </div>
+                <div className="text-[11px] font-semibold text-slate-500 mt-1">Pending Review</div>
+              </div>
+            </div>
+
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0">
+                <GraduationCap className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none">
+                  {enrolledCompletedCount}
+                </div>
+                <div className="text-[11px] font-semibold text-slate-500 mt-1">Graduated (500 pts)</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Search & Filter Bar */}
+          <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
+            <div className="relative flex-1 w-full">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={enrollmentSearch}
+                onChange={(e) => setEnrollmentSearch(e.target.value)}
+                placeholder="Search by student name, email, or project title..."
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 w-full md:w-auto flex-wrap">
+              <select
+                value={enrollmentDomainFilter}
+                onChange={(e) => setEnrollmentDomainFilter(e.target.value)}
+                className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 cursor-pointer"
+              >
+                <option value="all">All Domains ({DOMAINS.length})</option>
+                {DOMAINS.map((d) => (
+                  <option key={d.id} value={d.id}>{d.label}</option>
+                ))}
+              </select>
+
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                {[
+                  { id: 'all', label: 'All' },
+                  { id: 'pending_review', label: 'Review Needed' },
+                  { id: 'in_progress', label: 'In Progress' },
+                  { id: 'completed', label: 'Graduated' },
+                ].map((st) => (
+                  <button
+                    key={st.id}
+                    type="button"
+                    onClick={() => setEnrollmentStatusFilter(st.id)}
+                    className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                      enrollmentStatusFilter === st.id
+                        ? 'bg-white text-slate-900 shadow-2xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    {st.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Enrolled Students Table */}
+          {filteredEnrolledStudents.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center text-xs text-slate-500">
+              No enrolled students found matching your criteria.
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-bold text-[11px] uppercase tracking-wider">
+                      <th className="py-3.5 px-4">Student & Contact</th>
+                      <th className="py-3.5 px-4">Enrolled Project</th>
+                      <th className="py-3.5 px-4">Enrolled Date</th>
+                      <th className="py-3.5 px-4">4-Week Milestones</th>
+                      <th className="py-3.5 px-4">Points</th>
+                      <th className="py-3.5 px-4">Status</th>
+                      <th className="py-3.5 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredEnrolledStudents.map((student) => {
+                      const domainObj = DOMAINS.find((d) => d.id === student.domain);
+                      const initials = (student.user_name || student.user_email)
+                        .split(' ')
+                        .map((n) => n[0])
+                        .slice(0, 2)
+                        .join('')
+                        .toUpperCase();
+
+                      return (
+                        <tr key={`${student.user_email}-${student.project_title}`} className="hover:bg-slate-50/80 transition-colors">
+                          {/* Student Info */}
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-full bg-slate-900 text-white font-black text-xs flex items-center justify-center shrink-0">
+                                {initials}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="font-bold text-slate-900 line-clamp-1">{student.user_name}</div>
+                                <a
+                                  href={`mailto:${student.user_email}`}
+                                  className="text-[11px] text-slate-500 hover:text-emerald-600 flex items-center gap-1 font-medium truncate"
+                                  title="Send email"
+                                >
+                                  <Mail className="w-2.5 h-2.5 text-slate-400" />
+                                  <span>{student.user_email}</span>
+                                </a>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Enrolled Project & Domain */}
+                          <td className="py-3.5 px-4">
+                            <div className="space-y-1">
+                              <div className="font-bold text-slate-800 line-clamp-1" title={student.project_title}>
+                                {student.project_title}
+                              </div>
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-slate-100 text-slate-700 border border-slate-200">
+                                {domainObj?.label?.split(' ')[0] || student.domain.toUpperCase()}
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* Enrolled Date */}
+                          <td className="py-3.5 px-4 whitespace-nowrap text-slate-600 font-medium">
+                            {new Date(student.enrolled_at).toLocaleDateString(undefined, {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
+                          </td>
+
+                          {/* 4-Week Milestone Progress */}
+                          <td className="py-3.5 px-4">
+                            <div className="space-y-1.5 min-w-[190px]">
+                              {/* Segmented Progress Bar */}
+                              <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full transition-all ${
+                                    student.completed_weeks_count === 4 ? 'bg-emerald-500' : 'bg-blue-500'
+                                  }`}
+                                  style={{ width: `${(student.completed_weeks_count / 4) * 100}%` }}
+                                />
+                              </div>
+
+                              {/* 4 Week Milestone Pills */}
+                              <div className="flex items-center gap-1">
+                                {[1, 2, 3, 4].map((w) => {
+                                  const weekInfo = student.weeks[w];
+                                  const isApproved = weekInfo?.status === 'approved';
+                                  const isPending = weekInfo?.status === 'pending';
+                                  const isRejected = weekInfo?.status === 'rejected';
+
+                                  return (
+                                    <span
+                                      key={w}
+                                      title={`Week ${w}: ${
+                                        isApproved ? `Approved (+${weekInfo.points_awarded} pts)` :
+                                        isPending ? 'Submitted - Awaiting Review' :
+                                        isRejected ? 'Revision Requested' : 'Not Submitted'
+                                      }`}
+                                      className={`px-1.5 py-0.5 rounded text-[10px] font-black border flex items-center justify-center shrink-0 ${
+                                        isApproved
+                                          ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                                          : isPending
+                                          ? 'bg-amber-100 text-amber-800 border-amber-300 animate-pulse'
+                                          : isRejected
+                                          ? 'bg-rose-100 text-rose-800 border-rose-300'
+                                          : 'bg-slate-100 text-slate-400 border-slate-200'
+                                      }`}
+                                    >
+                                      {isApproved ? '✓' : isPending ? '⏳' : isRejected ? '✗' : `W${w}`}
+                                    </span>
+                                  );
+                                })}
+                                <span className="text-[10px] text-slate-400 font-semibold ml-1">
+                                  {student.completed_weeks_count}/4
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Points */}
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <div className="flex items-center gap-1 font-black text-slate-900 text-xs">
+                              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                              <span>{student.total_points}</span>
+                              <span className="text-slate-400 text-[10px] font-normal">/ 500</span>
+                            </div>
+                          </td>
+
+                          {/* Status */}
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide border flex items-center gap-1 w-max ${
+                              student.overall_status === 'completed'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : student.overall_status === 'pending_review'
+                                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                : student.overall_status === 'revision_requested'
+                                ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                : student.overall_status === 'in_progress'
+                                ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                : 'bg-slate-50 text-slate-600 border-slate-200'
+                            }`}>
+                              {student.overall_status === 'completed' && <CheckCircle2 className="w-3 h-3 text-emerald-600" />}
+                              {student.overall_status === 'pending_review' && <Clock className="w-3 h-3 text-amber-600" />}
+                              {student.overall_status === 'revision_requested' && <AlertCircle className="w-3 h-3 text-rose-600" />}
+                              {student.overall_status === 'in_progress' && <Zap className="w-3 h-3 text-blue-600" />}
+                              <span>
+                                {student.overall_status === 'completed' ? 'Graduated' :
+                                 student.overall_status === 'pending_review' ? 'Needs Review' :
+                                 student.overall_status === 'revision_requested' ? 'Needs Revision' :
+                                 student.overall_status === 'in_progress' ? 'In Progress' : 'Enrolled'}
+                              </span>
+                            </span>
+                          </td>
+
+                          {/* Actions */}
+                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => setViewingStudent(student)}
+                                className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                                title="View milestone breakdown & deliverables"
+                              >
+                                <Eye className="w-3.5 h-3.5 text-slate-600" />
+                                <span>Details</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setActiveTab('submissions');
+                                  setSubmissionSearch(student.user_email);
+                                }}
+                                className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                                title="Filter deliverables for this intern"
+                              >
+                                <span>Review</span>
+                                <ArrowRight className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Student Progress Details Modal ── */}
+      {viewingStudent && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-2xl w-full p-6 space-y-6 max-h-[90vh] overflow-y-auto animate-[scaleUp_0.15s_ease-out]">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white font-black text-sm flex items-center justify-center shrink-0">
+                  {viewingStudent.user_name.slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <span>{viewingStudent.user_name}</span>
+                    <span className="text-xs font-normal text-slate-500">({viewingStudent.user_email})</span>
+                  </h3>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-xs font-semibold text-slate-700">{viewingStudent.project_title}</span>
+                    <span className="text-slate-300">•</span>
+                    <span className="text-xs text-slate-500">
+                      Enrolled on {new Date(viewingStudent.enrolled_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewingStudent(null)}
+                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Quick Metrics Bar */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100 text-center">
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Earned</div>
+                <div className="text-xl font-black text-slate-900 mt-0.5 flex items-center justify-center gap-1">
+                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  <span>{viewingStudent.total_points}</span>
+                  <span className="text-xs text-slate-400 font-normal">/ 500</span>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100 text-center">
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Milestones Approved</div>
+                <div className="text-xl font-black text-emerald-600 mt-0.5">
+                  {viewingStudent.completed_weeks_count} <span className="text-xs text-slate-400 font-normal">/ 4 Weeks</span>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100 text-center">
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Cohort Status</div>
+                <div className="text-xs font-black uppercase tracking-wide text-slate-800 mt-1">
+                  {viewingStudent.overall_status === 'completed' ? '🎓 Graduated' :
+                   viewingStudent.overall_status === 'pending_review' ? '⏳ Needs Review' :
+                   viewingStudent.overall_status === 'in_progress' ? '⚡ Active' : 'Enrolled'}
+                </div>
+              </div>
+            </div>
+
+            {/* 4 Weeks Detailed Breakdown */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">
+                Weekly Deliverable Milestones (125 pts Each)
+              </h4>
+
+              {[1, 2, 3, 4].map((w) => {
+                const info = viewingStudent.weeks[w];
+                const matchingSubmission = submissions.find(
+                  (s) => s.id === info?.submission_id ||
+                  (s.user_email?.toLowerCase() === viewingStudent.user_email.toLowerCase() &&
+                   s.project_title?.toLowerCase() === viewingStudent.project_title.toLowerCase() &&
+                   s.week_number === w)
+                );
+
+                const { studentNotes, mentorFeedback } = parseSubmissionNotes(matchingSubmission?.notes || info?.notes);
+
+                return (
+                  <div
+                    key={w}
+                    className={`rounded-2xl p-4 border transition-all ${
+                      info?.status === 'approved'
+                        ? 'bg-emerald-50/40 border-emerald-200'
+                        : info?.status === 'pending'
+                        ? 'bg-amber-50/40 border-amber-200'
+                        : info?.status === 'rejected'
+                        ? 'bg-rose-50/40 border-rose-200'
+                        : 'bg-slate-50/60 border-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-lg bg-slate-900 text-white font-black text-xs flex items-center justify-center">
+                          {w}
+                        </span>
+                        <span className="font-bold text-xs text-slate-900">
+                          {w === 1 ? 'Week 1: Research, Audit & Scoping' :
+                           w === 2 ? 'Week 2: Framework & Workflow Design' :
+                           w === 3 ? 'Week 3: Execution & Integration' :
+                           'Week 4: Final SOPs & Presentation'}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {info?.status === 'approved' && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            Approved (+{info.points_awarded} pts)
+                          </span>
+                        )}
+                        {info?.status === 'pending' && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">
+                            Pending Review
+                          </span>
+                        )}
+                        {info?.status === 'rejected' && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                            Revision Requested
+                          </span>
+                        )}
+                        {(!info || info.status === 'not_submitted') && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-500">
+                            Not Submitted
+                          </span>
+                        )}
+
+                        {matchingSubmission && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              handleOpenEvaluationModal(matchingSubmission);
+                            }}
+                            className="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold rounded-lg transition-colors cursor-pointer"
+                          >
+                            Grade
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Deliverable Details if available */}
+                    {matchingSubmission ? (
+                      <div className="mt-3 pt-3 border-t border-slate-200/60 space-y-2 text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-slate-600">Deliverable Link:</span>
+                          <a
+                            href={matchingSubmission.deliverable_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-emerald-700 hover:underline flex items-center gap-1 font-semibold truncate max-w-sm"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate">{matchingSubmission.deliverable_url}</span>
+                          </a>
+                        </div>
+
+                        {studentNotes && (
+                          <div className="bg-white/80 p-2.5 rounded-xl border border-slate-100 text-slate-700 text-xs">
+                            <span className="font-bold text-slate-900">Student Notes: </span>
+                            {studentNotes}
+                          </div>
+                        )}
+
+                        {mentorFeedback && (
+                          <div className="bg-amber-50/80 p-2.5 rounded-xl border border-amber-200 text-amber-900 text-xs">
+                            <span className="font-bold">Mentor Feedback: </span>
+                            {mentorFeedback}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-slate-400 mt-2 italic">
+                        Intern has not submitted deliverables for Week {w} yet.
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => {
+                  const email = viewingStudent.user_email;
+                  setViewingStudent(null);
+                  setActiveTab('submissions');
+                  setSubmissionSearch(email);
+                }}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <FileCheck className="w-4 h-4" />
+                <span>Review All Deliverables for this Intern</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setViewingStudent(null)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* TAB 3: INTERN SUBMISSIONS & REVIEWS                                  */}
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'submissions' && (
         <div className="space-y-4 animate-[fadeSlideIn_0.2s_ease-out]">
