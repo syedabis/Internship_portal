@@ -1756,7 +1756,7 @@ export const InternshipProjectsView: React.FC = () => {
                 value: String(Math.max(...projectsList.map((p) => p.points || 0), 500)),
                 icon: '/Icons/6.png',
               },
-              { label: 'Avg Duration', value: '4.2 wks', icon: '/Icons/7.png' },
+              { label: 'Avg Duration', value: '4.0 wks', icon: '/Icons/7.png' },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -2310,8 +2310,9 @@ export const InternshipProjectsView: React.FC = () => {
                     }}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium cursor-pointer"
                   >
-                    <option value="Beginner|3 weeks">Beginner (3 Weeks, 500 pts)</option>
+                    <option value="Beginner|4 weeks">Beginner (4 Weeks, 500 pts)</option>
                     <option value="Intermediate|4 weeks">Intermediate (4 Weeks, 500 pts)</option>
+                    <option value="Advanced|4 weeks">Advanced (4 Weeks, 500 pts)</option>
                   </select>
                 </div>
               </div>

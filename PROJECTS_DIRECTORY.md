@@ -15,19 +15,19 @@ This document contains the comprehensive, re-calibrated directory of all **20 in
 | # | Domain | Project Title | Difficulty | Duration | Points | Team Size |
 |---|---|---|---|---|---|---|
 | 1 | **AI** | AI Document Knowledge Assistant & Q&A App | Intermediate | 4 weeks | 500 pts | 1–2 |
-| 2 | **AI** | AI Prompt Engineering & Chatbot Application | Beginner | 3 weeks | 500 pts | 1 |
+| 2 | **AI** | AI Prompt Engineering & Chatbot Application | Beginner | 4 weeks | 500 pts | 1 |
 | 3 | **Software Eng.** | Full-Stack Web App with Auth & Database (CRUD) | Intermediate | 4 weeks | 500 pts | 1–2 |
-| 4 | **Software Eng.** | Interactive Analytics Dashboard & REST API Integration | Beginner | 3 weeks | 500 pts | 1 |
-| 5 | **Software Eng.** | No-Code Business Website & AI Customer Support Chatbot | Beginner | 3 weeks | 500 pts | 1 |
+| 4 | **Software Eng.** | Interactive Analytics Dashboard & REST API Integration | Beginner | 4 weeks | 500 pts | 1 |
+| 5 | **Software Eng.** | No-Code Business Website & AI Customer Support Chatbot | Beginner | 4 weeks | 500 pts | 1 |
 | 6 | **Cybersecurity** | Web Application Security Audit & OWASP Top 10 Checklist | Intermediate | 4 weeks | 500 pts | 1–2 |
-| 7 | **Cybersecurity** | Security Baseline Audit & Incident Response Playbook | Beginner | 3 weeks | 500 pts | 1 |
+| 7 | **Cybersecurity** | Security Baseline Audit & Incident Response Playbook | Beginner | 4 weeks | 500 pts | 1 |
 | 8 | **Human Resources** | HR Talent Acquisition & Onboarding Workflow | Intermediate | 4 weeks | 500 pts | 1–2 |
-| 9 | **Human Resources** | HR Performance Management & OKR Evaluation Framework | Beginner | 3 weeks | 500 pts | 1 |
+| 9 | **Human Resources** | HR Performance Management & OKR Evaluation Framework | Beginner | 4 weeks | 500 pts | 1 |
 | 10 | **Sales & BD** | B2B Sales Pipeline & Lead Scoring Engine | Intermediate | 4 weeks | 500 pts | 1–2 |
-| 11 | **Sales & BD** | Outbound Cold Email & Lead Nurturing Campaign | Beginner | 3 weeks | 500 pts | 1 |
+| 11 | **Sales & BD** | Outbound Cold Email & Lead Nurturing Campaign | Beginner | 4 weeks | 500 pts | 1 |
 | 12 | **Marketing** | Omnichannel Digital Marketing & Campaign Strategy | Intermediate | 4 weeks | 500 pts | 1–2 |
-| 13 | **Marketing** | Content Marketing Strategy & SEO Editorial Calendar | Beginner | 3 weeks | 500 pts | 1 |
-| 14 | **Marketing** | Digital Marketing Circulation, Content Syndication & Growth Engine | Beginner | 3 weeks | 500 pts | 1 |
+| 13 | **Marketing** | Content Marketing Strategy & SEO Editorial Calendar | Beginner | 4 weeks | 500 pts | 1 |
+| 14 | **Marketing** | Digital Marketing Circulation, Content Syndication & Growth Engine | Beginner | 4 weeks | 500 pts | 1 |
 | 15 | **Finance** | Corporate Financial Modeling & Cash Flow Forecast | Intermediate | 4 weeks | 500 pts | 1–2 |
 | 16 | **Operations** | Supply Chain & Vendor Performance Management | Intermediate | 4 weeks | 500 pts | 1–2 |
 | 17 | **Customer Success** | Customer Retention & CSAT Health Score System | Intermediate | 4 weeks | 500 pts | 1–2 |
@@ -55,7 +55,7 @@ This document contains the comprehensive, re-calibrated directory of all **20 in
 #### Project 2: AI Prompt Engineering & Chatbot Application
 - **Project ID:** `p_ai2`
 - **Domain:** Artificial Intelligence (AI)
-- **Difficulty:** Beginner | **Duration:** 3 weeks | **Points:** 500 | **Team Size:** 1
+- **Difficulty:** Beginner | **Duration:** 4 weeks | **Points:** 500 | **Team Size:** 1
 - **Description:** Design domain-specific prompt templates, build an interactive conversational assistant using OpenAI APIs, and create an automated prompt evaluation matrix to benchmark response quality.
 - **Tech Stack:** Python, OpenAI API, Streamlit, Prompt Templates, JSON / Pandas
 - **Learning Outcomes:** Prompt engineering best practices, System vs User prompt crafting, Few-shot prompting techniques, Chatbot state management
@@ -81,7 +81,7 @@ This document contains the comprehensive, re-calibrated directory of all **20 in
 #### Project 4: Interactive Analytics Dashboard & REST API Integration
 - **Project ID:** `p_swe2`
 - **Domain:** Software Engineering
-- **Difficulty:** Beginner | **Duration:** 3 weeks | **Points:** 500 | **Team Size:** 1
+- **Difficulty:** Beginner | **Duration:** 4 weeks | **Points:** 500 | **Team Size:** 1
 - **Description:** Create a clean, responsive frontend dashboard that fetches data from public/mock REST APIs, transforms JSON data, and visualizes KPIs with interactive charts and filtering controls.
 - **Tech Stack:** React / Next.js, TailwindCSS, Recharts, REST APIs, TypeScript
 - **Learning Outcomes:** API data fetching & error handling, Interactive data visualization, Component modularity & props design, Responsive UI layout
@@ -92,7 +92,7 @@ This document contains the comprehensive, re-calibrated directory of all **20 in
 #### Project 5: No-Code Business Website & AI Customer Support Chatbot (For General Students & Non-Coders)
 - **Project ID:** `p13`
 - **Domain:** Software Engineering / Web
-- **Difficulty:** Beginner | **Duration:** 3 weeks | **Points:** 500 | **Team Size:** 1
+- **Difficulty:** Beginner | **Duration:** 4 weeks | **Points:** 500 | **Team Size:** 1
 - **Description:** Build a responsive, modern business website using no-code/low-code builders (Framer, Webflow, or WordPress) and integrate an intelligent AI customer support chatbot (Voiceflow, Chatbase, or Tidio) trained on business FAQs to capture leads and resolve inquiries 24/7 without writing complex code.
 - **Tech Stack:** Framer / Webflow / WordPress, Voiceflow / Chatbase / Tidio, HTML/Script Embeds, Lead Forms & Webhooks, Google Analytics 4
 - **Learning Outcomes:** No-code responsive web layout & UX design, AI knowledge base curation & conversation flows, Third-party script widget embedding & triggers, Lead capture conversion tracking & analytics
@@ -118,7 +118,7 @@ This document contains the comprehensive, re-calibrated directory of all **20 in
 #### Project 6: Security Baseline Audit & Incident Response Playbook
 - **Project ID:** `p_sec2`
 - **Domain:** Cybersecurity & InfoSec
-- **Difficulty:** Beginner | **Duration:** 3 weeks | **Points:** 500 | **Team Size:** 1
+- **Difficulty:** Beginner | **Duration:** 4 weeks | **Points:** 500 | **Team Size:** 1
 - **Description:** Evaluate access control configurations, audit authentication and security event logs, and build a step-by-step Incident Response (IR) playbook for handling phishing and credential compromise.
 - **Tech Stack:** Access Control Matrix, Log Analysis, NIST Cybersecurity Framework, Incident Playbooks, Google Docs / Sheets
 - **Learning Outcomes:** Principle of least privilege auditing, Security event log interpretation, Incident triage & containment workflows, Security policy writing
@@ -144,7 +144,7 @@ This document contains the comprehensive, re-calibrated directory of all **20 in
 #### Project 8: HR Performance Management & OKR Evaluation Framework
 - **Project ID:** `p9`
 - **Domain:** Human Resources (HR)
-- **Difficulty:** Beginner | **Duration:** 3 weeks | **Points:** 500 | **Team Size:** 1
+- **Difficulty:** Beginner | **Duration:** 4 weeks | **Points:** 500 | **Team Size:** 1
 - **Description:** Develop a quarterly OKR (Objectives & Key Results) tracking template, employee self-appraisal rubric, and structured 360-degree performance feedback process.
 - **Tech Stack:** OKR Frameworks, Performance Management, Google Sheets, HR Analytics, Employee Feedback Design
 - **Learning Outcomes:** OKR goal setting methodology, Performance appraisal rubric design, 360-degree feedback framework, Employee growth mapping
@@ -168,7 +168,7 @@ This document contains the comprehensive, re-calibrated directory of all **20 in
 #### Project 10: Outbound Cold Email & Lead Nurturing Campaign
 - **Project ID:** `p10`
 - **Domain:** Sales & Business Development
-- **Difficulty:** Beginner | **Duration:** 3 weeks | **Points:** 500 | **Team Size:** 1
+- **Difficulty:** Beginner | **Duration:** 4 weeks | **Points:** 500 | **Team Size:** 1
 - **Description:** Craft high-converting cold outreach email copy, setup automated drip sequences, conduct A/B subject line experiments, and analyze response rate conversions.
 - **Tech Stack:** Copywriting, Apollo.io / Instantly, Email Deliverability Setup, HubSpot / Mailchimp, A/B Testing
 - **Learning Outcomes:** Cold email copywriting, Email deliverability (SPF/DKIM), A/B testing methodology, Outreach response tracking
@@ -192,7 +192,7 @@ This document contains the comprehensive, re-calibrated directory of all **20 in
 #### Project 13: Content Marketing Strategy & SEO Editorial Calendar
 - **Project ID:** `p11`
 - **Domain:** Digital Marketing & Growth
-- **Difficulty:** Beginner | **Duration:** 3 weeks | **Points:** 500 | **Team Size:** 1
+- **Difficulty:** Beginner | **Duration:** 4 weeks | **Points:** 500 | **Team Size:** 1
 - **Description:** Perform keyword research, design a 3-month topic cluster strategy, write SEO-optimized long-form articles, and setup Google Search Console performance tracking.
 - **Tech Stack:** SEO Copywriting, SurferSEO, WordPress / CMS, Google Search Console, Editorial Calendar
 - **Learning Outcomes:** SEO keyword research & intent, Topic cluster strategy, Search engine content optimization, Editorial calendar management
@@ -201,7 +201,7 @@ This document contains the comprehensive, re-calibrated directory of all **20 in
 #### Project 14: Digital Marketing Circulation, Content Syndication & Growth Engine (Focus on Circulation & Marketing)
 - **Project ID:** `p14`
 - **Domain:** Digital Marketing & Growth
-- **Difficulty:** Beginner | **Duration:** 3 weeks | **Points:** 500 | **Team Size:** 1
+- **Difficulty:** Beginner | **Duration:** 4 weeks | **Points:** 500 | **Team Size:** 1
 - **Description:** Build and execute an organic content circulation and distribution engine that repurposes high-value core insights into multi-platform formats (LinkedIn carousels, X threads, short-form video hooks, and email newsletters) to maximize circulation reach, referral loops, and subscriber acquisition.
 - **Tech Stack:** Content Syndication Frameworks, Email Newsletter (Substack / Mailchimp), Social Scheduling (Buffer / Publer), Canva / CapCut, Audience Analytics (Meta / LinkedIn / GA4)
 - **Learning Outcomes:** 1-to-Many content repurposing & circulation workflows, Viral hook architecture & headline copywriting, Email newsletter audience growth & circulation metrics, Cross-channel engagement tracking & referral loop optimization

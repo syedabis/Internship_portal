@@ -22,17 +22,19 @@ Following architectural refactoring, schema corrections, and feature additions, 
 | **P1-2.2** | Review Flow | Lack of admin submission review interface | 🟢 **RESOLVED** | Added Tab 2: "Deliverable Submissions Review" in admin page with status filters (`pending`, `approved`, `rejected`) and point awards. |
 | **P1-2.3** | Proposals | No mechanism for custom student project proposals | 🟢 **RESOLVED** | Built student proposal modal & drawer + Tab 3 in admin panel to review, award 500 pts, and publish approved proposals to the catalog. |
 | **P2-3.1** | Point Balance | Irregular points distribution across projects | 🟢 **RESOLVED** | Standardized all 20 projects to exactly **500 points** across database, UI, and documentation. |
+| **P2-3.2** | Duration Standard | Variable durations (3 to 4 weeks) | 🟢 **RESOLVED** | Standardized all 20 projects to uniform **4 weeks** (4 weekly milestones @ 125 pts/week = 500 pts). |
 
 ---
 
 ## 1. Verified Architecture & Feature Set
 
-### 1.1 Standardized 500-Point Project Catalog
+### 1.1 Standardized 500-Point & 4-Week Project Catalog
 - **Total Projects:** **20 industry-standard projects** across **11 core domains** (`ai`, `swe`, `cybersecurity`, `hr`, `sales`, `marketing`, `finance`, `operations`, `customersuccess`, `product`, `design`).
+- **Uniform Duration:** Exactly **4 weeks** per project (4 progressive milestones: Week 1 Scoping, Week 2 Framework, Week 3 Execution, Week 4 Rollout & Presentation).
 - **Difficulty Curve:**
-  - **Beginner (40% / 8 Projects):** 3-week guided foundational tracks accessible to non-coders and beginners (including no-code website + AI chatbot, SEO & content marketing, and cold email outreach).
-  - **Intermediate (60% / 12 Projects):** 4-week end-to-end execution deliverables (RAG assistant, full-stack CRUD, security audit, financial modeling).
-- **Point Standardization:** **500 Points** across all capstone projects upon successful evaluation.
+  - **Beginner (8 Projects):** 4-week structured foundational tracks accessible to non-coders and beginners (including no-code website + AI chatbot, SEO & content marketing, and cold email outreach).
+  - **Intermediate (12 Projects):** 4-week end-to-end execution deliverables (RAG assistant, full-stack CRUD, security audit, financial modeling).
+- **Point Standardization:** **500 Points** across all capstone projects upon successful evaluation (125 points per weekly milestone).
 
 ### 1.2 Single Enrolled Active Project Policy
 - Interns are limited to **one active enrolled project** at a time to promote focus and milestone completion.

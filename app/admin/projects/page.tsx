@@ -542,7 +542,7 @@ export default function AdminProjectsPage() {
         description: parsedNotes.problemStatement || 'Custom student capstone project.',
         domain: parsedNotes.domain || 'swe',
         difficulty: assignedDifficulty,
-        duration: parsedNotes.duration || (assignedDifficulty === 'Beginner' ? '3 weeks' : '4 weeks'),
+        duration: parsedNotes.duration || '4 weeks',
         team_size: '1',
         tech_stack: Array.isArray(parsedNotes.techStack) && parsedNotes.techStack.length > 0 ? parsedNotes.techStack : ['Custom Stack'],
         learning_outcomes: [
@@ -1520,8 +1520,9 @@ export default function AdminProjectsPage() {
                     onChange={(e) => setAssignedDifficulty(e.target.value as any)}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold cursor-pointer"
                   >
-                    <option value="Beginner">Beginner (3 weeks)</option>
+                    <option value="Beginner">Beginner (4 weeks)</option>
                     <option value="Intermediate">Intermediate (4 weeks)</option>
+                    <option value="Advanced">Advanced (4 weeks)</option>
                   </select>
                 </div>
 
