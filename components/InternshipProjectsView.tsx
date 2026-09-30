@@ -37,6 +37,7 @@ import {
   ExternalLink,
   FileCheck,
   AlertCircle,
+  XCircle,
   Loader2,
   X,
   Cpu,
@@ -1301,17 +1302,76 @@ export const InternshipProjectsView: React.FC = () => {
                                           </span>
                                         )}
                                       </div>
-                                      <div className="text-[11px] text-slate-500 mt-0.5">
+                                      <div className="text-[11px] mt-0.5">
                                         {!isSelectedActive ? (
                                           <span className="text-slate-500">
                                             You must start this project to unlock deliverable submissions.
                                           </span>
                                         ) : submissions[week.week] ? (
-                                          <span className="flex items-center gap-1.5 font-semibold text-amber-600">
-                                            <Clock className="w-3 h-3" /> Submitted (Pending Review)
-                                          </span>
+                                          <div className="space-y-1.5">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                              {submissions[week.week].status === 'approved' && (
+                                                <span className="flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                                  Approved (+{submissions[week.week].points_awarded || 100} pts)
+                                                </span>
+                                              )}
+                                              {submissions[week.week].status === 'rejected' && (
+                                                <span className="flex items-center gap-1 font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">
+                                                  <XCircle className="w-3 h-3 text-rose-600" />
+                                                  Revisions Requested
+                                                </span>
+                                              )}
+                                              {submissions[week.week].status === 'pending' && (
+                                                <span className="flex items-center gap-1 font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                                                  <Clock className="w-3 h-3 text-amber-600" />
+                                                  Submitted (Under Review)
+                                                </span>
+                                              )}
+                                              <span className="text-slate-400 text-[10px]">
+                                                Updated {new Date(submissions[week.week].updated_at || submissions[week.week].created_at).toLocaleDateString()}
+                                              </span>
+                                            </div>
+
+                                            {/* Mentor Feedback Display */}
+                                            {(() => {
+                                              let parsedNotes: any = {};
+                                              try {
+                                                parsedNotes = JSON.parse(submissions[week.week].notes || '{}');
+                                              } catch {
+                                                parsedNotes = {};
+                                              }
+                                              const feedback = parsedNotes.mentorFeedback || parsedNotes.adminFeedback || '';
+                                              if (!feedback) return null;
+                                              const isRejected = submissions[week.week].status === 'rejected';
+
+                                              return (
+                                                <div
+                                                  className={`p-2.5 rounded-xl border text-xs leading-relaxed flex items-start gap-2 mt-1.5 ${
+                                                    isRejected
+                                                      ? 'bg-rose-50/80 border-rose-200 text-rose-900'
+                                                      : 'bg-purple-50/80 border-purple-200 text-purple-900'
+                                                  }`}
+                                                >
+                                                  <Sparkles
+                                                    className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${
+                                                      isRejected ? 'text-rose-600' : 'text-purple-600'
+                                                    }`}
+                                                  />
+                                                  <div>
+                                                    <span className="font-bold">
+                                                      {isRejected ? 'Mentor Revision Guidance: ' : 'Mentor Feedback: '}
+                                                    </span>
+                                                    <span>{feedback}</span>
+                                                  </div>
+                                                </div>
+                                              );
+                                            })()}
+                                          </div>
                                         ) : (
-                                          'Not submitted yet. Complete deliverables and submit link.'
+                                          <span className="text-slate-500">
+                                            Not submitted yet. Complete deliverables and submit link.
+                                          </span>
                                         )}
                                       </div>
                                     </div>
@@ -1339,9 +1399,13 @@ export const InternshipProjectsView: React.FC = () => {
                                       </a>
                                       <button
                                         onClick={() => setSubmittingWeek(week.week)}
-                                        className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition-colors cursor-pointer"
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                                          submissions[week.week].status === 'rejected'
+                                            ? 'bg-rose-100 hover:bg-rose-200 text-rose-800'
+                                            : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                                        }`}
                                       >
-                                        Update
+                                        {submissions[week.week].status === 'rejected' ? 'Resubmit' : 'Update'}
                                       </button>
                                     </div>
                                   ) : (

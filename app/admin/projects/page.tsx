@@ -35,6 +35,10 @@ import {
   Check,
   Lightbulb,
   Send,
+  Eye,
+  FileText,
+  Link2,
+  User,
 } from 'lucide-react';
 
 export type { Project };
@@ -119,6 +123,33 @@ export default function AdminProjectsPage() {
   const [isProcessingProposal, setIsProcessingProposal] = useState(false);
   const [rejectingProposal, setRejectingProposal] = useState<any | null>(null);
   const [rejectionFeedback, setRejectionFeedback] = useState('');
+
+  // Submission Evaluation & Custom Grading Modal State
+  const [evaluatingSubmission, setEvaluatingSubmission] = useState<ProjectSubmission | null>(null);
+  const [customPointsInput, setCustomPointsInput] = useState('100');
+  const [mentorComment, setMentorComment] = useState('');
+  const [isSavingEvaluation, setIsSavingEvaluation] = useState(false);
+
+  const parseSubmissionNotes = (notesRaw?: string | null): { studentNotes: string; mentorFeedback: string } => {
+    if (!notesRaw) return { studentNotes: '', mentorFeedback: '' };
+    try {
+      const parsed = JSON.parse(notesRaw);
+      if (parsed && typeof parsed === 'object') {
+        return {
+          studentNotes: parsed.studentNotes || parsed.notes || '',
+          mentorFeedback: parsed.mentorFeedback || parsed.adminFeedback || parsed.feedback || '',
+        };
+      }
+    } catch {}
+    return { studentNotes: notesRaw, mentorFeedback: '' };
+  };
+
+  const handleOpenEvaluationModal = (sub: ProjectSubmission) => {
+    setEvaluatingSubmission(sub);
+    const { mentorFeedback } = parseSubmissionNotes(sub.notes);
+    setMentorComment(mentorFeedback || '');
+    setCustomPointsInput(sub.points_awarded > 0 ? String(sub.points_awarded) : '100');
+  };
 
   const getLocalProjects = (): Project[] => {
     try {
@@ -370,15 +401,27 @@ export default function AdminProjectsPage() {
   const handleUpdateSubmissionStatus = async (
     subId: string,
     newStatus: 'pending' | 'approved' | 'rejected',
-    points: number = 0
+    points: number = 0,
+    feedbackText?: string
   ) => {
     setActionLoadingId(subId);
     try {
+      const targetSub = submissions.find((s) => s.id === subId);
+      const { studentNotes, mentorFeedback: existingFeedback } = parseSubmissionNotes(targetSub?.notes);
+      const finalFeedback = feedbackText !== undefined ? feedbackText.trim() : existingFeedback;
+
+      const updatedNotesPayload = JSON.stringify({
+        studentNotes: studentNotes || '',
+        mentorFeedback: finalFeedback || '',
+        evaluatedAt: new Date().toISOString(),
+      });
+
       const { error } = await supabase
         .from('project_submissions')
         .update({
           status: newStatus,
           points_awarded: points,
+          notes: updatedNotesPayload,
           updated_at: new Date().toISOString(),
         })
         .eq('id', subId);
@@ -390,17 +433,28 @@ export default function AdminProjectsPage() {
           newStatus === 'approved'
             ? `Submission approved! (+${points} pts awarded)`
             : newStatus === 'rejected'
-            ? 'Submission marked as rejected.'
-            : 'Submission reset to pending.'
+            ? 'Submission marked as revisions requested.'
+            : 'Evaluation updated.'
         );
         setSubmissions((prev) =>
-          prev.map((s) => (s.id === subId ? { ...s, status: newStatus, points_awarded: points } : s))
+          prev.map((s) =>
+            s.id === subId
+              ? {
+                  ...s,
+                  status: newStatus,
+                  points_awarded: points,
+                  notes: updatedNotesPayload,
+                }
+              : s
+          )
         );
+        setEvaluatingSubmission(null);
       }
     } catch {
       toast.error('Action failed. Check network connection.');
     } finally {
       setActionLoadingId(null);
+      setIsSavingEvaluation(false);
     }
   };
 
@@ -1065,11 +1119,12 @@ export default function AdminProjectsPage() {
             <div className="space-y-3">
               {filteredSubmissions.map((sub) => {
                 const isActionLoading = actionLoadingId === sub.id;
+                const { studentNotes, mentorFeedback } = parseSubmissionNotes(sub.notes);
 
                 return (
                   <div
                     key={sub.id}
-                    className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-start justify-between gap-4 hover:border-slate-300 transition-all"
+                    className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-start justify-between gap-4 hover:border-slate-300 transition-all group"
                   >
                     <div className="space-y-2 flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
@@ -1113,7 +1168,7 @@ export default function AdminProjectsPage() {
                       </div>
 
                       {/* Deliverable URL */}
-                      <div className="pt-1">
+                      <div className="pt-1 flex items-center gap-2 flex-wrap">
                         <a
                           href={sub.deliverable_url}
                           target="_blank"
@@ -1123,15 +1178,35 @@ export default function AdminProjectsPage() {
                           <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
                           <span className="truncate max-w-sm">{sub.deliverable_url}</span>
                         </a>
+
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEvaluationModal(sub)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 text-xs font-bold transition-colors cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Review & Grade</span>
+                        </button>
                       </div>
 
-                      {/* Notes / Reflection */}
-                      {sub.notes && (
+                      {/* Student Notes / Reflection */}
+                      {studentNotes && (
                         <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-600 leading-relaxed mt-2 flex items-start gap-2">
                           <MessageSquare className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
                           <div>
                             <span className="font-bold text-slate-700">Intern Notes: </span>
-                            <span>{sub.notes}</span>
+                            <span>{studentNotes}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Mentor Feedback (if present) */}
+                      {mentorFeedback && (
+                        <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-200/80 text-xs text-purple-900 leading-relaxed mt-1.5 flex items-start gap-2">
+                          <Sparkles className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold text-purple-800">Mentor Feedback: </span>
+                            <span>{mentorFeedback}</span>
                           </div>
                         </div>
                       )}
@@ -1143,12 +1218,21 @@ export default function AdminProjectsPage() {
                         <Loader2 className="w-5 h-5 text-emerald-600 animate-spin" />
                       ) : (
                         <>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEvaluationModal(sub)}
+                            className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                          >
+                            <Eye className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Evaluate</span>
+                          </button>
+
                           {sub.status !== 'approved' && (
                             <button
                               type="button"
                               onClick={() => handleUpdateSubmissionStatus(sub.id, 'approved', 100)}
                               className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow-2xs transition-colors cursor-pointer"
-                              title="Approve deliverable and award 100 points"
+                              title="Quick approve and award 100 points"
                             >
                               <Check className="w-3.5 h-3.5" />
                               <span>Approve (+100 pts)</span>
@@ -1158,23 +1242,12 @@ export default function AdminProjectsPage() {
                           {sub.status !== 'rejected' && (
                             <button
                               type="button"
-                              onClick={() => handleUpdateSubmissionStatus(sub.id, 'rejected', 0)}
+                              onClick={() => handleOpenEvaluationModal(sub)}
                               className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
-                              title="Reject submission"
+                              title="Reject or request revisions with mentor guidance"
                             >
                               <X className="w-3.5 h-3.5" />
                               <span>Reject</span>
-                            </button>
-                          )}
-
-                          {sub.status !== 'pending' && (
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateSubmissionStatus(sub.id, 'pending', 0)}
-                              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-medium transition-colors cursor-pointer"
-                              title="Reset status back to pending"
-                            >
-                              Reset
                             </button>
                           )}
                         </>
@@ -1563,6 +1636,274 @@ export default function AdminProjectsPage() {
           </div>
         </div>
       )}
+      {/* ── Deliverable Evaluation & Custom Grading Modal ── */}
+      {evaluatingSubmission && (() => {
+        const { studentNotes, mentorFeedback } = parseSubmissionNotes(evaluatingSubmission.notes);
+        const marksNum = parseInt(customPointsInput) || 0;
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-[fadeIn_0.15s_ease-out]">
+            <div className="relative w-full max-w-xl bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-5 max-h-[92vh] overflow-y-auto">
+              {/* Header */}
+              <div className="flex items-start justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-sm shadow-emerald-500/20 font-bold">
+                    <FileCheck className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                        Review Deliverable
+                      </h3>
+                      <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-extrabold uppercase">
+                        Week {evaluatingSubmission.week_number}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 font-medium">
+                      Evaluate submission quality, provide guidance, and award points
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEvaluatingSubmission(null)}
+                  className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Student & Project Details Card */}
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center uppercase">
+                      {evaluatingSubmission.user_name?.[0] || evaluatingSubmission.user_email[0]}
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-900">
+                        {evaluatingSubmission.user_name || 'Intern'}
+                      </div>
+                      <div className="text-[11px] text-slate-500">
+                        {evaluatingSubmission.user_email}
+                      </div>
+                    </div>
+                  </div>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide border flex items-center gap-1 ${
+                    evaluatingSubmission.status === 'approved'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                      : evaluatingSubmission.status === 'rejected'
+                      ? 'bg-rose-50 text-rose-700 border-rose-300'
+                      : 'bg-amber-50 text-amber-700 border-amber-300'
+                  }`}>
+                    {evaluatingSubmission.status === 'approved' && <CheckCircle2 className="w-3 h-3" />}
+                    {evaluatingSubmission.status === 'rejected' && <XCircle className="w-3 h-3" />}
+                    {evaluatingSubmission.status === 'pending' && <Clock className="w-3 h-3" />}
+                    <span>{evaluatingSubmission.status}</span>
+                  </span>
+                </div>
+
+                <div className="pt-2 border-t border-slate-200/60">
+                  <div className="text-xs font-bold text-slate-800">
+                    {evaluatingSubmission.project_title}
+                  </div>
+                  <div className="text-[11px] text-slate-500">
+                    Submitted on {new Date(evaluatingSubmission.created_at).toLocaleDateString()} at {new Date(evaluatingSubmission.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Deliverable Link Card */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <ExternalLink className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Submitted Deliverable Link</span>
+                </label>
+                <div className="p-3 rounded-xl bg-emerald-50/60 border border-emerald-200 flex items-center justify-between gap-3">
+                  <span className="text-xs font-semibold text-emerald-950 truncate max-w-sm">
+                    {evaluatingSubmission.deliverable_url}
+                  </span>
+                  <a
+                    href={evaluatingSubmission.deliverable_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors shrink-0"
+                  >
+                    <span>Open Link</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+
+              {/* Intern Reflection / Notes */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <MessageSquare className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Intern Reflection & Notes</span>
+                </label>
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed max-h-36 overflow-y-auto">
+                  {studentNotes ? (
+                    studentNotes
+                  ) : (
+                    <span className="text-slate-400 italic">No additional notes provided by intern.</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Custom Marks Section */}
+              <div className="space-y-2 p-4 rounded-2xl bg-amber-50/40 border border-amber-200/80">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                    <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                    <span>Award Milestone Points</span>
+                  </label>
+                  <span className="text-xs font-black text-amber-700">
+                    +{marksNum} Points
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    max="500"
+                    value={customPointsInput}
+                    onChange={(e) => setCustomPointsInput(e.target.value)}
+                    className="w-32 px-3 py-2 bg-white border border-amber-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                    placeholder="100"
+                  />
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {['50', '75', '100', '125', '500'].map((pts) => (
+                      <button
+                        key={pts}
+                        type="button"
+                        onClick={() => setCustomPointsInput(pts)}
+                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer border ${
+                          customPointsInput === pts
+                            ? 'bg-amber-500 text-white border-amber-600 shadow-2xs'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-50'
+                        }`}
+                      >
+                        +{pts}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Mentor Comments / Guidance Section */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-800 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Mentor Guidance & Comments (Visible to Intern)</span>
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-normal">Markdown supported</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={mentorComment}
+                  onChange={(e) => setMentorComment(e.target.value)}
+                  placeholder="Provide constructive feedback, praise strong points, or explain what revisions are required before approval..."
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+                />
+
+                {/* Quick Feedback Preset Pills */}
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {[
+                    '🌟 Excellent work! Meets all milestone criteria.',
+                    '👍 Good execution! Approved for the next week.',
+                    '⚠️ Please update link sharing permissions to Public.',
+                    '🔄 Revisions needed: Please review week deliverables.',
+                  ].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setMentorComment(preset)}
+                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 text-[10px] font-medium transition-colors cursor-pointer text-left truncate max-w-full"
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Footer Decision Buttons */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEvaluatingSubmission(null)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+
+                <div className="flex items-center gap-2 flex-wrap justify-end">
+                  {/* Save feedback without status change */}
+                  <button
+                    type="button"
+                    disabled={isSavingEvaluation}
+                    onClick={() => {
+                      setIsSavingEvaluation(true);
+                      handleUpdateSubmissionStatus(
+                        evaluatingSubmission.id,
+                        evaluatingSubmission.status,
+                        evaluatingSubmission.points_awarded,
+                        mentorComment
+                      );
+                    }}
+                    className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                  >
+                    Save Notes Only
+                  </button>
+
+                  {/* Reject / Request Revisions */}
+                  <button
+                    type="button"
+                    disabled={isSavingEvaluation}
+                    onClick={() => {
+                      setIsSavingEvaluation(true);
+                      handleUpdateSubmissionStatus(
+                        evaluatingSubmission.id,
+                        'rejected',
+                        0,
+                        mentorComment || 'Revisions requested. Please review feedback.'
+                      );
+                    }}
+                    className="px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    <span>Request Changes</span>
+                  </button>
+
+                  {/* Approve with custom marks */}
+                  <button
+                    type="button"
+                    disabled={isSavingEvaluation}
+                    onClick={() => {
+                      setIsSavingEvaluation(true);
+                      handleUpdateSubmissionStatus(
+                        evaluatingSubmission.id,
+                        'approved',
+                        marksNum,
+                        mentorComment || 'Approved by mentor.'
+                      );
+                    }}
+                    className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                  >
+                    {isSavingEvaluation ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Check className="w-4 h-4" />
+                    )}
+                    <span>Approve (+{marksNum} pts)</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
