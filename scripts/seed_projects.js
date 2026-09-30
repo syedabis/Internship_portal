@@ -40,21 +40,21 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const CASE_STUDIES = {
   ai: {
     company: 'Acme Cloud Intelligence (SaaS Startup)',
-    scenario: 'The company has 500+ internal Notion & Slack docs. Employees waste 12+ hours/week searching for documentation.',
-    targetProblem: 'No central AI system to answer technical questions with verified source citations.',
-    sampleBenchmark: 'A Streamlit / Next.js RAG application connected to a Pinecone vector database that ingests markdown files, processes queries in < 2 seconds, and provides clickable source links.',
+    scenario: 'The company has 200+ internal product markdown docs and FAQs. Employees and trial users waste hours searching for technical answers.',
+    targetProblem: 'Lack of an accessible, accurate AI assistant that answers technical questions with verified source citations.',
+    sampleBenchmark: 'An interactive Streamlit / Next.js AI assistant powered by OpenAI APIs and a lightweight vector store (FAISS/Chroma) that answers queries in <2 seconds with citations.',
   },
   swe: {
     company: 'PayPulse Fintech',
-    scenario: 'Monolithic API service crashes during high-traffic payment processing bursts due to database locking.',
-    targetProblem: 'Lack of containerized microservices, rate limiting, and automated deployment pipelines.',
-    sampleBenchmark: 'A TypeScript microservice built with Node.js/Express, JWT authentication, Redis rate limiting, Docker containerization, and a GitHub Actions CI/CD script.',
+    scenario: 'The operations team relies on manual spreadsheets to track transaction reviews and customer accounts, leading to data errors and lack of access logs.',
+    targetProblem: 'No centralized internal web application with secure authentication and structured CRUD data operations.',
+    sampleBenchmark: 'A clean full-stack web application built with React/Next.js, Node.js, and Supabase/PostgreSQL with JWT authentication, validation, and CRUD operations.',
   },
   cybersecurity: {
     company: 'HealthTech Connect (HIPAA Compliance)',
-    scenario: 'Preparing for a SOC-2 security audit, but lacks vulnerability scanning logs and SIEM incident playbooks.',
-    targetProblem: 'Unidentified OWASP Top 10 vulnerabilities and manual threat detection processes.',
-    sampleBenchmark: 'A detailed OWASP PenTest audit report generated via Burp Suite/OWASP ZAP, complete with CVSS risk scores, proof-of-concept steps, and code remediation snippets.',
+    scenario: 'The startup is preparing for vendor security questionnaires and needs an audit of web application vulnerabilities and access control baselines.',
+    targetProblem: 'Unidentified OWASP vulnerabilities, misconfigured HTTP headers, and lack of a documented incident response playbook.',
+    sampleBenchmark: 'A detailed OWASP Top 10 security audit report using OWASP ZAP and browser tools, complete with CVSS risk scores, proof-of-concept steps, and remediation SOPs.',
   },
   hr: {
     company: 'Nova Workflows (50-Person Remote Team)',
@@ -71,8 +71,8 @@ const CASE_STUDIES = {
   marketing: {
     company: 'Lumina Consumer Brand',
     scenario: 'Paid ad spend is increasing, but CAC (Customer Acquisition Cost) has risen 35% without clear UTM attribution.',
-    targetProblem: 'Inability to track which channels (Search vs Social) drive profitable long-term LTV.',
-    sampleBenchmark: 'An omnichannel marketing strategy report with a live Looker Studio dashboard, UTM tracking framework, and 3 high-converting ad copy templates.',
+    targetProblem: 'Inability to track which channels (Search vs Social vs Email) drive profitable customer acquisition.',
+    sampleBenchmark: 'An omnichannel marketing strategy report with a live Looker Studio dashboard, UTM tracking framework, and high-converting ad copy templates.',
   },
   finance: {
     company: 'Vanguard Logistics',
@@ -82,9 +82,9 @@ const CASE_STUDIES = {
   },
   product: {
     company: 'SaaSFlow Platform',
-    scenario: 'Product team wants to launch a new automated workflow feature but lacks user research validation and prioritization.',
-    targetProblem: 'Risk of building unused features without clear GTM positioning.',
-    sampleBenchmark: 'A GTM Strategy deck in Figma/Miro with RICE feature prioritization matrix, competitive analysis matrix, and 5 user interview synthesis notes.',
+    scenario: 'Product team wants to launch a new workflow automation feature but lacks structured competitive analysis and user prioritization.',
+    targetProblem: 'Risk of building unused features without clear GTM positioning and persona research.',
+    sampleBenchmark: 'A GTM Strategy deck in Figma/Miro with RICE feature prioritization matrix, competitive analysis matrix, and user interview synthesis.',
   },
   operations: {
     company: 'Nexus Global Supply Chain',
@@ -108,75 +108,75 @@ const CASE_STUDIES = {
 
 const RAW_PROJECTS = [
   {
-    title: 'Enterprise AI RAG Knowledge Agent & Vector Pipeline',
-    description: 'Build an end-to-end Retrieval-Augmented Generation (RAG) assistant using LangChain/LlamaIndex, vector embeddings, and OpenAI APIs to query technical documentation.',
+    title: 'AI Document Knowledge Assistant & Q&A App',
+    description: 'Build an interactive Retrieval-Augmented Generation (RAG) assistant using LangChain/LlamaIndex, OpenAI APIs, and a lightweight vector store (FAISS/Chroma) to answer questions from custom documentation with citations.',
     domain: 'ai',
-    difficulty: 'Advanced',
-    duration: '5 weeks',
+    difficulty: 'Intermediate',
+    duration: '4 weeks',
     teamSize: '1–2',
-    techStack: ['Python', 'LangChain', 'OpenAI API', 'Pinecone / Qdrant', 'Streamlit'],
-    learningOutcomes: ['RAG architecture design', 'Vector database indexing', 'Prompt optimization', 'LLM latency benchmarking'],
+    techStack: ['Python', 'LangChain', 'OpenAI API', 'FAISS / Chroma', 'Streamlit'],
+    learningOutcomes: ['RAG architecture & chunking', 'Vector embeddings & similarity search', 'Prompt template design', 'Interactive Streamlit UI development'],
     points: 500,
     popularity: 98,
   },
   {
-    title: 'LLM Prompt Engineering & Fine-Tuning Evaluation',
-    description: 'Construct automated evaluation pipelines, design domain-specific prompt strategies, and format JSONL datasets for fine-tuning open-source language models.',
+    title: 'AI Prompt Engineering & Chatbot Application',
+    description: 'Design domain-specific prompt templates, build an interactive conversational assistant using OpenAI APIs, and create an automated prompt evaluation matrix to benchmark response quality.',
     domain: 'ai',
-    difficulty: 'Intermediate',
-    duration: '4 weeks',
+    difficulty: 'Beginner',
+    duration: '3 weeks',
     teamSize: '1',
-    techStack: ['OpenAI Evals', 'Python / Pandas', 'HuggingFace', 'PromptLayer', 'JSONL Datasets'],
-    learningOutcomes: ['LLM evaluation metrics', 'Dataset curation & cleaning', 'Few-shot prompt design', 'Model alignment auditing'],
-    points: 400,
+    techStack: ['Python', 'OpenAI API', 'Streamlit', 'Prompt Templates', 'JSON / Pandas'],
+    learningOutcomes: ['Prompt engineering best practices', 'System vs User prompt crafting', 'Few-shot prompting techniques', 'Chatbot state management'],
+    points: 500,
     popularity: 95,
   },
   {
-    title: 'Full-Stack Microservices Architecture & API Gateway',
-    description: 'Architect a scalable REST / GraphQL backend with JWT authentication, Redis rate limiting, Docker containerization, and GitHub Actions CI/CD workflows.',
-    domain: 'swe',
-    difficulty: 'Advanced',
-    duration: '5 weeks',
-    teamSize: '2–3',
-    techStack: ['Node.js / Express', 'TypeScript', 'PostgreSQL', 'Docker', 'GitHub Actions'],
-    learningOutcomes: ['Microservice decomposition', 'Database schema migration', 'CI/CD pipeline automation', 'API security & rate limiting'],
-    points: 480,
-    popularity: 96,
-  },
-  {
-    title: 'Real-Time Analytics Dashboard & WebSockets Engine',
-    description: 'Develop a high-performance frontend application using Next.js, WebSockets, and state management to render real-time streaming telemetry and interactive charts.',
+    title: 'Full-Stack Web App with Auth & Database (CRUD)',
+    description: 'Develop a responsive web application featuring user authentication, protected routes, relational database schema (CRUD operations), and automated API endpoint validation.',
     domain: 'swe',
     difficulty: 'Intermediate',
     duration: '4 weeks',
     teamSize: '1–2',
-    techStack: ['React / Next.js', 'TailwindCSS', 'WebSockets', 'Recharts', 'Zustand'],
-    learningOutcomes: ['WebSockets connection lifecycle', 'State management optimization', 'Real-time UI updates', 'Responsive dashboard design'],
-    points: 390,
+    techStack: ['Next.js / React', 'Node.js / Express', 'Supabase / PostgreSQL', 'TailwindCSS', 'TypeScript'],
+    learningOutcomes: ['Full-stack CRUD architecture', 'Relational database schema modeling', 'Secure JWT / OAuth authentication', 'RESTful API route handlers'],
+    points: 500,
+    popularity: 96,
+  },
+  {
+    title: 'Interactive Analytics Dashboard & REST API Integration',
+    description: 'Create a clean, responsive frontend dashboard that fetches data from public/mock REST APIs, transforms JSON data, and visualizes KPIs with interactive charts and filtering controls.',
+    domain: 'swe',
+    difficulty: 'Beginner',
+    duration: '3 weeks',
+    teamSize: '1',
+    techStack: ['React / Next.js', 'TailwindCSS', 'Recharts', 'REST APIs', 'TypeScript'],
+    learningOutcomes: ['API data fetching & error handling', 'Interactive data visualization', 'Component modularity & props design', 'Responsive UI layout'],
+    points: 500,
     popularity: 92,
   },
   {
-    title: 'Web Application Penetration Testing & Vulnerability Audit',
-    description: 'Perform OWASP Top 10 security testing, execute automated vulnerability scans, identify injection flaws, and compile executive remediation reports.',
+    title: 'Web Application Security Audit & OWASP Top 10 Checklist',
+    description: 'Perform a systematic security assessment of web applications using automated scanning tools and browser DevTools, identify OWASP Top 10 vulnerabilities, and write practical remediation code snippets.',
     domain: 'cybersecurity',
-    difficulty: 'Advanced',
-    duration: '5 weeks',
+    difficulty: 'Intermediate',
+    duration: '4 weeks',
     teamSize: '1–2',
-    techStack: ['Burp Suite', 'OWASP ZAP', 'Nmap', 'Threat Modeling', 'Security Remediation'],
-    learningOutcomes: ['OWASP Top 10 exploitation', 'Vulnerability assessment', 'CVSS scoring framework', 'Security patch recommendations'],
+    techStack: ['OWASP ZAP', 'Browser DevTools', 'Security Headers', 'CVSS Scoring', 'Remediation SOPs'],
+    learningOutcomes: ['OWASP Top 10 vulnerability identification', 'Automated vulnerability scanning', 'CVSS severity score calculation', 'Security remediation documentation'],
     points: 500,
     popularity: 97,
   },
   {
-    title: 'SOC SIEM Log Analysis & Threat Detection Playbooks',
-    description: 'Configure SIEM log ingestion rules, detect unauthorized access attempts, analyze network pcap captures, and write automated incident response playbooks.',
+    title: 'Security Baseline Audit & Incident Response Playbook',
+    description: 'Evaluate access control configurations, audit authentication and security event logs, and build a step-by-step Incident Response (IR) playbook for handling phishing and credential compromise.',
     domain: 'cybersecurity',
-    difficulty: 'Intermediate',
-    duration: '4 weeks',
+    difficulty: 'Beginner',
+    duration: '3 weeks',
     teamSize: '1',
-    techStack: ['Splunk / Elastic SIEM', 'Wireshark', 'Log Parser', 'Mitre ATT&CK', 'Incident Playbooks'],
-    learningOutcomes: ['SIEM query syntax (SPL/KQL)', 'Network protocol analysis', 'MITRE ATT&CK mapping', 'Automated containment steps'],
-    points: 420,
+    techStack: ['Access Control Matrix', 'Log Analysis', 'NIST Cybersecurity Framework', 'Incident Playbooks', 'Google Docs / Sheets'],
+    learningOutcomes: ['Principle of least privilege auditing', 'Security event log interpretation', 'Incident triage & containment workflows', 'Security policy writing'],
+    points: 500,
     popularity: 91,
   },
   {
@@ -188,7 +188,7 @@ const RAW_PROJECTS = [
     teamSize: '1–2',
     techStack: ['HRIS Frameworks', 'Notion', 'Excel / Sheets', 'LMS Tools', 'Process Mapping'],
     learningOutcomes: ['End-to-end recruitment funnel', 'Onboarding SLA design', 'Employee retention strategies', 'HR metrics & analytics'],
-    points: 350,
+    points: 500,
     popularity: 94,
   },
   {
@@ -200,31 +200,31 @@ const RAW_PROJECTS = [
     teamSize: '1–2',
     techStack: ['HubSpot CRM', 'Salesforce Logic', 'LinkedIn Sales Navigator', 'Excel Financials', 'Email Automation'],
     learningOutcomes: ['B2B prospecting methodology', 'CRM pipeline optimization', 'Lead scoring algorithms', 'Sales conversion tracking'],
-    points: 380,
+    points: 500,
     popularity: 91,
   },
   {
-    title: 'Omnichannel Digital Growth & ROI Campaign',
-    description: 'Develop a multi-channel digital marketing campaign strategy across Search, Paid Social, and Content Marketing, complete with CAC/LTV forecasting and live ROI analytics dashboards.',
+    title: 'Omnichannel Digital Marketing & Campaign Strategy',
+    description: 'Develop a cohesive multi-channel marketing campaign strategy across Search, Paid Social, and Email, complete with target persona messaging, budget allocation, and ROI tracking dashboards.',
     domain: 'marketing',
-    difficulty: 'Advanced',
-    duration: '5 weeks',
-    teamSize: '2–3',
+    difficulty: 'Intermediate',
+    duration: '4 weeks',
+    teamSize: '1–2',
     techStack: ['Google Analytics 4', 'Meta Ads Manager', 'SEO Tools (Ahrefs/SEMrush)', 'Looker Studio', 'Canva'],
-    learningOutcomes: ['Performance marketing strategy', 'Customer acquisition cost (CAC)', 'UTM attribution modeling', 'Data-driven ad copywriting'],
-    points: 450,
+    learningOutcomes: ['Digital campaign planning', 'Customer acquisition cost (CAC) forecasting', 'UTM tracking & attribution modeling', 'Ad creative & copywriting strategy'],
+    points: 500,
     popularity: 96,
   },
   {
     title: 'Corporate Financial Modeling & Cash Flow Forecast',
-    description: 'Construct a 3-statement financial model, monthly cash flow forecast, and variance analysis system for quarterly operational budgeting and executive decision-making.',
+    description: 'Construct a structured 3-statement financial model, monthly cash flow projection, and variance analysis sheet for operational budgeting and executive decision-making.',
     domain: 'finance',
-    difficulty: 'Advanced',
-    duration: '5 weeks',
+    difficulty: 'Intermediate',
+    duration: '4 weeks',
     teamSize: '1–2',
     techStack: ['Financial Modeling', 'Excel / Sheets (Advanced)', 'Power BI', 'QuickBooks / Xero', 'Variance Analysis'],
     learningOutcomes: ['3-statement financial modeling', 'Cash burn & runway forecasting', 'Budget variance analysis', 'Executive financial reporting'],
-    points: 480,
+    points: 500,
     popularity: 88,
   },
   {
@@ -236,7 +236,7 @@ const RAW_PROJECTS = [
     teamSize: '1–2',
     techStack: ['Operations Process Mapping', 'ERP Systems', 'Excel / Power Pivot', 'SLA Frameworks', 'Risk Assessment'],
     learningOutcomes: ['Vendor SLA management', 'Inventory replenishment logic', 'Operational bottleneck audit', 'Cost reduction strategy'],
-    points: 360,
+    points: 500,
     popularity: 82,
   },
   {
@@ -248,16 +248,16 @@ const RAW_PROJECTS = [
     teamSize: '1–2',
     techStack: ['Zendesk / Freshdesk', 'NPS Analytics', 'Customer Journey Mapping', 'Churn Analysis', 'Gainsight Frameworks'],
     learningOutcomes: ['Net Promoter Score (NPS) methodology', 'Customer health scoring', 'Churn reduction tactics', 'Account expansion playbooks'],
-    points: 340,
+    points: 500,
     popularity: 85,
   },
   {
-    title: 'Product Go-To-Market (GTM) & Competitive Positioning',
-    description: 'Conduct a comprehensive competitive analysis, user persona validation, positioning framework, and RICE feature prioritization matrix for launching a new SaaS product feature.',
+    title: 'Product Go-To-Market (GTM) Strategy & Competitive Analysis',
+    description: 'Conduct a thorough competitive analysis, target persona validation, positioning framework, and RICE feature prioritization roadmap for launching a SaaS feature or product.',
     domain: 'product',
-    difficulty: 'Advanced',
-    duration: '5 weeks',
-    teamSize: '1–3',
+    difficulty: 'Intermediate',
+    duration: '4 weeks',
+    teamSize: '1–2',
     techStack: ['Product Strategy', 'Miro / Figma', 'User Research Methods', 'RICE Prioritization', 'Feature Roadmapping'],
     learningOutcomes: ['GTM product strategy', 'Competitive benchmarking', 'User interview synthesis', 'RICE prioritization framework'],
     points: 500,
@@ -272,7 +272,7 @@ const RAW_PROJECTS = [
     teamSize: '1–2',
     techStack: ['Figma', 'Adobe Illustrator', 'Photoshop', 'Brand Guidelines', 'Visual Asset Design'],
     learningOutcomes: ['Corporate visual identity', 'Brand style guide creation', 'Marketing collateral design', 'Design token consistency'],
-    points: 320,
+    points: 500,
     popularity: 89,
   },
   {
@@ -284,7 +284,7 @@ const RAW_PROJECTS = [
     teamSize: '1',
     techStack: ['OKR Frameworks', 'Performance Management', 'Google Sheets', 'HR Analytics', 'Employee Feedback Design'],
     learningOutcomes: ['OKR goal setting methodology', 'Performance appraisal rubric design', '360-degree feedback framework', 'Employee growth mapping'],
-    points: 260,
+    points: 500,
     popularity: 80,
   },
   {
@@ -296,7 +296,7 @@ const RAW_PROJECTS = [
     teamSize: '1',
     techStack: ['Copywriting', 'Apollo.io / Instantly', 'Email Deliverability Setup', 'HubSpot / Mailchimp', 'A/B Testing'],
     learningOutcomes: ['Cold email copywriting', 'Email deliverability (SPF/DKIM)', 'A/B testing methodology', 'Outreach response tracking'],
-    points: 280,
+    points: 500,
     popularity: 87,
   },
   {
@@ -308,7 +308,7 @@ const RAW_PROJECTS = [
     teamSize: '1',
     techStack: ['SEO Copywriting', 'SurferSEO', 'WordPress / CMS', 'Google Search Console', 'Editorial Calendar'],
     learningOutcomes: ['SEO keyword research & intent', 'Topic cluster strategy', 'Search engine content optimization', 'Editorial calendar management'],
-    points: 270,
+    points: 500,
     popularity: 84,
   },
   {
@@ -320,19 +320,54 @@ const RAW_PROJECTS = [
     teamSize: '1–2',
     techStack: ['Helpdesk Administration', 'Technical Writing', 'Knowledge Base Design', 'Ticket Analytics', 'SLA Management'],
     learningOutcomes: ['SLA escalation rules', 'Knowledge base taxonomy', 'Help center technical writing', 'Support queue optimization'],
-    points: 330,
+    points: 500,
     popularity: 78,
+  },
+  {
+    title: 'No-Code Business Website & AI Customer Support Chatbot',
+    description: 'Build a responsive, modern business website using no-code/low-code builders (Framer, Webflow, or WordPress) and integrate an intelligent AI customer support chatbot (Voiceflow, Chatbase, or Tidio) trained on business FAQs to capture leads and resolve inquiries 24/7 without writing complex backend code.',
+    domain: 'swe',
+    difficulty: 'Beginner',
+    duration: '3 weeks',
+    teamSize: '1',
+    techStack: ['Framer / Webflow / WordPress', 'Voiceflow / Chatbase / Tidio', 'HTML/Script Embeds', 'Lead Forms & Webhooks', 'Google Analytics 4'],
+    learningOutcomes: ['No-code responsive web layout & UX design', 'AI knowledge base curation & conversation flows', 'Third-party script widget embedding & triggers', 'Lead capture conversion tracking & analytics'],
+    points: 500,
+    popularity: 97,
+  },
+  {
+    title: 'Digital Marketing Circulation, Content Syndication & Growth Engine',
+    description: 'Build and execute an organic content circulation and distribution engine that repurposes high-value core insights into multi-platform formats (LinkedIn carousels, X threads, short-form video hooks, and email newsletters) to maximize circulation reach, referral loops, and subscriber acquisition.',
+    domain: 'marketing',
+    difficulty: 'Beginner',
+    duration: '3 weeks',
+    teamSize: '1',
+    techStack: ['Content Syndication Frameworks', 'Email Newsletter (Substack / Mailchimp)', 'Social Scheduling (Buffer / Publer)', 'Canva / CapCut', 'Audience Analytics (Meta / LinkedIn / GA4)'],
+    learningOutcomes: ['1-to-Many content repurposing & circulation workflows', 'Viral hook architecture & headline copywriting', 'Email newsletter audience growth & circulation metrics', 'Cross-channel engagement tracking & referral loop optimization'],
+    points: 500,
+    popularity: 95,
   }
 ];
 
 async function seed() {
-  console.log('Authenticating as admin@datacrumbs.org...');
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.ADMIN_EMAILS?.split(',')[0]?.trim() || 'admin@datacrumbs.org';
-  const adminPassword = process.env.ADMIN_PASSWORD || process.env.ADMIN_PASS || 'admin123';
-  const { data: auth, error: authErr } = await supabase.auth.signInWithPassword({
+  console.log('Authenticating for seed operation...');
+  let adminEmail = process.env.ADMIN_EMAIL || 'aun@datacrumbs.org';
+  let adminPassword = process.env.ADMIN_PASSWORD || 'Password123!';
+  
+  let { data: auth, error: authErr } = await supabase.auth.signInWithPassword({
     email: adminEmail,
     password: adminPassword,
   });
+
+  if (authErr && adminEmail !== 'aun@datacrumbs.org') {
+    console.log('Trying fallback aun@datacrumbs.org...');
+    const retry = await supabase.auth.signInWithPassword({
+      email: 'aun@datacrumbs.org',
+      password: 'Password123!',
+    });
+    auth = retry.data;
+    authErr = retry.error;
+  }
 
   if (authErr) {
     console.error('Authentication failed:', authErr.message);
@@ -350,7 +385,7 @@ async function seed() {
     }
   }
 
-  console.log(`Seeding ${RAW_PROJECTS.length} projects into Supabase...`);
+  console.log(`Seeding ${RAW_PROJECTS.length} calibrated projects (all 500 points) into Supabase...`);
 
   const payload = RAW_PROJECTS.map((p) => {
     const caseStudy = CASE_STUDIES[p.domain] || {
@@ -369,10 +404,10 @@ async function seed() {
       team_size: p.teamSize,
       tech_stack: p.techStack,
       learning_outcomes: p.learningOutcomes,
-      points: p.points,
+      points: 500,
       popularity: p.popularity,
       case_study: caseStudy,
-      final_deliverable: `A comprehensive executive case study for "${p.title}", complete with live dashboards/templates, standardized SOP documentation, and a 3-5 minute video presentation.`,
+      final_deliverable: `A comprehensive executive case study for "${p.title}", complete with working prototype/templates, standardized SOP documentation, and a 3-5 minute video presentation.`,
       evaluation_criteria: [
         'Strategic depth & problem-solving framework (25%)',
         'Execution completeness & template quality (25%)',
@@ -390,7 +425,7 @@ async function seed() {
     process.exit(1);
   }
 
-  console.log(`Successfully seeded ${data.length} projects into Supabase with full case studies and rubrics!`);
+  console.log(`Successfully seeded ${data.length} projects (all 500 points) into Supabase!`);
 }
 
 seed();

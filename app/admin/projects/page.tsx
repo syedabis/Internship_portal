@@ -32,7 +32,9 @@ import {
   MessageSquare,
   AlertCircle,
   XCircle,
-  Check
+  Check,
+  Lightbulb,
+  Send,
 } from 'lucide-react';
 
 export type { Project };
@@ -67,7 +69,7 @@ export interface ProjectSubmission {
 }
 
 export default function AdminProjectsPage() {
-  const [activeTab, setActiveTab] = useState<'projects' | 'submissions'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'submissions' | 'proposals'>('projects');
 
   // Projects State
   const [projects, setProjects] = useState<Project[]>([]);
@@ -87,7 +89,7 @@ export default function AdminProjectsPage() {
   const [teamSize, setTeamSize] = useState('1-2');
   const [techStackText, setTechStackText] = useState('');
   const [outcomesText, setOutcomesText] = useState('');
-  const [points, setPoints] = useState('350');
+  const [points, setPoints] = useState('500');
   const [popularity, setPopularity] = useState('90');
 
   // Advanced Execution Plan Form state
@@ -106,6 +108,17 @@ export default function AdminProjectsPage() {
   const [submissionFilter, setSubmissionFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
   const [submissionSearch, setSubmissionSearch] = useState('');
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+
+  // Proposals State
+  const [proposalFilter, setProposalFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [proposalSearch, setProposalSearch] = useState('');
+  const [approvingProposal, setApprovingProposal] = useState<any | null>(null);
+  const [assignedPoints, setAssignedPoints] = useState('500');
+  const [assignedDifficulty, setAssignedDifficulty] = useState<'Beginner' | 'Intermediate'>('Intermediate');
+  const [adminFeedback, setAdminFeedback] = useState('');
+  const [isProcessingProposal, setIsProcessingProposal] = useState(false);
+  const [rejectingProposal, setRejectingProposal] = useState<any | null>(null);
+  const [rejectionFeedback, setRejectionFeedback] = useState('');
 
   const getLocalProjects = (): Project[] => {
     try {
@@ -144,7 +157,7 @@ export default function AdminProjectsPage() {
           teamSize: p.team_size || p.teamSize || '1-2',
           techStack: p.tech_stack || p.techStack || [],
           learningOutcomes: p.learning_outcomes || p.learningOutcomes || [],
-          points: p.points || 350,
+          points: p.points || 500,
           popularity: p.popularity || 90,
           caseStudy: p.case_study || undefined,
           weeklyPlan: p.weekly_plan || undefined,
@@ -197,7 +210,7 @@ export default function AdminProjectsPage() {
     setTeamSize('1-2');
     setTechStackText('');
     setOutcomesText('');
-    setPoints('350');
+    setPoints('500');
     setPopularity('90');
     setEditingId(null);
     setShowForm(false);
@@ -256,7 +269,7 @@ export default function AdminProjectsPage() {
       team_size: teamSize.trim(),
       tech_stack: techStack,
       learning_outcomes: learningOutcomes,
-      points: parseInt(points) || 350,
+      points: parseInt(points) || 500,
       popularity: parseInt(popularity) || 90,
       case_study: caseStudyData || null,
       weekly_plan: parsedWeeklyPlan || null,
@@ -391,6 +404,12 @@ export default function AdminProjectsPage() {
     }
   };
 
+  const proposals = submissions.filter((s) => s.week_number === 0 || s.project_id?.startsWith('proposal_'));
+  const milestoneSubmissions = submissions.filter((s) => s.week_number > 0 && !s.project_id?.startsWith('proposal_'));
+
+  const pendingSubmissionsCount = milestoneSubmissions.filter((s) => s.status === 'pending').length;
+  const pendingProposalsCount = proposals.filter((s) => s.status === 'pending').length;
+
   const filteredProjects = projects.filter(p => {
     const matchesDomain = domainFilter === 'all' || p.domain === domainFilter;
     const matchesQuery = p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -398,7 +417,7 @@ export default function AdminProjectsPage() {
     return matchesDomain && matchesQuery;
   });
 
-  const filteredSubmissions = submissions.filter((sub) => {
+  const filteredSubmissions = milestoneSubmissions.filter((sub) => {
     const matchesStatus = submissionFilter === 'all' || sub.status === submissionFilter;
     const matchesSearch =
       sub.user_name?.toLowerCase().includes(submissionSearch.toLowerCase()) ||
@@ -408,7 +427,149 @@ export default function AdminProjectsPage() {
     return matchesStatus && matchesSearch;
   });
 
-  const pendingSubmissionsCount = submissions.filter((s) => s.status === 'pending').length;
+  const filteredProposals = proposals.filter((prop) => {
+    const matchesStatus = proposalFilter === 'all' || prop.status === proposalFilter;
+    const matchesSearch =
+      prop.user_name?.toLowerCase().includes(proposalSearch.toLowerCase()) ||
+      prop.user_email?.toLowerCase().includes(proposalSearch.toLowerCase()) ||
+      prop.project_title?.toLowerCase().includes(proposalSearch.toLowerCase()) ||
+      prop.notes?.toLowerCase().includes(proposalSearch.toLowerCase());
+    return matchesStatus && matchesSearch;
+  });
+
+  const handleOpenApproveProposal = (prop: any) => {
+    let parsedNotes: any = {};
+    try {
+      parsedNotes = JSON.parse(prop.notes || '{}');
+    } catch {}
+    setApprovingProposal(prop);
+    setAssignedPoints('500');
+    setAssignedDifficulty(parsedNotes.difficulty === 'Beginner' ? 'Beginner' : 'Intermediate');
+    setAdminFeedback('');
+  };
+
+  const handleConfirmApproveProposal = async () => {
+    if (!approvingProposal) return;
+    setIsProcessingProposal(true);
+    let parsedNotes: any = {};
+    try {
+      parsedNotes = JSON.parse(approvingProposal.notes || '{}');
+    } catch {
+      parsedNotes = { problemStatement: approvingProposal.notes };
+    }
+
+    const pointsNum = parseInt(assignedPoints) || 500;
+    const updatedNotes = {
+      ...parsedNotes,
+      adminFeedback: adminFeedback.trim() || 'Approved by program mentor. Enrolled in custom capstone.',
+      approvedAt: new Date().toISOString(),
+    };
+
+    try {
+      // 1. Update proposal status in project_submissions
+      const { error: subErr } = await supabase
+        .from('project_submissions')
+        .update({
+          status: 'approved',
+          points_awarded: pointsNum,
+          notes: JSON.stringify(updatedNotes),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', approvingProposal.id);
+
+      if (subErr) {
+        toast.error(`Could not update proposal: ${subErr.message}`);
+        return;
+      }
+
+      // 2. Insert into live projects table so it's a real project in the catalog
+      const newProjectPayload = {
+        title: approvingProposal.project_title,
+        description: parsedNotes.problemStatement || 'Custom student capstone project.',
+        domain: parsedNotes.domain || 'swe',
+        difficulty: assignedDifficulty,
+        duration: parsedNotes.duration || (assignedDifficulty === 'Beginner' ? '3 weeks' : '4 weeks'),
+        team_size: '1',
+        tech_stack: Array.isArray(parsedNotes.techStack) && parsedNotes.techStack.length > 0 ? parsedNotes.techStack : ['Custom Stack'],
+        learning_outcomes: [
+          'Custom problem framing & domain execution',
+          'End-to-end milestone delivery',
+          'Executive portfolio presentation',
+        ],
+        points: pointsNum,
+        popularity: 95,
+        case_study: {
+          company: `${approvingProposal.user_name || 'Intern'}'s Capstone Initiative`,
+          scenario: parsedNotes.problemStatement || 'Custom student proposed project.',
+          targetProblem: 'Custom real-world problem statement.',
+          sampleBenchmark: parsedNotes.targetDeliverables || 'Comprehensive deliverable with functional prototype and documentation.',
+        },
+        final_deliverable: parsedNotes.targetDeliverables || 'A comprehensive working prototype, SOP wiki documentation, and video presentation.',
+        evaluation_criteria: [
+          'Strategic depth & problem-solving framework (25%)',
+          'Execution completeness & template quality (25%)',
+          'Data accuracy & analytical rigor (20%)',
+          'Documentation & presentation clarity (15%)',
+          'Tool mastery & automation efficiency (15%)',
+        ],
+      };
+
+      const { error: projErr } = await supabase.from('projects').insert([newProjectPayload]);
+      if (projErr) {
+        console.warn('Notice adding project to table:', projErr.message);
+      }
+
+      toast.success(`Proposal approved! (+${pointsNum} pts awarded & published to portal)`);
+      setApprovingProposal(null);
+      await fetchSubmissions();
+      await fetchProjects();
+    } catch (err: any) {
+      toast.error(`Approval failed: ${err?.message || 'Check network connection'}`);
+    } finally {
+      setIsProcessingProposal(false);
+    }
+  };
+
+  const handleConfirmRejectProposal = async () => {
+    if (!rejectingProposal) return;
+    setIsProcessingProposal(true);
+    let parsedNotes: any = {};
+    try {
+      parsedNotes = JSON.parse(rejectingProposal.notes || '{}');
+    } catch {
+      parsedNotes = { problemStatement: rejectingProposal.notes };
+    }
+
+    const updatedNotes = {
+      ...parsedNotes,
+      adminFeedback: rejectionFeedback.trim() || 'Revisions requested. Please clarify problem scope and tech stack.',
+      reviewedAt: new Date().toISOString(),
+    };
+
+    try {
+      const { error } = await supabase
+        .from('project_submissions')
+        .update({
+          status: 'rejected',
+          notes: JSON.stringify(updatedNotes),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', rejectingProposal.id);
+
+      if (error) {
+        toast.error(`Could not reject proposal: ${error.message}`);
+      } else {
+        toast.success('Feedback recorded & revisions requested from intern.');
+        setRejectingProposal(null);
+        setRejectionFeedback('');
+        await fetchSubmissions();
+      }
+    } catch (err: any) {
+      toast.error(`Action failed: ${err?.message || 'Check connection'}`);
+    } finally {
+      setIsProcessingProposal(false);
+    }
+  };
 
   return (
     <div className="space-y-6 pb-16 font-sans max-w-5xl mx-auto">
@@ -421,7 +582,7 @@ export default function AdminProjectsPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-slate-900">Internship Projects & Tasks</h1>
-            <p className="text-xs text-slate-500 mt-0.5">Manage domain project assignments, execution plans, and review student deliverable submissions.</p>
+            <p className="text-xs text-slate-500 mt-0.5">Manage domain project assignments, execution plans, student deliverables, and custom proposals.</p>
           </div>
         </div>
 
@@ -438,7 +599,7 @@ export default function AdminProjectsPage() {
       </div>
 
       {/* Navigation Sub-Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 flex-wrap">
         <button
           type="button"
           onClick={() => setActiveTab('projects')}
@@ -465,10 +626,31 @@ export default function AdminProjectsPage() {
           }`}
         >
           <FileCheck className="w-4 h-4 text-emerald-400" />
-          <span>Intern Deliverables & Reviews</span>
+          <span>Intern Deliverables ({milestoneSubmissions.length})</span>
           {pendingSubmissionsCount > 0 && (
             <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black">
               {pendingSubmissionsCount} Pending
+            </span>
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab('proposals');
+            fetchSubmissions();
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+            activeTab === 'proposals'
+              ? 'bg-slate-900 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          <Lightbulb className="w-4 h-4 text-purple-400" />
+          <span>Student Proposals ({proposals.length})</span>
+          {pendingProposalsCount > 0 && (
+            <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[10px] font-black">
+              {pendingProposalsCount} Pending
             </span>
           )}
         </button>
@@ -1003,6 +1185,382 @@ export default function AdminProjectsPage() {
               })}
             </div>
           )}
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {/* TAB 3: STUDENT PROJECT PROPOSALS                                       */}
+      {/* ═══════════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'proposals' && (
+        <div className="space-y-4">
+          {/* Filter Bar */}
+          <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs">
+            <div className="relative flex-1 w-full">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search proposals by student, title, or problem statement..."
+                value={proposalSearch}
+                onChange={(e) => setProposalSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+              {(['all', 'pending', 'approved', 'rejected'] as const).map((status) => (
+                <button
+                  key={status}
+                  type="button"
+                  onClick={() => setProposalFilter(status)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer ${
+                    proposalFilter === status
+                      ? 'bg-slate-900 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  {status === 'all' ? 'All Proposals' : status}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Proposals List */}
+          {submissionsLoading ? (
+            <div className="py-16 text-center bg-white rounded-2xl border border-slate-200 shadow-xs">
+              <Loader2 className="w-8 h-8 text-purple-600 animate-spin mx-auto mb-2" />
+              <p className="text-xs text-slate-500">Loading student project proposals...</p>
+            </div>
+          ) : filteredProposals.length === 0 ? (
+            <div className="py-16 text-center bg-white rounded-2xl border border-slate-200 shadow-xs space-y-2">
+              <Lightbulb className="w-10 h-10 text-slate-300 mx-auto" />
+              <h3 className="text-sm font-bold text-slate-700">No project proposals found</h3>
+              <p className="text-xs text-slate-400">
+                {proposalSearch || proposalFilter !== 'all'
+                  ? 'No proposals matched your active search or filter.'
+                  : 'Interns have not submitted any custom project proposals yet.'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {filteredProposals.map((prop) => {
+                let parsedNotes: any = {};
+                try {
+                  parsedNotes = JSON.parse(prop.notes || '{}');
+                } catch {
+                  parsedNotes = { problemStatement: prop.notes };
+                }
+
+                const isPending = prop.status === 'pending';
+                const isApproved = prop.status === 'approved';
+                const isRejected = prop.status === 'rejected';
+
+                return (
+                  <div
+                    key={prop.id}
+                    className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-slate-300 transition-all space-y-4"
+                  >
+                    {/* Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-slate-900 text-sm">{prop.user_name || 'Student Intern'}</span>
+                          <span className="text-xs text-slate-400">• {prop.user_email}</span>
+                          <span className="text-xs text-slate-400">• {new Date(prop.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200">
+                            {parsedNotes.domain?.toUpperCase() || 'CUSTOM DOMAIN'}
+                          </span>
+                          {parsedNotes.difficulty && (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                              Target: {parsedNotes.difficulty} ({parsedNotes.duration || '4 weeks'})
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 border ${
+                            isApproved
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                              : isRejected
+                              ? 'bg-rose-50 text-rose-700 border-rose-300'
+                              : 'bg-amber-50 text-amber-700 border-amber-300'
+                          }`}
+                        >
+                          {isApproved && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
+                          {isPending && <Clock className="w-3.5 h-3.5 text-amber-600" />}
+                          {isRejected && <AlertCircle className="w-3.5 h-3.5 text-rose-600" />}
+                          <span>
+                            {isApproved
+                              ? `Approved (+${prop.points_awarded || 350} pts)`
+                              : isRejected
+                              ? 'Revisions Requested'
+                              : 'Pending Review'}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Proposed Title & Problem */}
+                    <div className="space-y-2">
+                      <h3 className="text-base font-bold text-slate-900">{prop.project_title}</h3>
+                      {parsedNotes.problemStatement && (
+                        <div className="text-xs text-slate-700 leading-relaxed bg-slate-50/80 p-3.5 rounded-xl border border-slate-200/70">
+                          <span className="font-bold text-slate-900 block mb-1">Problem Statement & Scope:</span>
+                          {parsedNotes.problemStatement}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Tech Stack & Deliverables */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      {Array.isArray(parsedNotes.techStack) && parsedNotes.techStack.length > 0 && (
+                        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/60 space-y-1.5">
+                          <span className="font-bold text-slate-800 text-[11px] uppercase tracking-wider block">
+                            Key Tools & Tech Stack
+                          </span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {parsedNotes.techStack.map((tech: string, i: number) => (
+                              <span
+                                key={i}
+                                className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700 text-[11px] font-medium"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {parsedNotes.targetDeliverables && (
+                        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/60 space-y-1">
+                          <span className="font-bold text-slate-800 text-[11px] uppercase tracking-wider block">
+                            Planned Deliverables
+                          </span>
+                          <p className="text-slate-600 text-[11px] leading-relaxed">
+                            {parsedNotes.targetDeliverables}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Reference Link if provided */}
+                    {prop.deliverable_url && prop.deliverable_url !== 'https://datacrumbs.org/proposal' && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-slate-500 font-semibold">Reference Link:</span>
+                        <a
+                          href={prop.deliverable_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-purple-700 hover:text-purple-900 font-bold hover:underline"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span className="truncate max-w-md">{prop.deliverable_url}</span>
+                        </a>
+                      </div>
+                    )}
+
+                    {/* Admin Feedback */}
+                    {parsedNotes.adminFeedback && (
+                      <div className="p-3 rounded-xl bg-purple-50/60 border border-purple-200/80 text-xs text-purple-900 space-y-1">
+                        <span className="font-bold block">Mentor Feedback / Review Notes:</span>
+                        <p>{parsedNotes.adminFeedback}</p>
+                      </div>
+                    )}
+
+                    {/* Review Actions */}
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 flex-wrap">
+                      {isApproved ? (
+                        <span className="text-xs text-emerald-700 font-bold flex items-center gap-1.5 py-1">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          Published to active project catalog
+                        </span>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setRejectingProposal(prop);
+                              setRejectionFeedback(parsedNotes.adminFeedback || '');
+                            }}
+                            className="px-3.5 py-2 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-colors cursor-pointer"
+                          >
+                            Request Revisions
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleOpenApproveProposal(prop)}
+                            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Approve & Add to Portal</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Proposal Approval Modal ── */}
+      {approvingProposal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-[fadeIn_0.15s_ease-out]">
+          <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-5">
+            <div className="flex items-start justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 tracking-tight">Approve Custom Proposal</h3>
+                  <p className="text-xs text-slate-500 font-medium">Publish as official project & award completion points</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setApprovingProposal(null)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-slate-500 font-bold block text-[10px] uppercase tracking-wider mb-1">Proposal Title</span>
+                <span className="text-slate-900 font-bold text-sm">{approvingProposal.project_title}</span>
+                <span className="text-slate-500 block mt-0.5 font-medium">By {approvingProposal.user_name} ({approvingProposal.user_email})</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-800">Assigned Difficulty</label>
+                  <select
+                    value={assignedDifficulty}
+                    onChange={(e) => setAssignedDifficulty(e.target.value as any)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold cursor-pointer"
+                  >
+                    <option value="Beginner">Beginner (3 weeks)</option>
+                    <option value="Intermediate">Intermediate (4 weeks)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-800">Completion Points</label>
+                  <input
+                    type="number"
+                    value={assignedPoints}
+                    onChange={(e) => setAssignedPoints(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold"
+                    placeholder="350"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-800">Mentor Approval Note (Optional)</label>
+                <textarea
+                  rows={2}
+                  placeholder="e.g. Excellent scope. Focus on milestone 2 API validation."
+                  value={adminFeedback}
+                  onChange={(e) => setAdminFeedback(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setApprovingProposal(null)}
+                className="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isProcessingProposal}
+                onClick={handleConfirmApproveProposal}
+                className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
+              >
+                {isProcessingProposal ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                <span>Confirm & Publish Project</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Proposal Revision / Reject Modal ── */}
+      {rejectingProposal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-[fadeIn_0.15s_ease-out]">
+          <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-5">
+            <div className="flex items-start justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-700 flex items-center justify-center shrink-0 border border-rose-200">
+                  <AlertCircle className="w-5 h-5 text-rose-600" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 tracking-tight">Request Proposal Changes</h3>
+                  <p className="text-xs text-slate-500 font-medium">Send mentor feedback to help the intern refine their scope</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRejectingProposal(null)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-slate-900 font-bold block">{rejectingProposal.project_title}</span>
+                <span className="text-slate-500 font-medium">Intern: {rejectingProposal.user_name} ({rejectingProposal.user_email})</span>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-800">
+                  Revision Guidance / Feedback <span className="text-rose-500">*</span>
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  placeholder="Explain what needs to be changed (e.g., Narrow the scope down to 3 deliverables, clarify the database architecture, etc.)"
+                  value={rejectionFeedback}
+                  onChange={(e) => setRejectionFeedback(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setRejectingProposal(null)}
+                className="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isProcessingProposal || !rejectionFeedback.trim()}
+                onClick={handleConfirmRejectProposal}
+                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-50"
+              >
+                {isProcessingProposal ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                <span>Send Revision Request</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
