@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { supabase } from '../lib/supabase';
-import { Menu, UserCheck, Sparkles, X } from 'lucide-react';
+import { Menu, UserCheck, Sparkles, X, Ban, ShieldAlert, AlertTriangle } from 'lucide-react';
 import { InternshipSidebar, InternshipTab } from '../components/InternshipSidebar';
 import { isFeatureAllowedForUser } from '../lib/accessConfig';
 
@@ -56,6 +56,23 @@ export default function Home() {
   const userEmail = user?.email || '';
   const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || (user?.email ? user.email.split('@')[0] : (isLoaded ? 'Guest Intern' : 'Loading...'));
 
+  const [blockedInfo, setBlockedInfo] = useState<{ isBlocked: boolean; record?: any } | null>(null);
+
+  useEffect(() => {
+    if (userEmail) {
+      fetch(`/api/interns/status?email=${encodeURIComponent(userEmail)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.isBlocked) {
+            setBlockedInfo(data);
+          } else {
+            setBlockedInfo(null);
+          }
+        })
+        .catch(err => console.warn('Blocked check error:', err));
+    }
+  }, [userEmail]);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('internship_portal_active_tab', activeTab);
@@ -70,6 +87,11 @@ export default function Home() {
   }, [isLoaded, user]);
 
   const handleTabSelect = (tab: InternshipTab) => {
+    if (blockedInfo?.isBlocked && ['projects', 'chapters', 'freetier'].includes(tab)) {
+      alert('Access Restricted: Your internship access is suspended due to inconsistent performance. Submissions and chapter actions are disabled.');
+      return;
+    }
+
     if (isLoaded && user && !isFeatureAllowedForUser(userEmail, tab)) {
       setBetaModalFeature(tab);
     } else {
@@ -162,42 +184,103 @@ export default function Home() {
           ) : !user ? (
             <RenderLockScreen />
           ) : (
-            <div
-              key={activeTab}
-              className="animate-[fadeSlideIn_0.18s_ease-out]"
-            >
-              {activeTab === 'leaderboard' && (
-                <InternshipLeaderboardView
-                  userName={userName}
-                  userEmail={userEmail}
-                  onNavigateToTab={(tab) => handleTabSelect(tab as InternshipTab)}
-                />
+            <>
+              {/* Prominent Account Suspension Header Banner */}
+              {blockedInfo?.isBlocked && (
+                <div className="mb-6 p-5 rounded-2xl bg-gradient-to-r from-rose-950 via-rose-900 to-red-950 border border-rose-500/50 shadow-xl text-white">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center shrink-0 text-rose-400 mt-0.5 shadow-inner">
+                        <Ban className="w-5 h-5" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500 text-white shadow-xs">
+                            Account Suspended
+                          </span>
+                          <span className="text-xs text-rose-300 font-medium">
+                            Status: Access Revoked &bull; Non-compliant
+                          </span>
+                        </div>
+                        <h2 className="text-base sm:text-lg font-black tracking-tight text-white">
+                          Due to Inconsistent Performance
+                        </h2>
+                        <p className="text-xs sm:text-sm text-rose-200/90 leading-relaxed max-w-3xl">
+                          {blockedInfo.record?.reason || 'Due to inconsistent performance, missed milestone requirements, and unfulfilled weekly deliverables, your participation in the internship has been terminated.'} All further actions (project submissions, chapter participation, and completion certificates) are revoked.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="shrink-0 flex items-center gap-2">
+                      <button
+                        onClick={() => setActiveTab('support')}
+                        className="px-4 py-2 rounded-xl text-xs font-bold bg-white text-rose-900 hover:bg-rose-50 transition-colors shadow-xs"
+                      >
+                        Contact Support
+                      </button>
+                    </div>
+                  </div>
+                </div>
               )}
 
-              {activeTab === 'jobopportunities' && <JobOpportunitiesView />}
+              {/* If blocked and visiting an actionable tab, show restricted lock state */}
+              {blockedInfo?.isBlocked && ['projects', 'chapters', 'freetier'].includes(activeTab) ? (
+                <div className="p-12 text-center bg-white rounded-3xl border border-rose-200 shadow-xs space-y-4 my-4">
+                  <div className="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
+                    <Ban className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-xl font-black text-slate-900">Internship Actions Restricted</h3>
+                  <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+                    Due to inconsistent performance and unfulfilled milestone requirements, your access to project submissions, deliverables, and chapter group participation has been revoked.
+                  </p>
+                  <div className="pt-2">
+                    <button
+                      onClick={() => setActiveTab('support')}
+                      className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+                    >
+                      File an Appeal via Support
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  key={activeTab}
+                  className="animate-[fadeSlideIn_0.18s_ease-out]"
+                >
+                  {activeTab === 'leaderboard' && (
+                    <InternshipLeaderboardView
+                      userName={userName}
+                      userEmail={userEmail}
+                      onNavigateToTab={(tab) => handleTabSelect(tab as InternshipTab)}
+                    />
+                  )}
 
-              {activeTab === 'projects' && <InternshipProjectsView />}
+                  {activeTab === 'jobopportunities' && <JobOpportunitiesView />}
 
-              {activeTab === 'cvaudit' && <CvAuditView />}
+                  {activeTab === 'projects' && <InternshipProjectsView />}
 
-              {activeTab === 'linkedinaudit' && <LinkedinAuditView />}
+                  {activeTab === 'cvaudit' && <CvAuditView />}
 
-              {activeTab === 'documents' && <InternshipDocumentsView />}
+                  {activeTab === 'linkedinaudit' && <LinkedinAuditView />}
 
-              {activeTab === 'resources' && <InternshipResourcesView />}
+                  {activeTab === 'documents' && <InternshipDocumentsView />}
 
-              {activeTab === 'inbox' && <InternshipInboxView userName={userName} userEmail={userEmail} />}
+                  {activeTab === 'resources' && <InternshipResourcesView />}
 
-              {activeTab === 'freetier' && <ProductMarketplaceView />}
+                  {activeTab === 'inbox' && <InternshipInboxView userName={userName} userEmail={userEmail} />}
 
-              {activeTab === 'chapters' && (
-                <ChaptersAmbassadorsView userName={userName} userEmail={userEmail} />
+                  {activeTab === 'freetier' && <ProductMarketplaceView />}
+
+                  {activeTab === 'chapters' && (
+                    <ChaptersAmbassadorsView userName={userName} userEmail={userEmail} />
+                  )}
+
+                  {['announcements', 'support'].includes(activeTab) && (
+                    <InternshipCommunityView type={activeTab as any} />
+                  )}
+                </div>
               )}
-
-              {['announcements', 'support'].includes(activeTab) && (
-                <InternshipCommunityView type={activeTab as any} />
-              )}
-            </div>
+            </>
           )}
         </div>
       </div>

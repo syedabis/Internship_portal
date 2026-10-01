@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Bell, ShoppingBag, BookOpen, HelpCircle, ArrowRight, Sparkles, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Bell, ShoppingBag, BookOpen, HelpCircle, ArrowRight, Sparkles, ShieldCheck, CheckCircle2, UserCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 type Stats = {
@@ -155,8 +155,15 @@ export default function AdminDashboard() {
       <div className="space-y-4">
         <h2 className="text-lg font-bold text-slate-900 tracking-tight">Quick Actions</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
+            {
+              href: '/admin/interns',
+              title: 'Interns & Group Roster',
+              desc: 'Check which candidates joined campus chapters and official WhatsApp groups.',
+              icon: UserCheck,
+              btnText: 'View Interns Roster',
+            },
             {
               href: '/admin/announcements',
               title: 'Post Official Announcement',
