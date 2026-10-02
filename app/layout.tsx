@@ -50,7 +50,6 @@ export const metadata: Metadata = {
   },
 };
 
-
 const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 export default function RootLayout({
@@ -58,19 +57,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <ClerkProvider publishableKey={publishableKey}>
-      <html
-        lang="en"
-        className={`${plusJakartaSans.variable} ${inter.variable} ${poppins.variable} ${bricolageGrotesque.variable} ${dancingScript.variable} ${playfairDisplay.variable} h-full antialiased`}
-      >
-        {/* suppressHydrationWarning covers only <body>'s own attributes, not
-            its children. Browser extensions (ColorZilla adds
-            cz-shortcut-listen, password managers add their own) stamp
-            attributes on <body> before React hydrates, which React reports as
-            a mismatch even though nothing in this app is at fault. */}
-        <body className="min-h-full flex flex-col" suppressHydrationWarning>{children}</body>
-      </html>
-    </ClerkProvider>
+  const content = (
+    <html
+      lang="en"
+      className={`${plusJakartaSans.variable} ${inter.variable} ${poppins.variable} ${bricolageGrotesque.variable} ${dancingScript.variable} ${playfairDisplay.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>{children}</body>
+    </html>
   );
+
+  if (publishableKey) {
+    return <ClerkProvider publishableKey={publishableKey}>{content}</ClerkProvider>;
+  }
+
+  return content;
 }

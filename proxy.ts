@@ -1,5 +1,5 @@
-import { clerkMiddleware } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { isAdminEmail } from '@/lib/adminEmails';
 
 function parseJwt(token: string) {
@@ -21,12 +21,7 @@ function parseJwt(token: string) {
   }
 }
 
-// File is named `proxy.ts`, not `middleware.ts` — Next.js 16 renamed the
-// middleware convention to "proxy" (see node_modules/next/dist/docs/01-app/
-// 03-api-reference/03-file-conventions/proxy.md). clerkMiddleware() still
-// returns a plain (request) => response function, so it works unchanged
-// under the new file name/convention.
-export default clerkMiddleware(async (_auth, req) => {
+export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Enforce server-side Admin Guard for all /admin routes except /admin/login
@@ -65,7 +60,7 @@ export default clerkMiddleware(async (_auth, req) => {
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: [
