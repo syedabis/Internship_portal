@@ -290,23 +290,22 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
       setChapters(updatedChapters);
       saveLocalChapters(updatedChapters);
 
-      // Save to Supabase
+      // Save to Supabase via server API route
       try {
-        await supabase.from('ambassadors').insert([{
-          name: ambName,
-          email: ambEmail,
-          phone: formattedPhone,
-          university: ambUni,
-          chapter_id: selectedChapter.id,
-          chapter_name: selectedChapter.name,
-          status: 'Active'
-        }]);
-
-        await supabase.from('chapters')
-          .update({ members_count: (selectedChapter.members_count || 0) + 1 })
-          .eq('id', selectedChapter.id);
+        await fetch('/api/ambassadors', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: ambName,
+            email: ambEmail,
+            phone: formattedPhone,
+            university: ambUni,
+            chapter_id: selectedChapter.id,
+            chapter_name: selectedChapter.name
+          })
+        });
       } catch (err) {
-        console.log('Supabase sync skipped:', err);
+        console.log('Ambassador API sync skipped:', err);
       }
     }
 

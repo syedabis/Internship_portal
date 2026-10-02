@@ -263,6 +263,7 @@ export default function AdminChaptersPage() {
 
   const filteredAmbassadors = ambassadors.filter(a =>
     a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (a.email && a.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
     a.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
     a.university.toLowerCase().includes(searchQuery.toLowerCase()) ||
     a.chapter_name.toLowerCase().includes(searchQuery.toLowerCase())
