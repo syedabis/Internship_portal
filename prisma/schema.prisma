@@ -213,3 +213,16 @@ model ProfileBuilderIssue {
   @@index([status])
   @@map("profile_builder_issues")
 }
+
+// Blocked interns / candidates whose portal access and actions are revoked
+model BlockedIntern {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String   @unique
+  name      String?
+  reason    String   @default("Due to inconsistent performance and unfulfilled milestone requirements")
+  blockedBy String?  @default("Admin") @map("blocked_by")
+  blockedAt DateTime @default(now()) @map("blocked_at")
+
+  @@map("internship_blocked_interns")
+}
+

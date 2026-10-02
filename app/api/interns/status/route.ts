@@ -9,6 +9,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ isBlocked: false });
   }
 
-  const status = checkInternBlocked(email);
+  const status = await checkInternBlocked(email);
   return NextResponse.json(status);
 }

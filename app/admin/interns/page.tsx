@@ -283,7 +283,7 @@ export default function AdminInternsPage() {
       const wasJoined = selectedInternForBlock.hasJoinedGroup;
 
       setInterns(prev => prev.map(item => {
-        if (item.email.toLowerCase() === selectedInternForBlock.email.toLowerCase()) {
+        if (item.email.toLowerCase().trim() === selectedInternForBlock.email.toLowerCase().trim()) {
           return {
             ...item,
             isBlocked: true,
@@ -327,7 +327,7 @@ export default function AdminInternsPage() {
       if (!res.ok) throw new Error('Failed to unblock intern');
 
       setInterns(prev => prev.map(item => {
-        if (item.email.toLowerCase() === intern.email.toLowerCase()) {
+        if (item.email.toLowerCase().trim() === intern.email.toLowerCase().trim()) {
           return {
             ...item,
             isBlocked: false,

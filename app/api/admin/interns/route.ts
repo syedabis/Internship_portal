@@ -31,7 +31,7 @@ export async function GET(req: Request) {
     }
 
     // Read Blocked interns list
-    const blockedMap = getBlockedInterns();
+    const blockedMap = await getBlockedInterns();
 
     // Fetch chapters and ambassadors from Supabase
     let chapters = INITIAL_CHAPTERS;
@@ -157,7 +157,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Email is required' }, { status: 400 });
       }
 
-      const blockedRecord = blockIntern(email, reason, name, auth.email);
+      const blockedRecord = await blockIntern(email, reason, name, auth.email);
 
       // Also update ambassadors table if exists
       try {
@@ -183,7 +183,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Email is required' }, { status: 400 });
       }
 
-      unblockIntern(email);
+      await unblockIntern(email);
 
       // Also update ambassadors table if exists
       try {
