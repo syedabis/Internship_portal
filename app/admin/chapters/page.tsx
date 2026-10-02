@@ -85,9 +85,15 @@ export default function AdminChaptersPage() {
       if (cData && cData.length > 0) setChapters(cData as Chapter[]);
       else setChapters(localC);
 
-      const { data: aData } = await supabase.from('ambassadors').select('*').order('created_at', { ascending: false });
-      if (aData && aData.length > 0) setAmbassadors(aData as Ambassador[]);
-      else setAmbassadors(localA);
+      const res = await fetch('/api/ambassadors');
+      const json = await res.json();
+      if (json && json.success && json.ambassadors && json.ambassadors.length > 0) {
+        setAmbassadors(json.ambassadors as Ambassador[]);
+      } else {
+        const { data: aData } = await supabase.from('ambassadors').select('*').order('created_at', { ascending: false });
+        if (aData && aData.length > 0) setAmbassadors(aData as Ambassador[]);
+        else setAmbassadors(localA);
+      }
     } catch {
       setChapters(localC);
       setAmbassadors(localA);

@@ -226,3 +226,20 @@ model BlockedIntern {
   @@map("internship_blocked_interns")
 }
 
+// Registered campus ambassadors
+model Ambassador {
+  id           String   @id @default(cuid())
+  name         String
+  email        String
+  phone        String
+  university   String
+  chapterId    String?  @map("chapter_id")
+  chapterName  String   @map("chapter_name")
+  status       String   @default("Active")
+  isGroupAdmin Boolean  @default(false) @map("is_group_admin")
+  notes        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("internship_ambassadors")
+}
+
