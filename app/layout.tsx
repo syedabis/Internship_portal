@@ -50,25 +50,21 @@ export const metadata: Metadata = {
   },
 };
 
-const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_test_bmVhdC1sZW11ci0xOS5jbGVyay5hY2NvdW50cy5kZXYk";
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const content = (
-    <html
-      lang="en"
-      className={`${plusJakartaSans.variable} ${inter.variable} ${poppins.variable} ${bricolageGrotesque.variable} ${dancingScript.variable} ${playfairDisplay.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>{children}</body>
-    </html>
+  return (
+    <ClerkProvider publishableKey={publishableKey}>
+      <html
+        lang="en"
+        className={`${plusJakartaSans.variable} ${inter.variable} ${poppins.variable} ${bricolageGrotesque.variable} ${dancingScript.variable} ${playfairDisplay.variable} h-full antialiased`}
+      >
+        <body className="min-h-full flex flex-col" suppressHydrationWarning>{children}</body>
+      </html>
+    </ClerkProvider>
   );
-
-  if (publishableKey) {
-    return <ClerkProvider publishableKey={publishableKey}>{content}</ClerkProvider>;
-  }
-
-  return content;
 }
