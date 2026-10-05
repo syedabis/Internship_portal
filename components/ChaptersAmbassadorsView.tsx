@@ -187,9 +187,14 @@ export const ChaptersAmbassadorsView: React.FC<ChaptersAmbassadorsViewProps> = (
         setChapters(localC);
       }
 
-      const { data: aData } = await supabase.from('ambassadors').select('*').order('created_at', { ascending: false });
-      if (aData && aData.length > 0) {
-        setAmbassadors(aData as Ambassador[]);
+      try {
+        const res = await fetch('/api/ambassadors');
+        const data = await res.json();
+        if (data.success && data.ambassadors && data.ambassadors.length > 0) {
+          setAmbassadors(data.ambassadors);
+        }
+      } catch (apiErr) {
+        console.warn('Failed to fetch merged ambassadors:', apiErr);
       }
     } catch {
       setChapters(localC);
