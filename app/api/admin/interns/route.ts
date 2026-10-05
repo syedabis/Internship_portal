@@ -7,6 +7,7 @@ import { parseInternsCSV, mergeInternsWithGroups, loadApplicationsPhoneMap } fro
 import { supabase } from '@/lib/supabase';
 import { INITIAL_CHAPTERS, INITIAL_AMBASSADORS } from '@/lib/chaptersData';
 import { getBlockedInterns, blockIntern, unblockIntern } from '@/lib/blockedInterns';
+import { db } from '@/lib/db';
 
 const INTERNS_CSV_PATH = path.join(process.cwd(), 'interns.csv');
 const APPLICATIONS_CSV_PATH = path.join(process.cwd(), 'number_email - Applications.csv');
@@ -48,13 +49,45 @@ export async function GET(req: Request) {
         chapters = dbChapters;
       }
 
+      const ambMap = new Map<string, any>();
+      ambassadors.forEach(a => {
+        if (a.email) ambMap.set(a.email.toLowerCase().trim(), a);
+      });
+
+      try {
+        const prismaAmbs = await db.ambassador.findMany();
+        prismaAmbs.forEach(a => {
+          ambMap.set(a.email.toLowerCase().trim(), {
+            id: a.id,
+            name: a.name,
+            email: a.email,
+            phone: a.phone,
+            university: a.university,
+            chapter_id: a.chapterId,
+            chapter_name: a.chapterName,
+            status: a.status,
+            is_group_admin: a.isGroupAdmin,
+            notes: a.notes,
+            created_at: a.createdAt,
+          });
+        });
+      } catch (e) {
+        console.warn('Admin Interns DB query fallback mapped Prisma error:', e);
+      }
+
       const { data: dbAmbassadors, error: aErr } = await supabase
         .from('ambassadors')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (!aErr && dbAmbassadors && dbAmbassadors.length > 0) {
-        ambassadors = dbAmbassadors;
+        dbAmbassadors.forEach(a => {
+          if (a.email) ambMap.set(a.email.toLowerCase().trim(), a);
+        });
+      }
+      
+      if (ambMap.size > 0) {
+        ambassadors = Array.from(ambMap.values());
       }
     } catch (dbErr) {
       console.warn('Admin Interns DB query fallback to defaults:', dbErr);
@@ -131,6 +164,22 @@ export async function POST(req: Request) {
         chapter_name: chapterName,
         status: 'Active',
       };
+
+      try {
+        await db.ambassador.create({
+          data: {
+            name: newAmbassador.name,
+            email: newAmbassador.email,
+            phone: newAmbassador.phone,
+            university: newAmbassador.university,
+            chapterId: newAmbassador.chapter_id,
+            chapterName: newAmbassador.chapter_name,
+            status: newAmbassador.status,
+          }
+        });
+      } catch (dbErr) {
+        console.warn('Prisma ambassador insert warning:', dbErr);
+      }
 
       try {
         const { error: insertErr } = await supabase
