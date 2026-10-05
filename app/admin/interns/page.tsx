@@ -78,7 +78,7 @@ export default function AdminInternsPage() {
   const fetchInternsData = async () => {
     try {
       setRefreshing(true);
-      const res = await fetch('/api/admin/interns');
+      const res = await fetch('/api/admin/interns', { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } });
       if (!res.ok) throw new Error('Failed to fetch interns');
       const data = await res.json();
       if (data.success) {

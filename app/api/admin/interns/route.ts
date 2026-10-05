@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import { requireAdmin } from '@/lib/adminAuth';
 import fs from 'fs';
 import path from 'path';

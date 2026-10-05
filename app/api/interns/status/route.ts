@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import { checkInternBlocked } from '@/lib/blockedInterns';
 
 export async function GET(req: Request) {
